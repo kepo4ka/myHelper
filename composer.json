@@ -1,0 +1,17 @@
+{
+    "name": "kepo4ka/helper",
+    "description": "A simple hello world composer package",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "kepo4ka",
+            "email": "ksdfsad@asfsef.se"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {"Helper\\": "php/"}
+    },
+    "require": {}
+}
