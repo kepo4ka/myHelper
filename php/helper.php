@@ -42,13 +42,14 @@ class Helper
             curl_setopt($ch, CURLOPT_REFERER, $z['refer']);
         }
 
-
         if (!empty($z['post'])) {
+            $ch = self::setHeaders_Form($ch);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($z['post']));
         }
 
         if (!empty($z['json'])) {
+            $ch = self::setHeaders_JSON($ch);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($z['json']));
         }
@@ -58,15 +59,7 @@ class Helper
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiePath);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiePath);
-
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-        if (!empty($z['is_form'])) {
-            $ch = self::setHeaders_Form($ch);
-        }
-        if (!empty($z['is_json'])) {
-            $ch = self::setHeaders_JSON($ch);
-        }
 
         if (!empty($z['headers'])) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $z['headers']);
@@ -138,7 +131,6 @@ class Helper
         }
         return $line;
     }
-
 
 
     /**
