@@ -7,8 +7,6 @@ use Exception;
 
 class Helper
 {
-
-
     /**
      * Выполнить запрос
      * @param $url string Адрес, куда будет отправлен запрос
