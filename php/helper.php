@@ -128,6 +128,20 @@ class Helper
         return $line;
     }
 
+    public
+    static function getRandUserAgent($file = __DIR__ . 'assets/useragents.txt')
+    {
+        $line = '';
+        try {
+            $f_contents = @file($file);
+            $line = @$f_contents[rand(0, count($f_contents) - 1)];
+        } catch (Exception $exception) {
+
+        }
+        return $line;
+    }
+
+
 
     /**
      * Выделить Ip-адрес из строки
