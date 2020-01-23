@@ -127,7 +127,7 @@ class Helper
     }
 
     public
-    static function getRandUserAgent($file = __DIR__ . 'assets/useragents.txt')
+    static function getRandUserAgent($file = __DIR__ . '/assets/useragents.txt')
     {
         $line = '';
         try {
