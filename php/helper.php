@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Helper;
+namespace MyHelper;
 
 use Exception;
 
@@ -26,17 +26,15 @@ class Helper
             $url .= '?' . http_build_query($z['params']);
         }
 
-
         $useragent = $config['current_user_agent'];
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_AUTOREFERER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-//    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-//    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
 
-        if (!empty($config['def_proxy_info'])) {
+
+        if (!empty($config['def_proxy_info']) && empty($z['no_proxy'])) {
             curl_setopt($ch, CURLOPT_PROXYTYPE, $config['def_proxy_info']['type']);
             curl_setopt($ch, CURLOPT_PROXY, $config['def_proxy_info']['full']);
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, $config['def_proxy_info']['auth']);
@@ -47,12 +45,14 @@ class Helper
         }
 
 
-        if (!empty($z['is_post'])) {
+        if (!empty($z['post'])) {
             curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($z['post']));
         }
 
-        if (!empty($z['post'])) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $z['post']);
+        if (!empty($z['json'])) {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($z['json']));
         }
 
         curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
@@ -63,6 +63,12 @@ class Helper
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
+        if (!empty($z['is_form'])) {
+            $ch = self::setHeaders_Form($ch);
+        }
+        if (!empty($z['is_json'])) {
+            $ch = self::setHeaders_JSON($ch);
+        }
 
         if (!empty($z['headers'])) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $z['headers']);
@@ -75,32 +81,51 @@ class Helper
     }
 
 
-    /**
-     * Получить список аккаунтов из файла
-     * @return array Список аккаунтов для авторизации
-     */
-    public static function getAccounts()
+    public static function setHeaders_Form($ch)
     {
-        global $config;
-        $config['accounts_list'] = array();
+        $headers = [
+            "Accept: */*",
+            "Accept-Encoding: gzip, deflate",
+            "Cache-Control: no-cache",
+            "Connection: keep-alive",
+            "Content-Type: application/x-www-form-urlencoded",
+            "cache-control: no-cache"
+        ];
 
-        $url = 'http://localhost/accounts.txt';
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        return $ch;
+    }
 
-        $data = self::fetchNoProxy($url);
+    public static function setHeaders_JSON($ch)
+    {
+        $headers = [
+            "application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Cache-Control: no-cache",
+            "Connection: keep-alive",
+            "Content-Type: application/json;charset=UTF-8",
+            "cache-control: no-cache",
+            "Sec-Fetch-Site: same-origin",
+            "Sec-Fetch-Mode: cors",
+        ];
 
-        $lines = preg_split('/\n/m', trim($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        return $ch;
+    }
 
-        $info = array();
 
-        foreach ($lines as $line) {
-            $split = explode(':', $line);
-            $info['login'] = trim($split[1]);
-            $info['password'] = trim($split[2]);
+    public
+    static function getRandLineFromFile($file)
+    {
+        $line = '';
+        try {
+            $f_contents = @file($file);
+            $line = @$f_contents[rand(0, count($f_contents) - 1)];
+        } catch (Exception $exception) {
 
-            $config['accounts_list'][] = $info;
         }
-
-        return $config['accounts_list'];
+        return $line;
     }
 
 
@@ -109,7 +134,8 @@ class Helper
      * @param $str string Исходная строка
      * @return bool|mixed Ip-адрес
      */
-    public static function getIpReg($str)
+    public
+    static function getIpReg($str)
     {
         $matches = array();
         preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/m', $str, $matches);
@@ -125,7 +151,8 @@ class Helper
      * Очистить Cookie
      * @return bool Результат операции
      */
-    public static function clearCookie()
+    public
+    static function clearCookie()
     {
         try {
             $cookiePath = self::getCookiePath();
@@ -144,15 +171,20 @@ class Helper
      * @param int $index Индекс группы совпадений
      * @return mixed|string Совпадение
      */
-    public static function checkRegular($re, $str, $index = 1)
+    public
+    static function checkRegular($re, $str, $index = 1)
     {
         $result = '';
-        $matches = array();
+        try {
+            $matches = array();
 
-        if (preg_match($re, $str, $matches)) {
-            if (!empty($matches[$index])) {
-                $result = $matches[$index];
+            if (preg_match($re, $str, $matches)) {
+                if (!empty($matches[$index])) {
+                    $result = $matches[$index];
+                }
             }
+        } catch (Exception $exception) {
+
         }
         return $result;
     }
@@ -163,8 +195,13 @@ class Helper
      * @param $array array Исходный массив
      * @return bool Результут проверки
      */
-    public static function checkArrayFilled($array)
+    public
+    static function checkArrayFilled($array)
     {
+        if (!is_array($array)) {
+            return false;
+        }
+
         foreach ($array as $key => $value) {
             if (empty($array[$key])) {
                 return false;
@@ -178,7 +215,8 @@ class Helper
      * Функция Random, аналогичная функции в JavaScript
      * @return float|int Случайное значение
      */
-    public static function jsRandom()
+    public
+    static function jsRandom()
     {
         return mt_rand() / (mt_getrandmax() + 1);
     }
@@ -189,7 +227,8 @@ class Helper
      * @param $string
      * @return bool|string
      */
-    public static function delApostrof($string)
+    public
+    static function delApostrof($string)
     {
         $bad_symbol = '"';
         $count = substr_count($string, $bad_symbol);
@@ -208,7 +247,8 @@ class Helper
      * @param $var mixed Переменная
      * @param bool $no_exit Прерывать ли работу всего скрипта
      */
-    public static function echoVarDumpPre($var, $no_exit = false)
+    public
+    static function echoVarDumpPre($var, $no_exit = false)
     {
         echo '<pre>';
         var_dump($var);
@@ -223,7 +263,8 @@ class Helper
      * Вывод в виде JSON
      * @param $var mixed Переменная для вывода
      */
-    public static function echoBr($var)
+    public
+    static function echoBr($var)
     {
         echo json_encode($var, JSON_UNESCAPED_UNICODE);
         echo '<hr>';
@@ -235,7 +276,8 @@ class Helper
      * @param bool $second Использовать обычный или обратный слэш, при генерации Пути
      * @return bool|string Путь
      */
-    public static function getCookiePath($second = false)
+    public
+    static function getCookiePath($second = false)
     {
         global $config;
 
@@ -243,7 +285,7 @@ class Helper
             return false;
         }
 
-       self::makeDir(dirname(__FILE__) . '\cookies');
+        self::makeDir(dirname(__FILE__) . '\cookies');
 
         $full_path = dirname(__FILE__) . '\cookies/' . $config['proccess_id'] . '.txt';
         if ($second) {
@@ -257,7 +299,8 @@ class Helper
      * Получить Адрес сайта
      * @return string Адрес
      */
-    public static function base_url()
+    public
+    static function base_url()
     {
         return strtok(sprintf(
             "%s://%s%s",
@@ -274,7 +317,8 @@ class Helper
      * @param string $separator Разделитель
      * @return bool|string Часть Url
      */
-    public static function urlLastPart($url, $separator = '/')
+    public
+    static function urlLastPart($url, $separator = '/')
     {
         if (empty($url)) {
             return false;
@@ -295,20 +339,148 @@ class Helper
      * @param $path string Путь до папки
      * @return bool Результат операции
      */
-    public static function makeDir($path)
+    public
+    static function makeDir($path)
     {
         return is_dir($path) || mkdir($path);
     }
 
 
-    public static function inputFilter($var)
+    /**
+     * Валидация значения
+     * @param $input string Исходное значение
+     * @param null $link MYSQLI LINK
+     * @return mixed|string "Очищенное" значение
+     */
+    public
+    static function inputFilter($input)
     {
-        $var = preg_replace('/[^\w]/m', '', $var);
-        return $var;
+        $input = trim($input);
+        $input = html_entity_decode($input);
+
+        $input = strip_tags($input);
+
+        $input = self::regexpFilter($input);
+        $input = self::scriptFilter($input);
+        return $input;
     }
 
 
-    public static function resize_image($file, $w, $h, $type = 'jpeg', $crop = FALSE)
+    /**
+     * Очистка от js тэга
+     * @param $input string Исходное значение
+     * @return mixed "Очищенное" значение
+     */
+    public
+    static function scriptFilter($input)
+    {
+        return str_replace('script', '', $input);
+    }
+
+
+    /**
+     * Очистка строки от "плохих" символов
+     * @param $input string Исходная строка
+     * @return string "Очищенная" строка
+     */
+    public
+    static function regexpFilter($input)
+    {
+        return preg_replace('/[^_\w\s\-+=,.\\/@#$^&\(\)\{\}\[\]!:]/u', '', $input);
+    }
+
+
+    /**
+     * Форматирование строки перед выводом
+     * @param $text string Исходная строка
+     * @return mixed|string Отформатированная строка
+     */
+    function readableText($text)
+    {
+        $formatted_text = preg_replace('/[_-]/', ' ', $text);
+        $formatted_text = ucwords($formatted_text);
+        return $formatted_text;
+    }
+
+
+    /**
+     * UTF8 encode
+     * @param $d
+     * @return array|string
+     */
+    public
+    static function utf8ize($d)
+    {
+        if (is_array($d)) {
+            foreach ($d as $k => $v) {
+                $d[$k] = self::utf8ize($v);
+            }
+        } else if (is_string($d)) {
+            return utf8_encode($d);
+        }
+        return $d;
+    }
+
+    /**
+     * Получить максимальное значение по ключу в ассоциативном массиве
+     * @param $array array Исходный массив
+     * @param $key_name string Ключ
+     * @return mixed|string Максимум
+     */
+    public
+    static function max_array_value($array, $key_name)
+    {
+        $max = '';
+        foreach ($array as $key => $value) {
+            $make_array[] = $value[$key_name];
+            $max = max($make_array);
+        }
+        return $max;
+    }
+
+
+    /**
+     * Получить минимальное значение по ключу в ассоциативном массиве
+     * @param $array array Исходный массив
+     * @param $key_name string Ключ
+     * @return mixed|string Минимум
+     */
+    public
+    static function min_array_value($array, $key_name)
+    {
+        $max = '';
+        foreach ($array as $key => $value) {
+            $make_array[] = $value[$key_name];
+            $max = min($make_array);
+        }
+        return $max;
+    }
+
+
+    public
+    static function checkListItemExist($list, $list_key, $value)
+    {
+        foreach ($list as $item) {
+            if ($item[$list_key] == $value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public
+    static function locationJs($url)
+    {
+        ?>
+        <script>
+            location.href = '<?=$url?>';
+        </script>
+        <?php
+    }
+
+
+    public
+    static function resize_image($file, $w, $h, $type = 'jpeg', $crop = FALSE)
     {
         list($width, $height) = getimagesize($file);
         $r = $width / $height;
@@ -358,7 +530,8 @@ class Helper
      * @param string $directory Путь к папке
      * @return array Список изображений
      */
-    public static function getDirectoryImages($directory = '../assets/images/')
+    public
+    static function getDirectoryImages($directory = '../assets/images/')
     {
         $images_array = array();
         $allowed_types = array("jpg", "jpeg", "bmp", "png", "gif", "ico", "svg");  //разрешеные типы изображений
@@ -401,7 +574,8 @@ class Helper
      * @param $string - Строка на кирилице
      * @return string - Строка для латинице
      */
-    public static function rus2translit($string)
+    public
+    static function rus2translit($string)
     {
         $converter = array(
             'а' => 'a', 'б' => 'b', 'в' => 'v',
@@ -436,7 +610,8 @@ class Helper
      * @param $str - исходная строка
      * @return mixed|string строка для url
      */
-    public static function str2url($str)
+    public
+    static function str2url($str)
     {
         // переводим в транслит
         $str = self:: rus2translit($str);
@@ -450,7 +625,8 @@ class Helper
     }
 
 
-    public static function json_encodeKirilica($val)
+    public
+    static function json_encodeKirilica($val)
     {
         return json_encode($val, JSON_UNESCAPED_UNICODE);
     }
@@ -463,11 +639,12 @@ class Helper
      * @param string $protocol
      * @return bool|string Содержимое файла
      */
-    public static function readFileOverDir($file_name, $level = 1, $protocol = 'http')
+    public
+    static function readFileOverDir($file_name, $level = 1, $protocol = 'http')
     {
         $dir_name = dirname($_SERVER['SCRIPT_NAME']);
 
-        $dir =self:: recDirName($_SERVER['SCRIPT_NAME'], 0);
+        $dir = self:: recDirName($_SERVER['SCRIPT_NAME'], 0);
 
 
         if ($dir_name == '\\') {
@@ -484,7 +661,8 @@ class Helper
         return $data;
     }
 
-    public static function recDirName($dir_name, $cur_level, $level = 1)
+    public
+    static function recDirName($dir_name, $cur_level, $level = 1)
     {
         if ($cur_level >= $level || $dir_name == '\\') {
             return $dir_name;
@@ -496,7 +674,8 @@ class Helper
     }
 
 
-    public static function myReadFile($file_name)
+    public
+    static function myReadFile($file_name)
     {
         $content = [];
 
@@ -513,5 +692,101 @@ class Helper
         }
         return $content;
     }
+
+    public
+    static function getShortMd5($mixed)
+    {
+        return substr(md5(json_encode($mixed)), 0, 5);
+    }
+
+    public
+    static function e($str)
+    {
+        return htmlspecialchars($str, ENT_QUOTES, 'utf-8');
+    }
+
+
+    public
+    static function getvarDumpPre($variable)
+    {
+        ob_start();
+        echo "<pre>";
+        var_dump($variable);
+        echo "</pre>";
+
+        return ob_get_clean();
+
+    }
+
+
+    public static function setPostToSession()
+    {
+        global $true__start_fields;
+
+        if (!empty($_POST)) {
+            foreach ($_POST as $key => $item) {
+                if (empty($item) || !in_array($key, $true__start_fields)) {
+                    continue;
+                }
+
+                $item = self::inputFilter($item);
+
+                if (strlen($item) > 1000) {
+                    continue;
+                }
+
+                $_SESSION[$key] = self::inputFilter($item);
+            }
+        }
+    }
+
+
+    public static function getPostFromSession()
+    {
+        $data = [];
+        if (empty($_SESSION)) {
+            return $data;
+        }
+
+        foreach ($_SESSION as $key => $item) {
+            $data[$key] = $item;
+        }
+        return $data;
+    }
+
+
+    /**
+     * Записать данные в Log файл
+     * @param $data mixed Данные для записи
+     * @param string $title Заголовок
+     * @param string $type Тип
+     */
+    public static function logFile($data, $title = 'Info', $type = 'info')
+    {
+        global $config;
+
+        @$old = json_decode(file_get_contents($config['log_path']), true);
+
+        if (!empty($old) && count($old) > 20) {
+            array_pop($old);
+        }
+
+        $element = array();
+        $element['date'] = date('Y-m-d H:i:s');
+        $element['content'] = print_r($data, true);
+        $element['json'] = json_encode($data);
+        $element['type'] = $type;
+        $element['title'] = $title;
+        $element['proccess'] = $config['proccess_id'];
+
+        if (empty($old)) {
+            $old[] = $element;
+        } else {
+            array_unshift($old, $element);
+        }
+
+        file_put_contents($config['log_path'], json_encode($old, JSON_UNESCAPED_UNICODE), LOCK_EX);
+    }
+
 
 }
