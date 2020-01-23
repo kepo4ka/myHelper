@@ -1,6 +1,6 @@
 <?php
 
-namespace MyHelper;
+namespace Helper;
 
 // DB QUERIES using `safemysql.class.php`
 
