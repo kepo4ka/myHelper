@@ -43,16 +43,11 @@ class Helper
         }
 
         if (!empty($z['post'])) {
-            $ch = self::setHeaders_Form($ch);
+//            $ch = self::setHeaders_Form($ch);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($z['post']));
         }
 
-        if (!empty($z['json'])) {
-            $ch = self::setHeaders_JSON($ch);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($z['json']));
-        }
 
         curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
@@ -289,12 +284,13 @@ class Helper
             return false;
         }
 
-        self::makeDir(dirname(__FILE__) . '\cookies');
+        self::makeDir( $config['project_dir'] . '\cookies');
 
-        $full_path = dirname(__FILE__) . '\cookies/' . $config['proccess_id'] . '.txt';
+        $full_path = $config['project_dir'] . '\cookies/' . $config['proccess_id'] . '.txt';
         if ($second) {
-            $full_path = dirname(__FILE__) . '\cookies\\' . $config['proccess_id'] . '.txt';
+            $full_path = $config['project_dir'] . '\cookies\\' . $config['proccess_id'] . '.txt';
         }
+
         return $full_path;
     }
 
