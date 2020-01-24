@@ -19,7 +19,7 @@ class DB
      * @param $order
      * @return array|bool|mixed Список записей
      */
-    public static function getAllLimitAdvanced($table, $limit = 0, $offset = 0, $search_array, $order)
+    public static function getAllLimitAdvanced($table, $limit = 0, $offset = 0, $search_array = [], $order='DESC')
     {
         global $db;
 
