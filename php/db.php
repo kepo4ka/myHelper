@@ -84,6 +84,25 @@ class DB
 
 
     /**
+     * Получить запись по значению `column`
+     * @param $table string Исходная таблица
+     * @param $id string Значение `column`
+     * @return array|FALSE Запись
+     */
+    public static function getByColumn($table, $column, $value)
+    {
+        global $db;
+        $query = 'SELECT * FROM ?n';
+
+        if (!empty($column))
+        {
+            $query .= "WHERE ?n=?s";
+            return $db->getRow($query, $table, $column, $value);
+        }
+        return $db->getRow($query, $table, $column, $value);
+    }
+
+    /**
      * Добавить запись в таблицу связей таблиц
      * @param $p_data array Данные для добавления
      * @param $table string Исходная таблица
