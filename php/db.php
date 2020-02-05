@@ -295,6 +295,25 @@ class DB
 
         return $db->getAll($query, $table);
     }
+
+
+    /**
+     * Удаляет текущую директорию и все файлы и папки в ней, включая скрытые файлы (.extension)...
+     * @param string $folder_path Путь до папки которую нужно удалить
+     */
+    function delete_folder( $folder_path, $delete_self = true ){
+
+        $glod = glob( "$folder_path/{,.}[!.,!..]*", GLOB_BRACE );
+        foreach( $glod as $file ){
+            if( is_dir($file) )
+                call_user_func( __FUNCTION__, $file );
+            else
+                unlink( $file );
+        }
+
+        if( $delete_self )
+            rmdir( $folder_path );
+    }
 }
 
 ?>
