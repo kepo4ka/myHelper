@@ -42,10 +42,16 @@ class Helper
             curl_setopt($ch, CURLOPT_REFERER, $z['refer']);
         }
 
-        if (!empty($z['post'])) {
-//            $ch = self::setHeaders_Form($ch);
+        if (!empty($z['post']) || !empty($z['json'])) {
             curl_setopt($ch, CURLOPT_POST, 1);
+        }
+
+        if (!empty($z['post'])) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($z['post']));
+        }
+
+        if (!empty($z['json'])) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($z['json']));
         }
 
 
