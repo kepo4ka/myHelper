@@ -735,7 +735,7 @@ class Helper
                     continue;
                 }
 				
-				if (!empty($true__start_fields)
+				if (!empty($true__start_fields))
 				{
 					if (!in_array($key, $true__start_fields))
 					{
