@@ -731,12 +731,18 @@ class Helper
 
         if (!empty($_POST)) {
             foreach ($_POST as $key => $item) {
-                if (empty($item) || !in_array($key, $true__start_fields)) {
+                if (empty($item)) {
                     continue;
                 }
-
-                $item = self::inputFilter($item);
-
+				
+				if (!empty($true__start_fields)
+				{
+					if (!in_array($key, $true__start_fields))
+					{
+						continue;
+					}
+				}				
+				
                 if (strlen($item) > 1000) {
                     continue;
                 }
@@ -759,6 +765,14 @@ class Helper
         }
         return $data;
     }
+	
+	
+	 public static function clearSession()
+    {
+		session_unset();
+        session_destroy();
+    }
+
 
 
     /**
