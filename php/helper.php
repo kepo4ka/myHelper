@@ -311,6 +311,7 @@ class Helper
     public
     static function base_url()
     {
+        
         return strtok(sprintf(
             "%s://%s%s",
             isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
