@@ -632,7 +632,7 @@ class Helper
             $item['abs_path'] = @substr($item['path'], 3);
             $item['abs_path1'] = @substr($item['abs_path'], 3);
             $item['title'] = $file;
-            $item['extension'] = $type;
+            $item['info'] = $type;
 
             $files[] = $item;
         }
