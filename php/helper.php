@@ -311,7 +311,7 @@ class Helper
     public
     static function base_url()
     {
-        
+
         return strtok(sprintf(
             "%s://%s%s",
             isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
@@ -599,6 +599,46 @@ class Helper
 
         closedir($dir_handle);  //закрыть папку
         return $images_array;
+    }
+
+    /**
+     * Получить список файлов в папке
+     * @param string $directory Путь к папке
+     * @return array Список изображений
+     */
+    public
+    static function getFiles(string $directory): array
+    {
+        $files = [];
+
+        //пробуем открыть папку
+        $dir_handle = @opendir($directory) or die("Ошибка при открытии папки ${directory}!!!");
+
+        while ($file = readdir($dir_handle))    //поиск по файлам
+        {
+            if ($file == "." || $file == "..") {
+                continue;
+            }
+
+            $type = explode('.', $file);
+
+            if (count($type) !== 2) {
+                continue;
+            }
+
+
+            $item = array();
+            $item['path'] = $directory . $file;
+            $item['abs_path'] = @substr($item['path'], 3);
+            $item['abs_path1'] = @substr($item['abs_path'], 3);
+            $item['title'] = $file;
+            $item['extension'] = $type;
+
+            $files[] = $item;
+        }
+        closedir($dir_handle);  //закрыть папку
+
+        return $files;
     }
 
 
