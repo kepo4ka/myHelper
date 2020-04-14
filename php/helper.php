@@ -642,6 +642,12 @@ class Helper
     }
 
 
+    public static function isAjax()
+    {
+        $is_ajax = 'xmlhttprequest' == strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '');
+        return $is_ajax;
+    }
+
     /**
      * Транслитерация
      * @param $string - Строка на кирилице
