@@ -24,7 +24,10 @@ class Helper
             $url .= '?' . http_build_query($z['params']);
         }
 
-        $useragent = $config['current_user_agent'];
+        $useragent = '';
+        if (!empty($config['current_user_agent'])) {
+            $useragent = $config['current_user_agent'];
+        }
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -290,7 +293,7 @@ class Helper
             return false;
         }
 
-        self::makeDir( $config['project_dir'] . '\cookies');
+        self::makeDir($config['project_dir'] . '\cookies');
 
         $full_path = $config['project_dir'] . '\cookies/' . $config['proccess_id'] . '.txt';
         if ($second) {
@@ -314,6 +317,29 @@ class Helper
             $_SERVER['SERVER_NAME'],
             $_SERVER['REQUEST_URI']
         ), '?');
+    }
+
+
+    /**
+     * Получить Домен сайта
+     * @return string Домен
+     */
+    public static function baseDomain()
+    {
+        $base = self::base_url();
+        if (empty($base)) {
+            return false;
+        }
+
+        $parsed = @parse_url($base);
+
+        if (empty($parsed) || empty($parsed['scheme']) || empty($parsed['host'])) {
+            return false;
+        }
+
+        $domain = $parsed['scheme'] . '://' . $parsed['host'];
+
+        return $domain;
     }
 
 
@@ -734,15 +760,13 @@ class Helper
                 if (empty($item)) {
                     continue;
                 }
-				
-				if (!empty($true__start_fields))
-				{
-					if (!in_array($key, $true__start_fields))
-					{
-						continue;
-					}
-				}				
-				
+
+                if (!empty($true__start_fields)) {
+                    if (!in_array($key, $true__start_fields)) {
+                        continue;
+                    }
+                }
+
                 if (strlen($item) > 1000) {
                     continue;
                 }
@@ -765,14 +789,13 @@ class Helper
         }
         return $data;
     }
-	
-	
-	 public static function clearSession()
+
+
+    public static function clearSession()
     {
-		session_unset();
+        session_unset();
         session_destroy();
     }
-
 
 
     /**
