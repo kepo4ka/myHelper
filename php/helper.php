@@ -865,10 +865,17 @@ class Helper
         $element = array();
         $element['date'] = date('Y-m-d H:i:s');
         $element['content'] = print_r($data, true);
-        $element['json'] = json_encode($data);
+        if (is_string($data)) {
+            $element['json'] = $data;
+        } else {
+            $element['json'] = json_encode($data);
+        }
+
         $element['type'] = $type;
         $element['title'] = $title;
-        $element['proccess'] = @$config['proccess_id'];
+        if (!empty($config['proccess_id'])) {
+            $element['proccess'] = $config['proccess_id'];
+        }
 
         if (empty($old)) {
             $old[] = $element;
@@ -878,7 +885,6 @@ class Helper
 
         file_put_contents($log_file, json_encode($old, JSON_UNESCAPED_UNICODE), LOCK_EX);
     }
-
 
 
 }
