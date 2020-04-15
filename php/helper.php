@@ -854,8 +854,10 @@ class Helper
     public static function logFile($data, $title = 'Info', $type = 'info')
     {
         global $config;
+        $base = self::baseDomain();
+        $log_file = "$base/log.json";
 
-        @$old = json_decode(file_get_contents($config['log_path']), true);
+        @$old = json_decode(file_get_contents($log_file), true);
 
         if (!empty($old) && count($old) > 20) {
             array_pop($old);
@@ -877,6 +879,7 @@ class Helper
 
         file_put_contents($config['log_path'], json_encode($old, JSON_UNESCAPED_UNICODE), LOCK_EX);
     }
+
 
 
 }
