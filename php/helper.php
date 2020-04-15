@@ -865,6 +865,7 @@ class Helper
         $element = array();
         $element['date'] = date('Y-m-d H:i:s');
         $element['content'] = print_r($data, true);
+
         if (is_string($data)) {
             $element['json'] = $data;
         } else {
@@ -873,6 +874,7 @@ class Helper
 
         $element['type'] = $type;
         $element['title'] = $title;
+        
         if (!empty($config['proccess_id'])) {
             $element['proccess'] = $config['proccess_id'];
         }
