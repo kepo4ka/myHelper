@@ -869,7 +869,7 @@ class Helper
         $element['json'] = json_encode($data);
         $element['type'] = $type;
         $element['title'] = $title;
-        $element['proccess'] = $config['proccess_id'];
+        $element['proccess'] = @$config['proccess_id'];
 
         if (empty($old)) {
             $old[] = $element;
