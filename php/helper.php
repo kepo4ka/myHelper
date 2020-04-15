@@ -856,6 +856,10 @@ class Helper
         global $config;
         $log_file = "$path/log.json";
 
+        if (empty($type)) {
+            $type = 'info';
+        }
+
         @$old = json_decode(file_get_contents($log_file), true);
 
         if (!empty($old) && count($old) > 20) {
