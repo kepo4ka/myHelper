@@ -851,11 +851,10 @@ class Helper
      * @param string $title Заголовок
      * @param string $type Тип
      */
-    public static function logFile($data, $title = 'Info', $type = 'info')
+    public static function logFile($data, $title = 'Info', $type = 'info', $path = '')
     {
         global $config;
-        $base = self::baseDomain();
-        $log_file = "$base/log.json";
+        $log_file = "$path/log.json";
 
         @$old = json_decode(file_get_contents($log_file), true);
 
