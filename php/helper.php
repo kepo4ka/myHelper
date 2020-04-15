@@ -877,7 +877,7 @@ class Helper
             array_unshift($old, $element);
         }
 
-        file_put_contents($config['log_path'], json_encode($old, JSON_UNESCAPED_UNICODE), LOCK_EX);
+        file_put_contents($log_file, json_encode($old, JSON_UNESCAPED_UNICODE), LOCK_EX);
     }
 
 
