@@ -102,6 +102,23 @@ class DB
         return $db->getRow($query, $table, $column, $value);
     }
 
+public static function getByColAll($table, $column, $value)
+{
+    global $db;
+    $query = 'SELECT * FROM ?n WHERE ?n = ?s';
+    return $db->getAll($query, $table, $column, $value);
+}
+
+
+public static function getAllByColLike($table, $column, $value)
+{
+    global $db;
+    $value = '%' . $value . '%';
+    $query = 'SELECT * FROM ?n WHERE ?n LIKE ?s';
+    return $db->getAll($query, $table, $column, $value);
+}
+
+
     /**
      * Добавить запись в таблицу связей таблиц
      * @param $p_data array Данные для добавления
