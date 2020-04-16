@@ -118,10 +118,19 @@ class DB
     }
 
 
-    public static function getByColumnAndArray($table, $array, $is_one = true)
+    public static function getByColumnAndArray($table, $array, $is_one = true, $needed_column = null)
     {
         global $db;
-        $query = "SELECT * FROM $table WHERE";
+		
+		if (!empty($needed_column))
+		{
+			$needed_column = "`needed_column`";
+		}
+		else {
+			$needed_column = '*';
+		}
+		
+        $query = "SELECT $needed_column FROM $table WHERE";
 
         foreach ($array as $item) {
             $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
