@@ -132,7 +132,7 @@ class DB
 		
 		if (!empty($needed_column))
 		{
-			$needed_column = "`needed_column`";
+			$needed_column = "`$needed_column`";
 		}
 		else {
 			$needed_column = '*';
