@@ -889,112 +889,131 @@ class Helper
 
         file_put_contents($log_file, json_encode($old, JSON_UNESCAPED_UNICODE), LOCK_EX);
     }
-	
-	
-	public static function deleteDir($dirPath)
-	{
-		if (!is_dir($dirPath)) {
-			throw new Exception("$dirPath must be a directory");
-		}
-		if (substr($dirPath, strlen($dirPath) - 1, 1) != '\\') {
-			$dirPath .= '\\';
-		}
 
 
-		$files = glob($dirPath . '*', GLOB_MARK);
-		foreach ($files as $file) {
-			if (is_dir($file)) {
-				deleteDir($file);
-			} else {
-				unlink($file);
-			}
-		}
-		rmdir($dirPath);
-		return true;
-	}
-	
-	
-	public static 
-function scanDirFiltered($dir)
-{
-    $filtered_files = [];
-    $files = scandir($dir);
-    foreach ($files as $item) {
-        if ($item == '.' || $item == '..') {
-            continue;
+    public static function deleteDir($dirPath)
+    {
+        if (!is_dir($dirPath)) {
+            throw new Exception("$dirPath must be a directory");
         }
-        $filtered_files[] = $item;
-    }
-    return $filtered_files;
-}
-	
-	
-	 /**
- * Валидация поля
- * @param $field string Название поля
- * @param $required bool Является ли Поле обязательным для заполнения
- * @param string $type Предполагаемый тип Поля
- * @return array Прошло ли Поле проверку
- */
-public static function checkField($info=['field' => '', 'required' =>true, 'form_name'=>'formdata', 'type'=>'', 'method'=>'post', 'regex'=>'[^\w\-\.\,\s]+'])
-{	
-	
-	$form_name = $info['form_name'];
-	$field= $info['field'];
-	$type = $info['type'];
-	$method = $info['method'];
-	 $regex = "/" . $info['regex'] . "/u";
-	
-	$request = $_REQUEST;
-	switch($method)
-	{
-		case 'post':
-		$request = $_POST;
-		break;
-		case 'get':
-		$request = $_GET;
-		break;
-	}
-				
-   
-    if (isset($type)) {
-        switch ($type) {
-            case 'email':
-                $regex = "/[^\w\-@\.]+/u";
-                break;
-            case 'number':
-                $regex = "/[^+\d-()\s]/";
-                break;
-            case "hash":
-                $regex = "/[^\w\$\.\/\-]+/";
-                break;
+        if (substr($dirPath, strlen($dirPath) - 1, 1) != '\\') {
+            $dirPath .= '\\';
         }
+
+
+        $files = glob($dirPath . '*', GLOB_MARK);
+        foreach ($files as $file) {
+            if (is_dir($file)) {
+                deleteDir($file);
+            } else {
+                unlink($file);
+            }
+        }
+        rmdir($dirPath);
+        return true;
     }
 
-    $res = array();
-    $res['type'] = true;
-    $res['value'] = '';
 
-    if (!isset($request[$form_name][$field]) || empty($request[$form_name][$field])) {
-        if ($required) {
-            $res['type'] = false;
+    public static
+    function scanDirFiltered($dir)
+    {
+        $filtered_files = [];
+        $files = scandir($dir);
+        foreach ($files as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+            $filtered_files[] = $item;
         }
-    } else {
-        $val = trim($request[$form_name][$field]);
+        return $filtered_files;
+    }
 
-        $match = preg_match($regex, $val, $matches);
 
-        if ($match) {
-            $res['type'] = false;
+    /**
+     * Валидация поля
+     * @param $field string Название поля
+     * @param $required bool Является ли Поле обязательным для заполнения
+     * @param string $type Предполагаемый тип Поля
+     * @return array Прошло ли Поле проверку
+     */
+    public static function checkField($info = ['field' => '', 'required' => true, 'form_name' => 'formdata', 'type' => '', 'method' => 'post', 'regex' => '[^\w\-\.\,\s]+'])
+    {
 
+        $form_name = $info['form_name'];
+        $field = $info['field'];
+        $type = $info['type'];
+        $method = $info['method'];
+        $regex = "/" . $info['regex'] . "/u";
+        $required = $info['required'];
+
+        $request = $_REQUEST;
+        switch ($method) {
+            case 'post':
+                $request = $_POST;
+                break;
+            case 'get':
+                $request = $_GET;
+                break;
+        }
+
+
+        if (isset($type)) {
+            switch ($type) {
+                case 'email':
+                    $regex = "/[^\w\-@\.]+/u";
+                    break;
+                case 'number':
+                    $regex = "/[^+\d-()\s]/";
+                    break;
+                case "hash":
+                    $regex = "/[^\w\$\.\/\-]+/";
+                    break;
+            }
+        }
+
+        $res = array();
+        $res['type'] = true;
+        $res['value'] = '';
+
+        if (!isset($request[$form_name][$field]) || empty($request[$form_name][$field])) {
+            if ($required) {
+                $res['type'] = false;
+            }
         } else {
-            $res['type'] = true;
-            $res['value'] = $val;
+            $val = trim($request[$form_name][$field]);
+
+            $match = preg_match($regex, $val, $matches);
+
+            if ($match) {
+                $res['type'] = false;
+
+            } else {
+                $res['type'] = true;
+                $res['value'] = $val;
+            }
         }
+
+        return $res;
     }
 
-    return $res;
-}
+
+    /**
+     * Проверить валидность Капчи
+     * @return bool Валидна ли Капча
+     */
+    public static function checkRecaptcha($captcha, $secretKey)
+    {
+        // post request to server
+        $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) . '&response=' . urlencode($captcha);
+        $recaptcha_response = file_get_contents($url);
+
+        $responseKeys = json_decode($recaptcha_response, true);
+
+        if (!$responseKeys['success']) {
+            return false;
+        }
+        return true;
+    }
 
 
 }
