@@ -9,6 +9,14 @@ use Exception;
 
 class DB
 {
+	
+	public static function getTables($db_name)
+{
+    global $db;
+    $query = 'SHOW TABLES FROM ?n';
+    return $db->getCol($query, $db_name);
+}
+	
 
     /**
      * Получить все записи из таблицы (расширенная)
@@ -137,6 +145,10 @@ class DB
         }
         $query .= ' 1';
 
+		if ($needed_column!=='*')
+		{
+			 return $db->getCol($query);
+		}
 
         if ($is_one) {
             return $db->getRow($query);
