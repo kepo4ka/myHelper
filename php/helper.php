@@ -912,6 +912,73 @@ class Helper
 		rmdir($dirPath);
 		return true;
 	}
+	
+	 /**
+ * Валидация поля
+ * @param $field string Название поля
+ * @param $required bool Является ли Поле обязательным для заполнения
+ * @param string $type Предполагаемый тип Поля
+ * @return array Прошло ли Поле проверку
+ */
+public static function checkField($info=['field' => '', 'required' =>true, 'form_name'=>'formdata', 'type'=>'', 'method'=>'post', 'regex'=>'[^\w\-\.\,\s]+'])
+{	
+	
+	$form_name = $info['form_name'];
+	$field= $info['field'];
+	$type = $info['type'];
+	$method = $info['method'];
+	 $regex = "/" . $info['regex'] . "/u";
+	
+	$request = $_REQUEST;
+	switch($method)
+	{
+		case 'post':
+		$request = $_POST;
+		break;
+		case 'get':
+		$request = $_GET;
+		break;
+	}
+				
+   
+    if (isset($type)) {
+        switch ($type) {
+            case 'email':
+                $regex = "/[^\w\-@\.]+/u";
+                break;
+            case 'number':
+                $regex = "/[^+\d-()\s]/";
+                break;
+            case "hash":
+                $regex = "/[^\w\$\.\/\-]+/";
+                break;
+        }
+    }
+
+    $res = array();
+    $res['type'] = true;
+    $res['value'] = '';
+
+    if (!isset($request[$form_name][$field]) || empty($request[$form_name][$field])) {
+        if ($required) {
+            $res['type'] = false;
+        }
+    } else {
+        $val = trim($request[$form_name][$field]);
+
+        $match = preg_match($regex, $val, $matches);
+
+        if ($match) {
+            $res['type'] = false;
+
+        } else {
+            $res['type'] = true;
+            $res['value'] = $val;
+        }
+    }
+
+    return $res;
+}
 
 
 }
