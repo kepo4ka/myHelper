@@ -913,6 +913,22 @@ class Helper
 		return true;
 	}
 	
+	
+	public static 
+function scanDirFiltered($dir)
+{
+    $filtered_files = [];
+    $files = scandir($dir);
+    foreach ($files as $item) {
+        if ($item == '.' || $item == '..') {
+            continue;
+        }
+        $filtered_files[] = $item;
+    }
+    return $filtered_files;
+}
+	
+	
 	 /**
  * Валидация поля
  * @param $field string Название поля
