@@ -338,7 +338,7 @@ class DB
      * Получить записи Лог-базы
      * @return array Список логирования
      */
-    function getlogDB($site = false, $table = 'debug_log')
+    public static function getlogDB($site = false, $table = 'debug_log')
     {
         global $db;
         $query = 'SELECT * FROM ?n';
@@ -355,7 +355,7 @@ class DB
      * Удаляет текущую директорию и все файлы и папки в ней, включая скрытые файлы (.extension)...
      * @param string $folder_path Путь до папки которую нужно удалить
      */
-    function delete_folder($folder_path, $delete_self = true)
+    public static function delete_folder($folder_path, $delete_self = true)
     {
 
         $glod = glob("$folder_path/{,.}[!.,!..]*", GLOB_BRACE);
@@ -369,6 +369,15 @@ class DB
         if ($delete_self)
             rmdir($folder_path);
     }
+
+
+    public static function getColumnComment($db_name, $table, $column)
+    {
+        global $info_db;
+        $query = "SELECT `COLUMN_COMMENT` FROM `COLUMNS` WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
+        return $info_db->getOne($query, $db_name, $table, $column);
+    }
+
 }
 
 ?>
