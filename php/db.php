@@ -94,30 +94,47 @@ class DB
         global $db;
         $query = 'SELECT * FROM ?n';
 
-        if (!empty($column))
-        {
+        if (!empty($column)) {
             $query .= "WHERE ?n=?s";
             return $db->getRow($query, $table, $column, $value);
         }
         return $db->getRow($query, $table, $column, $value);
     }
 
-public static function getByColAll($table, $column, $value)
-{
-    global $db;
-    $query = 'SELECT * FROM ?n WHERE ?n = ?s';
-    return $db->getAll($query, $table, $column, $value);
-}
+    public static function getByColAll($table, $column, $value)
+    {
+        global $db;
+        $query = 'SELECT * FROM ?n WHERE ?n = ?s';
+        return $db->getAll($query, $table, $column, $value);
+    }
 
 
-public static function getAllByColLike($table, $column, $value)
-{
-    global $db;
-    $value = '%' . $value . '%';
-    $query = 'SELECT * FROM ?n WHERE ?n LIKE ?s';
-    return $db->getAll($query, $table, $column, $value);
-}
+    public static function getAllByColLike($table, $column, $value)
+    {
+        global $db;
+        $value = '%' . $value . '%';
+        $query = 'SELECT * FROM ?n WHERE ?n LIKE ?s';
+        return $db->getAll($query, $table, $column, $value);
+    }
 
+
+    public static function getByColumnAndArray($table, $array, $is_one = true)
+    {
+        global $db;
+        $query = "SELECT * FROM $table WHERE";
+
+        foreach ($array as $item) {
+            $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
+        }
+        $query .= ' 1';
+
+
+        if ($is_one) {
+            return $db->getRow($query);
+        } else {
+            return $db->getAll($query);
+        }
+    }
 
     /**
      * Добавить запись в таблицу связей таблиц
@@ -191,7 +208,6 @@ public static function getAllByColLike($table, $column, $value)
         }
         return true;
     }
-
 
 
     /**
@@ -301,7 +317,7 @@ public static function getAllByColLike($table, $column, $value)
      * Получить записи Лог-базы
      * @return array Список логирования
      */
-    function getlogDB($site = false, $table='debug_log')
+    function getlogDB($site = false, $table = 'debug_log')
     {
         global $db;
         $query = 'SELECT * FROM ?n';
@@ -318,18 +334,19 @@ public static function getAllByColLike($table, $column, $value)
      * Удаляет текущую директорию и все файлы и папки в ней, включая скрытые файлы (.extension)...
      * @param string $folder_path Путь до папки которую нужно удалить
      */
-    function delete_folder( $folder_path, $delete_self = true ){
+    function delete_folder($folder_path, $delete_self = true)
+    {
 
-        $glod = glob( "$folder_path/{,.}[!.,!..]*", GLOB_BRACE );
-        foreach( $glod as $file ){
-            if( is_dir($file) )
-                call_user_func( __FUNCTION__, $file );
+        $glod = glob("$folder_path/{,.}[!.,!..]*", GLOB_BRACE);
+        foreach ($glod as $file) {
+            if (is_dir($file))
+                call_user_func(__FUNCTION__, $file);
             else
-                unlink( $file );
+                unlink($file);
         }
 
-        if( $delete_self )
-            rmdir( $folder_path );
+        if ($delete_self)
+            rmdir($folder_path);
     }
 }
 
