@@ -1014,6 +1014,13 @@ class Helper
         }
         return true;
     }
+	
+	
+	public static function checkJson($str)
+{
+    $json = json_decode($str);
+    return $json && $str != $json;
+}
 
 
 }
