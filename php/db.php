@@ -147,11 +147,16 @@ class DB
 
 		if ($needed_column!=='*')
 		{
+			if ($is_one)
+			{
+				return $db->getOne($query);
+			}
 			 return $db->getCol($query);
+			 
 		}
 
         if ($is_one) {
-            return $db->getOne($query);
+            return $db->getRow($query);
         } else {
             return $db->getAll($query);
         }
