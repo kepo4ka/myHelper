@@ -151,7 +151,7 @@ class DB
 		}
 
         if ($is_one) {
-            return $db->getRow($query);
+            return $db->getOne($query);
         } else {
             return $db->getAll($query);
         }
