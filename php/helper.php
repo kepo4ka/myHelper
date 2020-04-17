@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MyHelper;
+namespace Helper;
 
 use Exception;
 
