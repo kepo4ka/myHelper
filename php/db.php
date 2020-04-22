@@ -9,14 +9,14 @@ use Exception;
 
 class DB
 {
-	
-	public static function getTables($db_name)
-{
-    global $db;
-    $query = 'SHOW TABLES FROM ?n';
-    return $db->getCol($query, $db_name);
-}
-	
+
+    public static function getTables($db_name)
+    {
+        global $db;
+        $query = 'SHOW TABLES FROM ?n';
+        return $db->getCol($query, $db_name);
+    }
+
 
     /**
      * Получить все записи из таблицы (расширенная)
@@ -129,15 +129,13 @@ class DB
     public static function getByColumnAndArray($table, $array, $is_one = true, $needed_column = null)
     {
         global $db;
-		
-		if (!empty($needed_column))
-		{
-			$needed_column = "`$needed_column`";
-		}
-		else {
-			$needed_column = '*';
-		}
-		
+
+        if (!empty($needed_column)) {
+            $needed_column = "`$needed_column`";
+        } else {
+            $needed_column = '*';
+        }
+
         $query = "SELECT $needed_column FROM $table WHERE";
 
         foreach ($array as $item) {
@@ -145,15 +143,13 @@ class DB
         }
         $query .= ' 1';
 
-		if ($needed_column!=='*')
-		{
-			if ($is_one)
-			{
-				return $db->getOne($query);
-			}
-			 return $db->getCol($query);
-			 
-		}
+        if ($needed_column !== '*') {
+            if ($is_one) {
+                return $db->getOne($query);
+            }
+            return $db->getCol($query);
+
+        }
 
         if ($is_one) {
             return $db->getRow($query);
@@ -224,15 +220,34 @@ class DB
         $columns = self::getColumnNames($table);
         $data = $db->filterArray($p_data, $columns);
 
+        $exist = false;
 
-        if (!self::checkExist($table, $primary, $data[$primary])) {
+        if (is_array($primary)) {
+            $exist = self::getByColumnAndArray($table, $primary);
+        } else {
+            $exist = self::checkExist($table, $primary, $data[$primary]);
+        }
+
+        if (!$exist) {
             $query = 'INSERT INTO ?n SET ?u';
             return $db->query($query, $table, $data);
         } elseif (!empty($data[$primary])) {
-            $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
-            return $db->query($query, $table, $data, $primary, $data[$primary]);
+            if (is_array($primary)) {
+                $query = 'UPDATE ?n SET ?u WHERE';
+
+                foreach ($primary as $item) {
+                    $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
+                }
+                $query .= ' 1';
+
+                return $db->query($query, $table, $data);
+            } else {
+                $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
+                return $db->query($query, $table, $data, $primary, $data[$primary]);
+            }
+
         }
-        return true;
+        return false;
     }
 
 
