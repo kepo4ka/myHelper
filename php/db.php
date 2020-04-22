@@ -231,7 +231,7 @@ class DB
         if (!$exist) {
             $query = 'INSERT INTO ?n SET ?u';
             return $db->query($query, $table, $data);
-        } elseif (!empty($data[$primary])) {
+        } else {
             if (is_array($primary)) {
                 $query = 'UPDATE ?n SET ?u WHERE';
 
@@ -245,9 +245,7 @@ class DB
                 $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
                 return $db->query($query, $table, $data, $primary, $data[$primary]);
             }
-
         }
-        return false;
     }
 
 
