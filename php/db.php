@@ -319,7 +319,8 @@ class DB
     public static function createLogTable($table = 'debug_log')
     {
         global $db;
-        $query = "CREATE TABLE `$table` (
+        $query = "
+CREATE TABLE `$table` (
   `id` int(11) NOT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp(),
   `title` varchar(100) NOT NULL,
@@ -327,18 +328,26 @@ class DB
   `data` text NOT NULL,
   `site` varchar(25) NOT NULL,
   `proccess_id` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;ALTER TABLE `debug_log`
+) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+";
+
+
+        $query1 = "
+ALTER TABLE `$table`
   ADD PRIMARY KEY (`id`),
   ADD KEY `date` (`date`),
   ADD KEY `title` (`title`),
   ADD KEY `type` (`type`),
-  ADD KEY `proccess_id` (`proccess_id`);ALTER TABLE `debug_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-COMMIT;";
+  ADD KEY `proccess_id` (`proccess_id`); 
+ALTER TABLE `$table`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
 
-        return $db->query($query);
+        try {
+            return $db->query($query) && $db->query($query1);
+        } catch (Exception $exception) {
+            return false;
+        }
     }
-
 
     /**
      * Записать данные в Лог-базу
