@@ -406,6 +406,13 @@ ALTER TABLE `$table`
     }
 
 
+    public static function clearlogDB($table = 'debug_log')
+    {
+        global $db;
+        $table = 'debug_log';
+        return $db->query('DELETE FROM ?n', $table);
+    }
+
     /**
      * Удаляет текущую директорию и все файлы и папки в ней, включая скрытые файлы (.extension)...
      * @param string $folder_path Путь до папки которую нужно удалить
