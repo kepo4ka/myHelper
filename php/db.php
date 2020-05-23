@@ -354,35 +354,39 @@ ALTER TABLE `$table`
      * @param $data mixed Данные для записи
      * @param string $title Заголовок
      * @param string $type Тип
-     * @return FALSE|resource Результат операции
+     * @return array|FALSE|resource
      */
     public static function logDB($data, $title = 'Info', $type = 'info', $table = 'debug_log')
     {
         global $config, $db;
 
-        $count = self::counting($table);
+        try {
+            $count = self::counting($table);
 
-        if ($count > 500) {
-            $primary = 'id';
-            $id = $db->getOne('SELECT ?n FROM ?n', $primary, $table);
+            if ($count > 500) {
+                $primary = 'id';
+                $id = $db->getOne('SELECT ?n FROM ?n', $primary, $table);
 
-            if (!empty($id)) {
-                $db->query('DELETE FROM ?n WHERE ?n=?i', $table, $primary, $id);
+                if (!empty($id)) {
+                    $db->query('DELETE FROM ?n WHERE ?n=?i', $table, $primary, $id);
+                }
             }
+
+            if (!is_array($data)) {
+                $data = [$data];
+            }
+
+            $element = array();
+            $element['data'] = json_encode($data);
+            $element['type'] = $type;
+            $element['title'] = $title;
+            @$element['site'] = @$config['site'];
+            $element['proccess_id'] = @$config['proccess_id'];
+
+            return $db->query('INSERT INTO ?n SET ?u', $table, $element);
+        } catch (Exception $exception) {
+            return ['error' => true, 'message' => $exception->getMessage()];
         }
-
-        if (!is_array($data)) {
-            $data = [$data];
-        }
-
-        $element = array();
-        $element['data'] = json_encode($data);
-        $element['type'] = $type;
-        $element['title'] = $title;
-        @$element['site'] = $config['site'];
-        $element['proccess_id'] = $config['proccess_id'];
-
-        return $db->query('INSERT INTO ?n SET ?u', $table, $element);
     }
 
     /**
