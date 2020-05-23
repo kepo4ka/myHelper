@@ -316,6 +316,30 @@ class DB
     }
 
 
+    public static function createLogTable($table = 'debug_log')
+    {
+        global $db;
+        $query = "CREATE TABLE `$table` (
+  `id` int(11) NOT NULL,
+  `date` datetime NOT NULL DEFAULT current_timestamp(),
+  `title` varchar(100) NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `data` text NOT NULL,
+  `site` varchar(25) NOT NULL,
+  `proccess_id` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;ALTER TABLE `debug_log`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `date` (`date`),
+  ADD KEY `title` (`title`),
+  ADD KEY `type` (`type`),
+  ADD KEY `proccess_id` (`proccess_id`);ALTER TABLE `debug_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+COMMIT;";
+
+        return $db->query($query);
+    }
+
+
     /**
      * Записать данные в Лог-базу
      * @param $data mixed Данные для записи
