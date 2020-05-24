@@ -377,7 +377,7 @@ ALTER TABLE `$table`
             }
 
             $element = array();
-            $element['data'] = json_encode($data);
+            $element['data'] = json_encode($data, JSON_UNESCAPED_UNICODE);
             $element['type'] = $type;
             $element['title'] = $title;
             @$element['site'] = @$config['site'];
