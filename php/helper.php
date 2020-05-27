@@ -704,12 +704,12 @@ class Helper
     }
 
 
-    public function json_encode($val)
+    public static function json_encode($val)
     {
         return json_encode($val, JSON_UNESCAPED_UNICODE);
     }
 
-    public function json_decode($val)
+    public static function json_decode($val)
     {
         return json_decode($val, true);
     }
