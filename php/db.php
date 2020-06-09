@@ -225,7 +225,12 @@ class DB
         if (is_array($primary)) {
             $exist = self::getByColumnAndArray($table, $primary);
         } else {
-            $exist = self::checkExist($table, $primary, $data[$primary]);
+            if (!isset($data[$primary])) {
+                $exist = false;
+            }
+            else {
+                $exist = self::checkExist($table, $primary, $data[$primary]);
+            }
         }
 
         if (!$exist) {
