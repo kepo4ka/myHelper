@@ -137,6 +137,13 @@ class SafeMySQL
             $res = $this->rawQuery($this->prepareQuery(func_get_args()));
             return $res;
         } catch (Exception $exception) {
+            try {
+                @\Helper\DB::logDB($exception);
+            }
+            catch (Exception $exception1)
+            {
+
+            }
             return false;
         }
     }
@@ -477,7 +484,6 @@ class SafeMySQL
 
     protected function prepareQuery($args)
     {
-        try {
             $query = '';
             $raw = array_shift($args);
             $array = preg_split('~(\?[nsiuapxw])~u', $raw, null, PREG_SPLIT_DELIM_CAPTURE);
@@ -525,16 +531,6 @@ class SafeMySQL
                         break;
                 }
                 $query .= $part;
-            }
-        }
-        catch (Exception $ex)
-        {
-            try {
-                @\Helper\DB::logDB($ex);
-            }
-            catch (Exception $ex1)
-            {
-
             }
         }
         return $query;
