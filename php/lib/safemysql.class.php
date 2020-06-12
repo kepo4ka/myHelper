@@ -133,18 +133,17 @@ class SafeMySQL
      */
     public function query()
     {
-        try {
-            $res = $this->rawQuery($this->prepareQuery(func_get_args()));
-            return $res;
-        } catch (Exception $exception) {
+        $prepare = $this->prepareQuery(func_get_args());
+        if (!empty($_ENV['log_query'])) {
             try {
-                @\Helper\DB::logDB(func_get_args());
-                @\Helper\DB::logDB($exception->getMessage());
-            } catch (Exception $exception1) {
+                \Helper\DB::logDB($prepare, 'log_query');
+            } catch (Exception $exception) {
 
             }
-            return false;
         }
+        $res = $this->rawQuery($prepare);
+
+        return $res;
     }
 
     /**
