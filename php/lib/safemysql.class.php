@@ -140,9 +140,7 @@ class SafeMySQL
             try {
                 @\Helper\DB::logDB(func_get_args());
                 @\Helper\DB::logDB($exception->getMessage());
-            }
-            catch (Exception $exception1)
-            {
+            } catch (Exception $exception1) {
 
             }
             return false;
@@ -394,8 +392,8 @@ class SafeMySQL
      * $data = $db->getArr($sql, $order, $dir, $start, $per_page);
      *
      * @param string $iinput - field name to test
-     * @param  array $allowed - an array with allowed variants
-     * @param  string $default - optional variable to set if no match found. Default to false.
+     * @param array $allowed - an array with allowed variants
+     * @param string $default - optional variable to set if no match found. Default to false.
      * @return string|FALSE    - either sanitized value or FALSE
      */
     public function whiteList($input, $allowed, $default = FALSE)
@@ -416,8 +414,8 @@ class SafeMySQL
      * $sql     = "INSERT INTO ?n SET ?u";
      * $db->query($sql,$table,$data);
      *
-     * @param  array $input - source array
-     * @param  array $allowed - an array with allowed field names
+     * @param array $input - source array
+     * @param array $allowed - an array with allowed field names
      * @return array filtered out source array
      */
     public function filterArray($input, $allowed)
@@ -485,60 +483,53 @@ class SafeMySQL
 
     protected function prepareQuery($args)
     {
-        try {
-            $query = '';
-            $raw = array_shift($args);
-            $array = preg_split('~(\?[nsiuapxw])~u', $raw, null, PREG_SPLIT_DELIM_CAPTURE);
-            $anum = count($args);
-            $pnum = floor(count($array) / 2);
-            if ($pnum != $anum) {
-                $this->error("Number of args ($anum) doesn't match number of placeholders ($pnum) in [$raw]");
-            }
-
-            foreach ($array as $i => $part) {
-                if (($i % 2) == 0) {
-                    $query .= $part;
-                    continue;
-                }
-
-                $value = array_shift($args);
-                switch ($part) {
-                    case '?n':
-                        $part = $this->escapeIdent($value);
-                        break;
-                    case '?s':
-                        $part = $this->escapeString($value);
-                        break;
-                    case '?i':
-                        $part = $this->escapeInt($value);
-                        break;
-                    case '?a':
-                        $part = $this->createIN($value);
-                        break;
-                    case '?u':
-                        $comma = ',';
-                        $part = $this->createSET($value, $comma);
-                        break;
-                    case '?x':
-                        $comma = ' AND ';
-                        $part = $this->createSET($value, $comma);
-                        break;
-                    case '?w':
-                        $comma = ' OR ';
-                        $part = $this->createSET($value, $comma);
-                        break;
-
-                    case '?p':
-                        $part = $value;
-                        break;
-                }
-                $query .= $part;
-            }
+        $query = '';
+        $raw = array_shift($args);
+        $array = preg_split('~(\?[nsiuapxw])~u', $raw, null, PREG_SPLIT_DELIM_CAPTURE);
+        $anum = count($args);
+        $pnum = floor(count($array) / 2);
+        if ($pnum != $anum) {
+            $this->error("Number of args ($anum) doesn't match number of placeholders ($pnum) in [$raw]");
         }
-        catch (Throwable $er)
-        {
-            \Helper\DB::logDB($args);
-            \Helper\DB::logDB($er);
+
+        foreach ($array as $i => $part) {
+            if (($i % 2) == 0) {
+                $query .= $part;
+                continue;
+            }
+
+            $value = array_shift($args);
+            switch ($part) {
+                case '?n':
+                    $part = $this->escapeIdent($value);
+                    break;
+                case '?s':
+                    $part = $this->escapeString($value);
+                    break;
+                case '?i':
+                    $part = $this->escapeInt($value);
+                    break;
+                case '?a':
+                    $part = $this->createIN($value);
+                    break;
+                case '?u':
+                    $comma = ',';
+                    $part = $this->createSET($value, $comma);
+                    break;
+                case '?x':
+                    $comma = ' AND ';
+                    $part = $this->createSET($value, $comma);
+                    break;
+                case '?w':
+                    $comma = ' OR ';
+                    $part = $this->createSET($value, $comma);
+                    break;
+
+                case '?p':
+                    $part = $value;
+                    break;
+            }
+            $query .= $part;
         }
 
         return $query;
