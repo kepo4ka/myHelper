@@ -530,7 +530,7 @@ class SafeMySQL
         catch (Exception $ex)
         {
             try {
-                /Helper:DB::logDB($args);
+                @\Helper\DB::logDB($ex);
             }
             catch (Exception $ex1)
             {
