@@ -485,6 +485,7 @@ class SafeMySQL
 
     protected function prepareQuery($args)
     {
+        try {
             $query = '';
             $raw = array_shift($args);
             $array = preg_split('~(\?[nsiuapxw])~u', $raw, null, PREG_SPLIT_DELIM_CAPTURE);
@@ -533,6 +534,12 @@ class SafeMySQL
                 }
                 $query .= $part;
             }
+        }
+        catch (Throwable $er)
+        {
+            \Helper\DB::logDB($args);
+            \Helper\DB::logDB($er);
+        }
 
         return $query;
     }
