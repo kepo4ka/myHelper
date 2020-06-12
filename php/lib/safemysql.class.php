@@ -532,7 +532,7 @@ class SafeMySQL
                 }
                 $query .= $part;
             }
-        }
+
         return $query;
     }
 
