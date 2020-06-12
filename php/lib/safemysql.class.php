@@ -139,6 +139,7 @@ class SafeMySQL
         } catch (Exception $exception) {
             try {
                 @\Helper\DB::logDB(func_get_args());
+                @\Helper\DB::logDB($exception->getMessage());
             }
             catch (Exception $exception1)
             {
