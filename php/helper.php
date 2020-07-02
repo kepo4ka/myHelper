@@ -4,6 +4,7 @@
 namespace Helper;
 
 use Exception;
+use SimpleXMLElement;
 
 class Helper
 {
@@ -722,8 +723,6 @@ class Helper
     }
 
 
-
-
     /**
      * Прочитать файл в родительской папке, зная только относительно расположение относительно текущего файла скрипта
      * @param $file_name string Имя файла с расширением
@@ -1047,5 +1046,77 @@ class Helper
         }
         return $ip;
     }
+
+
+    private function _array_to_xml(SimpleXMLElement $object, array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                if (is_integer($key)) {
+                    $key = 'item';
+                }
+
+                $new_object = $object->addChild($key);
+                $this->_array_to_xml($new_object, $value);
+            } else {
+//            if ($key == (int)$key) {
+//                $key = "$key";
+//            }
+
+                $object->addChild($key, $value);
+            }
+        }
+    }
+
+    private function _xml_to_array(string $xml)
+    {
+        $xml = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
+        $json = json_encode($xml);
+        $array = json_decode($json, TRUE);
+        return $array;
+    }
+
+
+    private function _clear_xml_array(&$array, $name = 'item')
+    {
+        foreach ($array as $key => $value) {
+            if ($key == $name) {
+                if (!empty($value[0])) {
+                    $array = $value;
+                } else {
+                    $array = [$value];
+                }
+                break;
+            }
+        }
+
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                $value = $this->_clear_xml_array($value);
+            }
+        }
+        return $array;
+    }
+
+
+    public function arrayToXml(array $array)
+    {
+        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?>'
+            . '<Document></Document>');
+        $this->_array_to_xml($xml, $array);
+
+        return $xml->asXML();
+    }
+
+    public function XmlToArray($xml, $name = 'item', $clear = true)
+    {
+        $array = $this->_xml_to_array($xml);
+        if (!empty($clear)) {
+            $array = $this->_clear_xml_array($array, $name);
+        }
+
+        return $array;
+    }
+
 
 }
