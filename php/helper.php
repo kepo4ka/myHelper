@@ -1057,7 +1057,7 @@ class Helper
                 }
 
                 $new_object = $object->addChild($key);
-                $this->_array_to_xml($new_object, $value);
+                self::_array_to_xml($new_object, $value);
             } else {
 //            if ($key == (int)$key) {
 //                $key = "$key";
@@ -1092,7 +1092,7 @@ class Helper
 
         foreach ($array as $key => &$value) {
             if (is_array($value)) {
-                $value = $this->_clear_xml_array($value);
+                $value = self::_clear_xml_array($value);
             }
         }
         return $array;
@@ -1103,16 +1103,16 @@ class Helper
     {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?>'
             . '<Document></Document>');
-        $this->_array_to_xml($xml, $array);
+        self::_array_to_xml($xml, $array);
 
         return $xml->asXML();
     }
 
     public function XmlToArray($xml, $name = 'item', $clear = true)
     {
-        $array = $this->_xml_to_array($xml);
+        $array = self::_xml_to_array($xml);
         if (!empty($clear)) {
-            $array = $this->_clear_xml_array($array, $name);
+            $array = self::_clear_xml_array($array, $name);
         }
 
         return $array;
