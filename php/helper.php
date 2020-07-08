@@ -77,6 +77,11 @@ class Helper
     }
 
 
+    /**
+     * Задать стандартный набор заголовков для запроса
+     * @param $ch mixed Объект curl
+     * @return mixed Обновлённый Объект curl
+     */
     public static function setHeaders_Form($ch)
     {
         $headers = [
@@ -92,6 +97,11 @@ class Helper
         return $ch;
     }
 
+    /**
+     * Задать заголовки для передачи данных в формате JSON
+     * @param $ch
+     * @return mixed
+     */
     public static function setHeaders_JSON($ch)
     {
         $headers = [
@@ -110,7 +120,11 @@ class Helper
         return $ch;
     }
 
-
+    /**
+     * Считать случайную строку из файла
+     * @param $file string Название файла
+     * @return string Случайная строка
+     */
     public
     static function getRandLineFromFile($file)
     {
@@ -124,6 +138,11 @@ class Helper
         return $line;
     }
 
+    /**
+     * Получить случайный UserAgent из файла
+     * @param string $file Файл со списком агентов
+     * @return string Случайный UserAgent
+     */
     public
     static function getRandUserAgent($file = __DIR__ . '/assets/useragents.txt')
     {
@@ -490,7 +509,13 @@ class Helper
         return $max;
     }
 
-
+    /**
+     * Проверить наличие элемента в ассоциативном массиве
+     * @param $list array Массив
+     * @param $list_key string Ключ, по которому идёт проверка
+     * @param $value mixed Контрольное значение
+     * @return bool Присутствует ли элемент в массиве
+     */
     public
     static function checkListItemExist($list, $list_key, $value)
     {
@@ -502,6 +527,12 @@ class Helper
         return false;
     }
 
+
+
+    /**
+     * Перенаправление с помощью JS
+     * @param $url string Ссылка, на которую идёт перенаправление
+     */
     public
     static function locationJs($url)
     {
@@ -513,6 +544,15 @@ class Helper
     }
 
 
+    /**
+     * Изменить размер картинки
+     * @param $file string Название файла
+     * @param $w integer|double Требуемая ширина
+     * @param $h integer|double Требуемая высота
+     * @param string $type Расширение файла
+     * @param bool $crop Нужно ли делать обрезание
+     * @return bool|resource Результат обработки
+     */
     public
     static function resize_image($file, $w, $h, $type = 'jpeg', $crop = FALSE)
     {
@@ -642,7 +682,10 @@ class Helper
         return $files;
     }
 
-
+    /**
+     * Проверить выполнен ли запрос с помощью AJAX (внимание: заголовки могут быть подменены пользователем, поэтому не всегда достоверно)
+     * @return bool Выполнено с помощью ajax
+     */
     public static function isAjax()
     {
         $is_ajax = 'xmlhttprequest' == strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '');
@@ -704,17 +747,27 @@ class Helper
         return $str;
     }
 
-
+    /**
+     * Закодировать в Json с использованием Unicode
+     * @param $val
+     * @return string
+     */
     public static function json_encode($val)
     {
         return json_encode($val, JSON_UNESCAPED_UNICODE);
     }
 
+    /**
+     * Декодировать Json в ассоциативный массив
+     * @param $val string Исходный Json
+     * @return mixed Массив
+     */
     public static function json_decode($val)
     {
         return json_decode($val, true);
     }
 
+    // Дублирование функции `json_encode`
     // Сохранение функции для обратной совместимости
     public
     static function json_encodeKirilica($val)
@@ -752,6 +805,7 @@ class Helper
         return $data;
     }
 
+
     public
     static function recDirName($dir_name, $cur_level, $level = 1)
     {
@@ -764,7 +818,11 @@ class Helper
         }
     }
 
-
+    /**
+     * Прочитать файл в виде массива строк
+     * @param $file_name string Название файла
+     * @return array Массив строк
+     */
     public
     static function myReadFile($file_name)
     {
@@ -784,6 +842,11 @@ class Helper
         return $content;
     }
 
+    /**
+     * Получить часть зашифрованных в md5 данных
+     * @param $mixed mixed Данные
+     * @return bool|string Краткий md5
+     */
     public
     static function getShortMd5($mixed)
     {
@@ -797,6 +860,11 @@ class Helper
     }
 
 
+    /**
+     * Получить результут функции var_dump в виде переменной
+     * @param $variable mixed Наблюдаемая переменная
+     * @return string Дамп переменной
+     */
     public
     static function getvarDumpPre($variable)
     {
@@ -809,7 +877,9 @@ class Helper
 
     }
 
-
+    /**
+     * Сохранить в сессии данные $_POST
+     */
     public static function setPostToSession()
     {
         global $true__start_fields;
@@ -836,6 +906,10 @@ class Helper
     }
 
 
+    /**
+     * Получить из сесси сохранённые данные $_POST
+     * @return array|mixed Данные $_POST
+     */
     public static function getPostFromSession()
     {
         $data = [];
@@ -849,7 +923,9 @@ class Helper
         return $data;
     }
 
-
+    /**
+     * Очистить сессию
+     */
     public static function clearSession()
     {
         session_unset();
@@ -902,7 +978,12 @@ class Helper
         file_put_contents($log_file, json_encode($old, JSON_UNESCAPED_UNICODE), LOCK_EX);
     }
 
-
+    /**
+     * Удалить директорию вместо с содержимым
+     * @param $dirPath string Путь до директории
+     * @return bool Удалось ли удалить директорию
+     * @throws Exception Ошибка при удалении
+     */
     public static function deleteDir($dirPath)
     {
         if (!is_dir($dirPath)) {
@@ -916,7 +997,7 @@ class Helper
         $files = glob($dirPath . '*', GLOB_MARK);
         foreach ($files as $file) {
             if (is_dir($file)) {
-                deleteDir($file);
+                self::deleteDir($file);
             } else {
                 unlink($file);
             }
@@ -925,7 +1006,11 @@ class Helper
         return true;
     }
 
-
+    /**
+     * Получить списко файлов в директории
+     * @param $dir string Путь к директории
+     * @return array Список файлов
+     */
     public static
     function scanDirFiltered($dir)
     {
@@ -1027,14 +1112,21 @@ class Helper
         return true;
     }
 
-
+    /**
+     * Попытаться декодировать из json
+     * @param $str string Строка Json
+     * @return bool Удалось ли
+     */
     public static function checkJson($str)
     {
         $json = json_decode($str);
         return $json && $str != $json;
     }
 
-
+    /**
+     * Получить IP пользователя
+     * @return mixed Полученный IP
+     */
     public static function getIp()
     {
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -1047,7 +1139,12 @@ class Helper
         return $ip;
     }
 
-
+    /**
+     * Вспомогательная функция
+     * Заполнить xml элементами массива
+     * @param SimpleXMLElement $object
+     * @param array $data
+     */
     private function _array_to_xml(SimpleXMLElement $object, array $data)
     {
         foreach ($data as $key => $value) {
@@ -1068,6 +1165,12 @@ class Helper
         }
     }
 
+    /**
+     * Вспомогательная функция
+     * Конвертация из xml в массив
+     * @param string $xml
+     * @return mixed
+     */
     private function _xml_to_array(string $xml)
     {
         $xml = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
@@ -1076,7 +1179,14 @@ class Helper
         return $array;
     }
 
-
+    /**
+     * Вспомогательная функция
+     * При конвертации внутри массива сохдаётся лишняя `прослойка` в виде ещё одного уровня в массиве
+     * Функция удаляет её
+     * @param $array array Исходный массив
+     * @param string $name Название
+     * @return array
+     */
     private function _clear_xml_array(&$array, $name = 'item')
     {
         foreach ($array as $key => $value) {
