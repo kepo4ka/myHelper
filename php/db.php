@@ -260,8 +260,7 @@ class DB
         $columns = self::getColumnNames($table);
 
         foreach ($columns as $column) {
-            $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
-  WHERE TABLE_SCHEMA = ?n AND table_name = ?n AND COLUMN_NAME = ?n ";
+            $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ?s AND table_name = ?s AND COLUMN_NAME = ?s";
 
             $type = $db->query($query, $db_name, $table, $column);
 
