@@ -491,19 +491,18 @@ ALTER TABLE `$table`
 
     public static function getColumnComment($db_name, $table, $column)
     {
-        global $info_db;
-        $query = "SELECT `COLUMN_COMMENT` FROM `COLUMNS` WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
-        return $info_db->getOne($query, $db_name, $table, $column);
+        global $db;
+        $query = "SELECT `COLUMN_COMMENT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
+        return $db->getOne($query, $db_name, $table, $column);
     }
 
 
     public static function getColumnDefaultValue($db_name, $table, $column)
     {
-        global $info_db;
-        $query = "SELECT `COLUMN_DEFAULT` FROM `COLUMNS` WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
-        return $info_db->getOne($query, $db_name, $table, $column);
+        global $db;
+        $query = "SELECT `COLUMN_DEFAULT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
+        return $db->getOne($query, $db_name, $table, $column);
     }
-
 
 
 
