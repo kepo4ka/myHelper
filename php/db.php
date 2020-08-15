@@ -253,27 +253,40 @@ class DB
     }
 
 
-    public static function setDefaultString($db_name, $table)
+    public static function setDefaultColumnValue($db_name, $table)
     {
         global $db;
 
         $columns = self::getColumnNames($table);
 
+        $types = [];
+
         foreach ($columns as $column) {
-            $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ?s AND table_name = ?s AND COLUMN_NAME = ?s";
+            $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ?s AND table_name = ?s AND COLUMN_NAME = ?s limit 1";
 
-            $type = $db->query($query, $db_name, $table, $column);
+            $type_info = $db->getRow($query, $db_name, $table, $column);
 
-            if ($type== 'varchar') {
-                $default = self::getColumnDefaultValue($db_name, $table, $column);
+            $type = @$type_info['DATA_TYPE'];
 
-                if (empty($default)) {
-                    $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ' '";
-                    $db->query($query, $table, $column);
-                }
+            switch ($type)
+            {
+                case 'varchar':
+                    $default = self::getColumnDefaultValue($db_name, $table, $column);
+                    if (empty($default)) {
+                        $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ' '";
+                        $db->query($query, $table, $column);
+                    }
+                    break;
+                case 'int':
+                    $default = self::getColumnDefaultValue($db_name, $table, $column);
+                    if (!is_int($default)) {
+                        $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT 0";
+                        $db->query($query, $table, $column);
+                    }
+                    break;
             }
         }
-        return true;
+        return $types;
 
     }
 
