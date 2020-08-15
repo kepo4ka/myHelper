@@ -261,7 +261,7 @@ class DB
 
         foreach ($columns as $column) {
             $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
-  WHERE INDEX_SCHEMA = ?n AND table_name = ?n AND COLUMN_NAME = ?n ";
+  WHERE TABLE_SCHEMA = ?n AND table_name = ?n AND COLUMN_NAME = ?n ";
 
             $type = $db->query($query, $db_name, $table, $column);
 
