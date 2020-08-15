@@ -219,7 +219,7 @@ class DB
 
         $columns = self::getColumnNames($table);
         $data = $db->filterArray($p_data, $columns);
-        
+
         $exist = false;
 
         if (is_array($primary)) {
@@ -252,6 +252,31 @@ class DB
         }
     }
 
+
+    public static function setDefaultString($db_name, $table)
+    {
+        global $db;
+
+        $columns = self::getColumnNames($table);
+
+        foreach ($columns as $column) {
+            $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+  WHERE INDEX_SCHEMA = ?n AND table_name = ?n AND COLUMN_NAME = ?n ";
+
+            $type = $db->query($query, $db_name, $table, $column);
+
+            if (str_contains($type, 'varchar')) {
+                $default = self::getColumnDefaultValue($db_name, $table, $column);
+
+                if (empty($default)) {
+                    $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ' '";
+                    $db->query($query, $table, $column);
+                }
+            }
+        }
+        return true;
+
+    }
 
     /**
      * Удалить запись
