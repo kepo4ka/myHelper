@@ -220,6 +220,15 @@ class DB
         $columns = self::getColumnNames($table);
         $data = $db->filterArray($p_data, $columns);
 
+        foreach($columns as $column)
+        {
+            if (!isset($data[$column]))
+            {
+                $data[$column] = '';
+            }
+        }
+
+
         $exist = false;
 
         if (is_array($primary)) {
