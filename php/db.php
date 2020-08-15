@@ -236,8 +236,7 @@ class DB
         } else {
             if (!isset($data[$primary])) {
                 $exist = false;
-            }
-            else {
+            } else {
                 $exist = self::checkExist($table, $primary, $data[$primary]);
             }
         }
@@ -260,6 +259,21 @@ class DB
                 return $db->query($query, $table, $data, $primary, $data[$primary]);
             }
         }
+    }
+
+
+    /**
+     * Удалить запись
+     * @param $table string Исходная таблица
+     * @param $column string Столбец, по которому идёт фильрация
+     * @param $value string Значение стоблца
+     * @return FALSE|\mysqli|resource Удалось ли удалить запись
+     */
+    public static function deleteRow($table, $column, $value)
+    {
+        global $db;
+        $query = 'DELETE FROM ?n WHERE ?n=?s';
+        return $db->query($query, $table, $column, $value);
     }
 
 
@@ -461,6 +475,8 @@ ALTER TABLE `$table`
         $query = "SELECT `COLUMN_DEFAULT` FROM `COLUMNS` WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
         return $info_db->getOne($query, $db_name, $table, $column);
     }
+
+
 
 
 }
