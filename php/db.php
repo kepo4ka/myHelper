@@ -264,7 +264,7 @@ class DB
 
             $type = $db->query($query, $db_name, $table, $column);
 
-            if ($type== 'varchar')) {
+            if ($type== 'varchar') {
                 $default = self::getColumnDefaultValue($db_name, $table, $column);
 
                 if (empty($default)) {
