@@ -222,6 +222,11 @@ class DB
 
         foreach($columns as $column)
         {
+            if ($column==$primary)
+            {
+                continue;
+            }
+
             if (!isset($data[$column]))
             {
                 $data[$column] = '';
