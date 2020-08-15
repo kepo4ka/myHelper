@@ -273,7 +273,7 @@ class DB
                 case 'varchar':
                     $default = self::getColumnDefaultValue($db_name, $table, $column);
                     if (empty($default)) {
-                        $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ' '";
+                        $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ''";
                         $db->query($query, $table, $column);
                     }
                     break;
