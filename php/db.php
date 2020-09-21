@@ -324,6 +324,13 @@ class DB
         return $res ?: 0;
     }
 
+    
+    public static function lastId()
+    {
+        global $db;
+        return $db->insertId();
+    }
+
 
     /**
      * Проверить существование записи с указанным значением одного поля
