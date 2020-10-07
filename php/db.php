@@ -6,6 +6,8 @@ require_once(__DIR__ . '/safemysql.php');
 
 use Exception;
 
+
+
 class DB
 {
 
@@ -731,6 +733,39 @@ public static function checkTableHavingSelectBox($table)
         $query = "select REFERENCED_TABLE_NAME as ref_table, REFERENCED_COLUMN_NAME as ref_column from INFORMATION_SCHEMA.KEY_COLUMN_USAGE where  REFERENCED_COLUMN_NAME<>'' AND TABLE_SCHEMA=?s AND TABLE_NAME = ?s AND COLUMN_NAME=?s";
         return self::$db->getRow($query, $db_name, $table, $column);
     }
+
+
+
+/**
+ * Получить количество записей с учётом выборки по массиву
+ * @param $table string Таблица, по которой идёт подсчёт
+ * @param $cols array Массив для фильтрации
+ * @return string
+ */
+public static function countingAdvanced($table, $cols)
+{
+    $query = "SELECT COUNT(1) FROM ?n";
+
+    $query .= ' WHERE';
+
+    foreach ($cols as $item) {
+
+
+        $col = $item['column'];
+        $val = $item['value'];
+
+        if ($item['full']) {
+            $query .= " `$col`='$val' AND";
+        } else {
+            $query .= " `$col` LIKE '%$val%' AND";
+        }
+    }
+
+    $query .= ' 1';
+
+    $res = self::$db->getOne($query, $table);
+    return $res ?: 0;
+}
 
 }
 
