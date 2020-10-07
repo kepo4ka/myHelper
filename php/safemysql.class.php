@@ -91,7 +91,7 @@ class SafeMySQL
     const RESULT_ASSOC = MYSQLI_ASSOC;
     const RESULT_NUM = MYSQLI_NUM;
 
-    function __construct($opt = array())
+    public function __construct($opt = array())
     {
         $opt = array_merge($this->defaults, $opt);
 
