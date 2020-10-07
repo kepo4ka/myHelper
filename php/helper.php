@@ -1259,7 +1259,7 @@ class Helper
      */
     public static function generateRandomArray($count, $min, $max)
     {
-        $array = array();
+        $array = [];
 
         while (count($array) < $count) {
             $number = rand($min, $max);
@@ -1277,6 +1277,5 @@ class Helper
 
         return $array;
     }
-
 
 }
