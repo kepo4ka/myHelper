@@ -4,6 +4,7 @@ namespace Helper;
 
 // DB QUERIES using `safemysql.class.php`
 
+require_once(__DIR__ . '/lib/safemysql.class.php');
 
 use Exception;
 
