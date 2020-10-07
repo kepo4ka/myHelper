@@ -91,6 +91,19 @@ class DB
     }
 
 
+/**
+ * Получить отсортированные данные из таблицы
+ * @param $table string Исходная таблица
+ * @param $column string Столбец, по которому идёт сортировка
+ * @return array Отсортированный список записей
+ */
+public static function getAllOrdered($table, $column)
+{
+    global $db;
+    $query = 'SELECT * FROM ?n ORDER BY ?n';
+    return $db->getAll($query, $table, $column);
+}
+
     /**
      * Получить запись по значению `column`
      * @param $table string Исходная таблица
