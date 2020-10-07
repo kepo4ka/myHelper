@@ -3,6 +3,7 @@
 
 namespace Helper;
 
+
 class Generator
 {
 
@@ -1055,5 +1056,43 @@ class Generator
 
         return $temp;
 
+    }
+
+
+    /**
+     * Сгенерировать Кнопки для строки DataTable
+     * Generate Action buttons for Datatable row
+     * @param $table string Source table
+     * @param $item mixed Table row
+     * @param $type string page url
+     * @return bool|string generated html
+     */
+    public static function genActionButtons($page_name, $table, &$item, $type)
+    {
+        global $page_name;
+
+        if (empty($item['id'])) {
+            return '';
+        }
+
+        $id = $item['id'];
+
+        $info['table'] = $table;
+        $info['page_name'] = $page_name;
+
+        $info['id'] = $id;
+
+        $info['data_type'] = $type;
+        $info['edit'] = true;
+        $info['copy'] = false;
+        $info['delete'] = true;
+
+        $relations = DB::getTableRelationsManyToOne($table);
+
+        if (!empty($relations)) {
+            $info['relations'] = $relations;
+        }
+
+        return self::getActionButtons($info);
     }
 }
