@@ -448,7 +448,7 @@ class Helper
      * @param $text string Исходная строка
      * @return mixed|string Отформатированная строка
      */
-    function readableText($text)
+    public static function readableText($text)
     {
         $formatted_text = preg_replace('/[_-]/', ' ', $text);
         $formatted_text = ucwords($formatted_text);
