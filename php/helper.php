@@ -1250,5 +1250,33 @@ class Helper
         return round($new_value, 1);
     }
 
+    /**
+     * Сгенерировать массив, заполненный случайными числами
+     * @param $count int Длина массива
+     * @param $min int Минимально возможное значение элемента массива
+     * @param $max int Максимально возможное значение элемента массива
+     * @return array Сгенерированный массив
+     */
+    public static function generateRandomArray($count, $min, $max)
+    {
+        $array = array();
+
+        while (count($array) < $count) {
+            $number = rand($min, $max);
+            $is_exist = false;
+            for ($i = 0, $iMax = count($array); $i < $iMax; $i++) {
+                if ($number === $array[$i]) {
+                    $is_exist = true;
+                    break;
+                }
+            }
+            if (!$is_exist) {
+                $array[] = $number;
+            }
+        }
+
+        return $array;
+    }
+
 
 }
