@@ -884,6 +884,21 @@ public static function countingAdvanced($table, $cols)
         return self::qSELECT($query);
     }
 
+    public static function transactionStart()
+    {
+        return self::$db->query('START TRANSACTION');
+    }
+
+    public static function transactionRollback()
+    {
+        return self::$db->query('ROLLBACK');
+    }
+
+    public static function transactionCommit()
+    {
+        return self::$db->query('commit');
+    }
+
 }
 
 ?>
