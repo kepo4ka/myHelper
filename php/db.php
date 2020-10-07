@@ -846,7 +846,7 @@ public static function countingAdvanced($table, $cols)
      * @param bool $search Выражение для поиска
      * @return array|bool|mixed Список записей
      */
-    public static function getAllLimit($table, $limit = 0, $offset = 0, $search = false)
+    public static function getAllLimit($table, $order_column = 'id', $limit = 0, $offset = 0, $search = false)
     {
         if ($limit > 0) {
         } else {
@@ -866,7 +866,7 @@ public static function countingAdvanced($table, $cols)
 
         }
 
-        $query .= ' ORDER BY `id` DESC';
+        $query .= " ORDER BY `$order_column` DESC";
 
         if ($limit > 0) {
             $query .= " LIMIT $limit";
@@ -875,6 +875,12 @@ public static function countingAdvanced($table, $cols)
                 $query .= " OFFSET $offset";
             }
         }
+        return self::qSELECT($query);
+    }
+
+    function getLastRows($table, $column = 'id', $limit = 5)
+    {
+        $query = "SELECT * FROM `$table` ORDER BY `$column` DESC LIMIT $limit";
         return self::qSELECT($query);
     }
 
