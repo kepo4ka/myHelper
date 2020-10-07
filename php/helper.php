@@ -1228,5 +1228,27 @@ class Helper
         return $array;
     }
 
+    /**
+     * Расчитать отношений двух величин
+     * @param $new mixed Первая величина
+     * @param $old mixed Вторая величина
+     * @return float|int
+     */
+    public static function getRatio($new, $old)
+    {
+        $new = (float)$new;
+        $old = (float)$old;
+        if ($old == 0) {
+            if ($new == 0) {
+                return 0;
+            }
+            return 100;
+        }
+
+        $new_value = (($new / $old) - 1) * 100;
+
+        return round($new_value, 1);
+    }
+
 
 }
