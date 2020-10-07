@@ -511,6 +511,242 @@ ALTER TABLE `$table`
         return $db->getOne($query, $db_name, $table, $column);
     }
 
+/**
+ * @param $results
+ * @param $keys_for_formatting
+ * @return mixed
+ */
+public static function formatDataForTableShowing($results, $keys_for_formatting)
+{
+    foreach ($results as &$item) {
+        foreach ($item as $key => &$obj) {
+            if (in_array($key, $keys_for_formatting)) {
+                $obj = Helper::inputFilter($obj);
+                if (strlen($obj) > 100) {
+                    $obj = mb_strcut($obj, 0, 200);
+                    $symbol_index = strrpos($obj, '.');
+
+                    if ($symbol_index === false) {
+                        $symbol_index = strrpos($obj, ' ');
+                    }
+                    $obj = mb_strcut($obj, 0, $symbol_index + 1) . ' ...';
+                }
+            }
+        }
+        unset($obj);
+    }
+    unset($item);
+
+    return $results;
+}
+
+
+/**
+ *  Отформатировать столбцы таблицы
+ * @param $table string Исходная таблица
+ * @return mixed Массив списков столбцов
+ */
+public static function getColumnsReadable($table)
+{
+    $columns = getColumnNames($table);
+    $data_columns = array('action');
+    $max_columns = array();
+
+    foreach ($columns as $column) {
+        $data_columns[] = $column;
+        $max_columns[] = self::readableText($column);
+    }
+
+    $result['data_columns'] = $data_columns;
+    $result['columns'] = $max_columns;
+    return $result;
+}
+
+
+/**
+     * Форматирование строки перед выводом
+     * @param $text string Исходная строка
+     * @return mixed|string Отформатированная строка
+     */
+    private static function readableText($text)
+    {
+        $formatted_text = preg_replace('/[_-]/', ' ', $text);
+        $formatted_text = ucwords($formatted_text);
+        return $formatted_text;
+    }
+
+/**
+ * Получить типы столбцов в таблице
+ * @param $table string Исходная таблица
+ * @return array Список типов
+ */
+public static function getTableTypes($table)
+{
+    global $db;
+    $columns = array();
+
+    $q = $db->query("DESCRIBE `$table`");
+    while ($row = $db->fetch($q)) {
+        $temp['type'] = $row['Type'];
+        $temp['name'] = $row['Field'];
+        $temp['value'] = '';
+        $columns[] = $temp;
+    }
+    return $columns;
+}
+
+/**
+ * Получить тип столбца
+ * @param $table string Исходная таблицы
+ * @param $column string Исходный столбец
+ * @return FALSE|string Тип столбца
+ */
+function getColumnType($table, $column)
+{
+    global $db;
+    $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+  WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
+    $res = $db->getOne($query, $table, $column);
+    return $res;
+}
+
+
+/**
+ * Получить столбцы таблицы, которые принимают только два значения: "Y" или "N"
+ * @param $table string Исходная таблицы
+ * @return array Список столбцов, подходящих под критерий
+ */
+public static function filterEnumColumns($table)
+{
+    $list = self::getTableTypes($table);
+
+    $bolean_columns = array();
+    foreach ($list as $item) {
+        if ($item['type'] === "tinyint(1)") {
+            $bolean_columns[] = $item['name'];
+        }
+    }
+    return $bolean_columns;
+}
+
+/**
+ * Получить данные для генерации формы
+ * @param $table string Исходная таблица
+ * @param $id int Id, по которой идёт выборка
+ * @return array Данные для генерации
+ */
+public static function rowWithTableTypes($table, $id)
+{
+    $empty_row = self::getTableTypes($table);
+
+    if (!$id) {
+        return $empty_row;
+    }
+
+    $row = self::getById($table, $id);
+
+    if (empty($row)) {
+        return $empty_row;
+    }
+
+
+    foreach ($empty_row as &$item) {
+        foreach ($row as $key => $value) {
+            if ($item['name'] == $key) {
+                $item['value'] = $value;
+                break;
+            }
+        }
+    }
+    return $empty_row;
+}
+
+
+/**
+ * Проверить имеет ли таблица возможность использования SelectBox
+ * @param $table string Исходная таблица
+ * @return array Список связей
+ */
+public static function checkTableHavingSelectBox($table)
+{
+    global $db;
+
+    $query = 'SELECT inner_column FROM relations WHERE table_name=?s';
+    return $db->getAll($query, $table);
+}
+
+
+/**
+ * Получить список связей "один ко многим"
+ * @param $table string Исходная таблица
+ * @param $key string Первичный ключ
+ * @return array|FALSE|string
+ */
+function getTableRelationsOneToMany($table, $key)
+{
+    $array =
+        [
+            [
+                'column' => 'table_name',
+                'value' => $table
+            ],
+            [
+                'column' => 'inner_column',
+                'value' => $key
+            ]
+        ];
+
+    $relation = self::getByColumnAndArray('relations', $array);
+    return $relation;
+}
+
+
+function getTableRelationsManyToOne($table)
+{
+    $array =
+        [
+            [
+                'column' => 'foreign_table',
+                'value' => $table
+            ]
+        ];
+
+    $relations = self::getByColumnAndArray('relations', $array, false);
+
+    $result_array = [];
+    foreach ($relations as $relation) {
+        if ($relation['table_name'] !== $relation['foreign_table']) {
+
+            $filter = [
+                [
+                    'column' => 'name',
+                    'value' => $relation['table_name']
+                ]
+            ];
+
+            $relation['foreign_table_name'] = DB::getByColumnAndArray('tables', $filter, true, 'full_name');
+
+            $result_array[] = $relation;
+
+        }
+    }
+
+    $relations = $result_array;
+
+
+    return $relations;
+}
+
+
+public static function getForeignKeys($table, $column)
+{
+    global $info_db, $db_name;
+
+    $query = "select REFERENCED_TABLE_NAME as ref_table, REFERENCED_COLUMN_NAME as ref_column from INFORMATION_SCHEMA.KEY_COLUMN_USAGE where  REFERENCED_COLUMN_NAME<>'' AND TABLE_SCHEMA=?s AND TABLE_NAME = ?s AND COLUMN_NAME=?s";
+
+    return $info_db->getRow($query, $db_name, $table, $column);
+}
+
 
 
 }
