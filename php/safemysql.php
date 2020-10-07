@@ -68,6 +68,7 @@
 namespace Helper;
 
 use Exception;
+use mysqli;
 
 class SafeMySQL
 {
