@@ -682,9 +682,8 @@ class Generator
     </button>
     <div class="dropdown-menu">';
             foreach ($info['relations'] as $relation_info) {
-
                 $table_name = $relation_info['table_name'];
-                $table_full_name = !empty($relation_info['foreign_table_name']) ? $relation_info['foreign_table_name'] : readableText($table_name);
+                $table_full_name = !empty($relation_info['foreign_table_name']) ? $relation_info['foreign_table_name'] : Helper::readableText($table_name);
                 $get_column = $relation_info['inner_column'];
                 $get_value = $id;
 
