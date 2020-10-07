@@ -899,6 +899,17 @@ public static function countingAdvanced($table, $cols)
         return self::$db->query('commit');
     }
 
+
+    /**
+     * Очистить таблицу
+     * @param $table string Название очищаемой таблицы
+     */
+    function clearTable($table)
+    {
+        $query = 'TRUNCATE TABLE ?n';
+        return self::$db->query($query, $table);
+    }
+
 }
 
 ?>
