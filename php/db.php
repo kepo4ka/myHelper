@@ -7,7 +7,6 @@ require_once(__DIR__ . '/safemysql.php');
 use Exception;
 
 
-
 class DB
 {
 
@@ -824,6 +823,59 @@ public static function countingAdvanced($table, $cols)
 
 
         return $tables;
+    }
+
+
+    public static function qSELECT($query, $is_one = false)
+    {
+        $result = self::$db->query($query);
+
+        if ($is_one) {
+            return @$result[0];
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Получить все записи из таблицы (расширенная)
+     * @param $table string Название таблицы
+     * @param int $limit Ограничение
+     * @param int $offset Отступ
+     * @param bool $search Выражение для поиска
+     * @return array|bool|mixed Список записей
+     */
+    public static function getAllLimit($table, $limit = 0, $offset = 0, $search = false)
+    {
+        if ($limit > 0) {
+        } else {
+            $limit = 1000;
+        }
+
+        $query = "SELECT * FROM `$table`";
+
+        if (!empty($search)) {
+            if (empty($search['value'])) {
+                return array();
+            }
+            $column = $search['column'];
+            $value = $search['value'];
+
+            $query .= " WHERE $column LIKE '%$value%'";
+
+        }
+
+        $query .= ' ORDER BY `id` DESC';
+
+        if ($limit > 0) {
+            $query .= " LIMIT $limit";
+
+            if ($offset > 0) {
+                $query .= " OFFSET $offset";
+            }
+        }
+        return self::qSELECT($query);
     }
 
 }
