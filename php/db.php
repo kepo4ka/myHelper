@@ -2,8 +2,6 @@
 
 namespace Helper;
 
-// DB QUERIES using `safemysql.class.php`
-
 require_once(__DIR__ . '/safemysql.php');
 
 use Exception;
@@ -11,11 +9,17 @@ use Exception;
 class DB
 {
 
+    public static $db;
+
+    public function __construct($host, $db_name, $user, $password, $charset = 'utf8mb4')
+    {
+        self::$db = new SafeMysql(array('user' => $user, 'pass' => $password, 'db' => $db_name, 'charset' => $charset));
+    }
+
     public static function getTables($db_name)
     {
-        global $db;
         $query = 'SHOW TABLES FROM ?n';
-        return $db->getCol($query, $db_name);
+        return self::$db->getCol($query, $db_name);
     }
 
 
@@ -30,8 +34,6 @@ class DB
      */
     public static function getAllLimitAdvanced($table, $limit = 0, $offset = 0, $search_array, $order)
     {
-        global $db;
-
         if ($limit > 0) {
         } else {
             $limit = 1000;
@@ -74,7 +76,7 @@ class DB
                 $query .= " OFFSET $offset";
             }
         }
-        return $db->getAll($query, $table);
+        return self::$db->getAll($query, $table);
     }
 
 
@@ -86,9 +88,8 @@ class DB
      */
     public static function getById($table, $id)
     {
-        global $db;
         $query = 'SELECT * FROM ?n WHERE `id`=?i';
-        return $db->getRow($query, $table, $id);
+        return self::$db->getRow($query, $table, $id);
     }
 
 
@@ -100,9 +101,8 @@ class DB
  */
 public static function getAllOrdered($table, $column)
 {
-    global $db;
     $query = 'SELECT * FROM ?n ORDER BY ?n';
-    return $db->getAll($query, $table, $column);
+    return self::$db->getAll($query, $table, $column);
 }
 
     /**
@@ -113,36 +113,32 @@ public static function getAllOrdered($table, $column)
      */
     public static function getByColumn($table, $column, $value)
     {
-        global $db;
         $query = 'SELECT * FROM ?n';
 
         if (!empty($column)) {
             $query .= "WHERE ?n=?s";
-            return $db->getRow($query, $table, $column, $value);
+            return self::$db->getRow($query, $table, $column, $value);
         }
-        return $db->getRow($query, $table, $column, $value);
+        return self::$db->getRow($query, $table, $column, $value);
     }
 
     public static function getByColAll($table, $column, $value)
     {
-        global $db;
         $query = 'SELECT * FROM ?n WHERE ?n = ?s';
-        return $db->getAll($query, $table, $column, $value);
+        return self::$db->getAll($query, $table, $column, $value);
     }
 
 
     public static function getAllByColLike($table, $column, $value)
     {
-        global $db;
         $value = '%' . $value . '%';
         $query = 'SELECT * FROM ?n WHERE ?n LIKE ?s';
-        return $db->getAll($query, $table, $column, $value);
+        return self::$db->getAll($query, $table, $column, $value);
     }
 
 
     public static function getByColumnAndArray($table, $array, $is_one = true, $needed_column = null)
     {
-        global $db;
 
         if (!empty($needed_column)) {
             $needed_column = "`$needed_column`";
@@ -159,16 +155,16 @@ public static function getAllOrdered($table, $column)
 
         if ($needed_column !== '*') {
             if ($is_one) {
-                return $db->getOne($query);
+                return self::$db->getOne($query);
             }
-            return $db->getCol($query);
+            return self::$db->getCol($query);
 
         }
 
         if ($is_one) {
-            return $db->getRow($query);
+            return self::$db->getRow($query);
         } else {
-            return $db->getAll($query);
+            return self::$db->getAll($query);
         }
     }
 
@@ -180,16 +176,15 @@ public static function getAllOrdered($table, $column)
      */
     public static function saveRelation($p_data, $table)
     {
-        global $db;
         if (empty($p_data)) {
             return false;
         }
 
         $columns = self::getColumnNames($table);
-        $data = $db->filterArray($p_data, $columns);
+        $data = self::$db->filterArray($p_data, $columns);
 
         $query = 'INSERT INTO ?n SET ?u';
-        return $db->query($query, $table, $data);
+        return self::$db->query($query, $table, $data);
     }
 
 
@@ -204,7 +199,6 @@ public static function getAllOrdered($table, $column)
      */
     public static function getOneToMany($table, $column, $value, $needed_column, $limit = 0)
     {
-        global $db;
         $query = 'SELECT ?n FROM ?n WHERE ?n=?s';
         $limit = (int)$limit;
 
@@ -212,7 +206,7 @@ public static function getAllOrdered($table, $column)
             $query .= "LIMIT $limit";
         }
 
-        return $db->getCol($query, $needed_column, $table, $column, $value);
+        return self::$db->getCol($query, $needed_column, $table, $column, $value);
     }
 
 
@@ -225,14 +219,12 @@ public static function getAllOrdered($table, $column)
      */
     public static function save($p_data, $table, $primary = 'id')
     {
-        global $db;
-
         if (empty($p_data)) {
             return false;
         }
 
         $columns = self::getColumnNames($table);
-        $data = $db->filterArray($p_data, $columns);
+        $data = self::$db->filterArray($p_data, $columns);
 
         $exist = false;
 
@@ -248,7 +240,7 @@ public static function getAllOrdered($table, $column)
 
         if (!$exist) {
             $query = 'INSERT INTO ?n SET ?u';
-            return $db->query($query, $table, $data);
+            return self::$db->query($query, $table, $data);
         } else {
             if (is_array($primary)) {
                 $query = 'UPDATE ?n SET ?u WHERE';
@@ -258,10 +250,10 @@ public static function getAllOrdered($table, $column)
                 }
                 $query .= ' 1';
 
-                return $db->query($query, $table, $data);
+                return self::$db->query($query, $table, $data);
             } else {
                 $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
-                return $db->query($query, $table, $data, $primary, $data[$primary]);
+                return self::$db->query($query, $table, $data, $primary, $data[$primary]);
             }
         }
     }
@@ -269,8 +261,6 @@ public static function getAllOrdered($table, $column)
 
     public static function setDefaultColumnValue($db_name, $table)
     {
-        global $db;
-
         $columns = self::getColumnNames($table);
 
         $types = [];
@@ -278,7 +268,7 @@ public static function getAllOrdered($table, $column)
         foreach ($columns as $column) {
             $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ?s AND table_name = ?s AND COLUMN_NAME = ?s limit 1";
 
-            $type_info = $db->getRow($query, $db_name, $table, $column);
+            $type_info = self::$db->getRow($query, $db_name, $table, $column);
 
             $type = @$type_info['DATA_TYPE'];
 
@@ -288,14 +278,14 @@ public static function getAllOrdered($table, $column)
                     $default = self::getColumnDefaultValue($db_name, $table, $column);
                     if (empty($default)) {
                         $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ''";
-                        $db->query($query, $table, $column);
+                        self::$db->query($query, $table, $column);
                     }
                     break;
                 case 'int':
                     $default = self::getColumnDefaultValue($db_name, $table, $column);
                     if (!is_int($default)) {
                         $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT 0";
-                        $db->query($query, $table, $column);
+                        self::$db->query($query, $table, $column);
                     }
                     break;
             }
@@ -313,9 +303,8 @@ public static function getAllOrdered($table, $column)
      */
     public static function deleteRow($table, $column, $value)
     {
-        global $db;
         $query = 'DELETE FROM ?n WHERE ?n=?s';
-        return $db->query($query, $table, $column, $value);
+        return self::$db->query($query, $table, $column, $value);
     }
 
 
@@ -328,21 +317,19 @@ public static function getAllOrdered($table, $column)
      */
     public static function counting($table, $col = false, $val = false)
     {
-        global $db;
         $query = "SELECT COUNT(1) FROM ?n";
 
         if (!empty($col) && !empty($val)) {
             $query .= " WHERE `$col`='$val'";
         }
-        $res = $db->getOne($query, $table);
+        $res = self::$db->getOne($query, $table);
         return $res ?: 0;
     }
 
     
     public static function lastId()
     {
-        global $db;
-        return $db->insertId();
+        return self::$db->insertId();
     }
 
 
@@ -355,9 +342,8 @@ public static function getAllOrdered($table, $column)
      */
     public static function checkExist($table, $column, $value)
     {
-        global $db;
         $query = 'SELECT ?n FROM ?n WHERE ?n=?s';
-        $is_exist = $db->getOne($query, $column, $table, $column, $value);
+        $is_exist = self::$db->getOne($query, $column, $table, $column, $value);
         return $is_exist;
     }
 
@@ -369,13 +355,12 @@ public static function getAllOrdered($table, $column)
      */
     public static function getColumnNames($table_name)
     {
-        global $db;
         $columns = array();
 
         try {
             $sql = "SHOW COLUMNS FROM `$table_name`";
-            $result = $db->query($sql);
-            while ($row = $db->fetch($result)) {
+            $result = self::$db->query($sql);
+            while ($row = self::$db->fetch($result)) {
                 $columns[] = $row['Field'];
             }
         } catch (Exception $ex) {
@@ -387,15 +372,13 @@ public static function getAllOrdered($table, $column)
 
     public static function getAll($table)
     {
-        global $db;
         $query = "SELECT * FROM " . $table;
-        return $db->getAll($query);
+        return self::$db->getAll($query);
     }
 
 
     public static function createLogTable($table = 'debug_log')
     {
-        global $db;
         $query = "
 CREATE TABLE `$table` (
   `id` int(11) NOT NULL,
@@ -420,7 +403,7 @@ ALTER TABLE `$table`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
 
         try {
-            return $db->query($query) && $db->query($query1);
+            return self::$db->query($query) && self::$db->query($query1);
         } catch (Exception $exception) {
             return false;
         }
@@ -435,17 +418,16 @@ ALTER TABLE `$table`
      */
     public static function logDB($data, $title = 'Info', $type = 'info', $table = 'debug_log')
     {
-        global $config, $db;
 
         try {
             $count = self::counting($table);
 
             if ($count > 500) {
                 $primary = 'id';
-                $id = $db->getOne('SELECT ?n FROM ?n', $primary, $table);
+                $id = self::$db->getOne('SELECT ?n FROM ?n', $primary, $table);
 
                 if (!empty($id)) {
-                    $db->query('DELETE FROM ?n WHERE ?n=?i', $table, $primary, $id);
+                    self::$db->query('DELETE FROM ?n WHERE ?n=?i', $table, $primary, $id);
                 }
             }
 
@@ -457,10 +439,10 @@ ALTER TABLE `$table`
             $element['data'] = json_encode($data, JSON_UNESCAPED_UNICODE);
             $element['type'] = $type;
             $element['title'] = $title;
-            @$element['site'] = @$config['site'];
-            $element['proccess_id'] = @$config['proccess_id'];
+            @$element['site'] = '';
+            $element['proccess_id'] = '';
 
-            return $db->query('INSERT INTO ?n SET ?u', $table, $element);
+            return self::$db->query('INSERT INTO ?n SET ?u', $table, $element);
         } catch (Exception $exception) {
             return ['error' => true, 'message' => $exception->getMessage()];
         }
@@ -472,22 +454,20 @@ ALTER TABLE `$table`
      */
     public static function getlogDB($site = false, $table = 'debug_log')
     {
-        global $db;
         $query = 'SELECT * FROM ?n';
         if (!empty($site)) {
             $query .= ' WHERE `site`="' . $site . '"';
         }
         $query .= ' ORDER BY `id` DESC LIMIT 50';
 
-        return $db->getAll($query, $table);
+        return self::$db->getAll($query, $table);
     }
 
 
     public static function clearlogDB($table = 'debug_log')
     {
-        global $db;
         $table = 'debug_log';
-        return $db->query('DELETE FROM ?n', $table);
+        return self::$db->query('DELETE FROM ?n', $table);
     }
 
     /**
@@ -512,17 +492,15 @@ ALTER TABLE `$table`
 
     public static function getColumnComment($db_name, $table, $column)
     {
-        global $db;
         $query = "SELECT `COLUMN_COMMENT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
-        return $db->getOne($query, $db_name, $table, $column);
+        return self::$db->getOne($query, $db_name, $table, $column);
     }
 
 
     public static function getColumnDefaultValue($db_name, $table, $column)
     {
-        global $db;
         $query = "SELECT `COLUMN_DEFAULT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
-        return $db->getOne($query, $db_name, $table, $column);
+        return self::$db->getOne($query, $db_name, $table, $column);
     }
 
 /**
@@ -562,7 +540,7 @@ public static function formatDataForTableShowing($results, $keys_for_formatting)
  */
 public static function getColumnsReadable($table)
 {
-    $columns = getColumnNames($table);
+    $columns = self::getColumnNames($table);
     $data_columns = array('action');
     $max_columns = array();
 
@@ -596,11 +574,10 @@ public static function getColumnsReadable($table)
  */
 public static function getTableTypes($table)
 {
-    global $db;
     $columns = array();
 
-    $q = $db->query("DESCRIBE `$table`");
-    while ($row = $db->fetch($q)) {
+    $q = self::$db->query("DESCRIBE `$table`");
+    while ($row = self::$db->fetch($q)) {
         $temp['type'] = $row['Type'];
         $temp['name'] = $row['Field'];
         $temp['value'] = '';
@@ -615,12 +592,11 @@ public static function getTableTypes($table)
  * @param $column string Исходный столбец
  * @return FALSE|string Тип столбца
  */
-function getColumnType($table, $column)
+    public static function getColumnType($table, $column)
 {
-    global $db;
     $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
   WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
-    $res = $db->getOne($query, $table, $column);
+    $res = self::$db->getOne($query, $table, $column);
     return $res;
 }
 
@@ -683,10 +659,8 @@ public static function rowWithTableTypes($table, $id)
  */
 public static function checkTableHavingSelectBox($table)
 {
-    global $db;
-
     $query = 'SELECT inner_column FROM relations WHERE table_name=?s';
-    return $db->getAll($query, $table);
+    return self::$db->getAll($query, $table);
 }
 
 
@@ -696,7 +670,7 @@ public static function checkTableHavingSelectBox($table)
  * @param $key string Первичный ключ
  * @return array|FALSE|string
  */
-function getTableRelationsOneToMany($table, $key)
+    public static function getTableRelationsOneToMany($table, $key)
 {
     $array =
         [
@@ -715,7 +689,7 @@ function getTableRelationsOneToMany($table, $key)
 }
 
 
-function getTableRelationsManyToOne($table)
+    public static function getTableRelationsManyToOne($table)
 {
     $array =
         [
@@ -752,16 +726,11 @@ function getTableRelationsManyToOne($table)
 }
 
 
-public static function getForeignKeys($table, $column)
-{
-    global $info_db, $db_name;
-
-    $query = "select REFERENCED_TABLE_NAME as ref_table, REFERENCED_COLUMN_NAME as ref_column from INFORMATION_SCHEMA.KEY_COLUMN_USAGE where  REFERENCED_COLUMN_NAME<>'' AND TABLE_SCHEMA=?s AND TABLE_NAME = ?s AND COLUMN_NAME=?s";
-
-    return $info_db->getRow($query, $db_name, $table, $column);
-}
-
-
+    public static function getForeignKeys($db_name, $table, $column)
+    {
+        $query = "select REFERENCED_TABLE_NAME as ref_table, REFERENCED_COLUMN_NAME as ref_column from INFORMATION_SCHEMA.KEY_COLUMN_USAGE where  REFERENCED_COLUMN_NAME<>'' AND TABLE_SCHEMA=?s AND TABLE_NAME = ?s AND COLUMN_NAME=?s";
+        return self::$db->getRow($query, $db_name, $table, $column);
+    }
 
 }
 
