@@ -767,6 +767,65 @@ public static function countingAdvanced($table, $cols)
     return $res ?: 0;
 }
 
+
+    /**
+     * Создать таблицу для контроля других таблиц
+     * @param $db_name string Исходная база
+     * @param string $control_table_name Название контрольной таблицы
+     * @return array|FALSE Создана ли база
+     */
+    public static function createControlTable($db_name, $control_table_name = 'tables')
+    {
+
+        $query = 'DROP TABLE IF EXISTS ?n.?n';
+
+       self::$db->query($query, $db_name, $control_table_name);
+
+
+        $query = "CREATE TABLE ?n.?n (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `name` varchar(100) NOT NULL,
+          `full_name` varchar(150) NOT NULL,
+          `edit` tinyint(1) NOT NULL,
+          `position` int(11) NOT NULL,
+          `info` text NOT NULL,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `name` (`name`),
+          KEY `edit` (`edit`),
+          KEY `position` (`position`)
+        ) ENGINE=InnoDB";
+
+        self::$db->query($query, $db_name, $control_table_name);
+
+        $relations_table = 'relations';
+
+        $query = 'CREATE TABLE ?n.?n (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `table_name` varchar(130) NOT NULL,
+      `inner_column` varchar(130) NOT NULL,
+      `foreign_table` varchar(130) NOT NULL,
+      `foreign_column` varchar(130) NOT NULL,
+      PRIMARY KEY (`id`)
+    )';
+        self::$db->query($query, $db_name, $relations_table);
+
+
+        $tables = self::getTables($db_name);
+
+
+        foreach ($tables as $table) {
+            $info = [];
+            $info['name'] = $table;
+            $info['full_name'] = Helper::readableText($info['name']);
+            $info['position'] = 1;
+            $info['edit'] = 'Y';
+            self::save($info, $control_table_name);
+        }
+
+
+        return $tables;
+    }
+
 }
 
 ?>
