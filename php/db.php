@@ -878,7 +878,7 @@ public static function countingAdvanced($table, $cols)
         return self::qSELECT($query);
     }
 
-    function getLastRows($table, $column = 'id', $limit = 5)
+    public static function getLastRows($table, $column = 'id', $limit = 5)
     {
         $query = "SELECT * FROM `$table` ORDER BY `$column` DESC LIMIT $limit";
         return self::qSELECT($query);
