@@ -904,7 +904,7 @@ public static function countingAdvanced($table, $cols)
      * Очистить таблицу
      * @param $table string Название очищаемой таблицы
      */
-    function clearTable($table)
+    public static function clearTable($table)
     {
         $query = 'TRUNCATE TABLE ?n';
         return self::$db->query($query, $table);
