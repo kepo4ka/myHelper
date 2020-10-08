@@ -828,7 +828,7 @@ public static function countingAdvanced($table, $cols)
 
     public static function qSELECT($query, $is_one = false)
     {
-        if (preg_match('/select/u', $query)) {
+        if (preg_match('/select/iu', $query)) {
             $result = self::$db->getAll($query);
         } else {
             $result = self::$db->query($query);
