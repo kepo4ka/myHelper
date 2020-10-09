@@ -646,10 +646,25 @@ public static function getTableTypes($table)
     public static function getColumnType($table, $column)
 {
     $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
-  WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
+      WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
     $res = self::$db->getOne($query, $table, $column);
     return $res;
 }
+
+    /**
+     * Получить длину столбца
+     * @param $table string Исходная таблицы
+     * @param $column string Исходный столбец
+     * @return FALSE|string Тип столбца
+     */
+    public static function getColumnLength($table, $column)
+    {
+        $query = "SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS 
+          WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
+        $res = self::$db->getOne($query, $table, $column);
+        return $res;
+    }
+
 
 
 /**
