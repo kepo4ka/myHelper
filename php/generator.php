@@ -1061,6 +1061,7 @@ class Generator
     /**
      * Сгенерировать Кнопки для строки DataTable
      * Generate Action buttons for Datatable row
+     * @param $page_name
      * @param $table string Source table
      * @param $item mixed Table row
      * @param $type string page url
@@ -1068,8 +1069,6 @@ class Generator
      */
     public static function genActionButtons($page_name, $table, &$item, $type)
     {
-        global $page_name;
-
         if (empty($item['id'])) {
             return '';
         }
