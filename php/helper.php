@@ -1278,4 +1278,16 @@ class Helper
         return $array;
     }
 
+    /**
+     * Проверка является ли массив Ассоциативным
+     * https://stackoverflow.com/questions/173400/how-to-check-if-php-array-is-associative-or-sequential
+     * @param array $arr
+     * @return bool
+     */
+    function isAssoc(array $arr)
+    {
+        if (array() === $arr) return false;
+        return array_keys($arr) !== range(0, count($arr) - 1);
+    }
+
 }

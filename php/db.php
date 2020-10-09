@@ -137,7 +137,14 @@ public static function getAllOrdered($table, $column)
         return self::$db->getAll($query, $table, $column, $value);
     }
 
-
+    /**
+     * Получить записи, фильтруя по нескольким полям
+     * @param $table string Исходная таблица
+     * @param $array array Массив вида [['column'=>'col_example', 'value'=>'value_example']] ИЛИ [['col_example', 'value_example']]
+     * @param bool $is_one Получить только одну запись
+     * @param null $needed_column Выбирать определённую колонку
+     * @return array|FALSE|string
+     */
     public static function getByColumnAndArray($table, $array, $is_one = true, $needed_column = null)
     {
 
@@ -150,6 +157,11 @@ public static function getAllOrdered($table, $column)
         $query = "SELECT $needed_column FROM $table WHERE";
 
         foreach ($array as $item) {
+            if (!isset($item['column']) && count($item) == 2) {
+                $item['column'] = @$item[0];
+                $item['value'] = @$item[1];
+            }
+
             $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
         }
         $query .= ' 1';
@@ -247,6 +259,11 @@ public static function getAllOrdered($table, $column)
                 $query = 'UPDATE ?n SET ?u WHERE';
 
                 foreach ($primary as $item) {
+                    if (!isset($item['column']) && count($item) == 2) {
+                        $item['column'] = @$item[0];
+                        $item['value'] = @$item[1];
+                    }
+                    
                     $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
                 }
                 $query .= ' 1';
