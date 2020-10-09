@@ -409,6 +409,7 @@ class Helper
     static function inputFilter($input)
     {
         $input = trim($input);
+        $input = htmlspecialchars($input, ENT_QUOTES | ENT_SUBSTITUTE, 'utf-8');
         $input = html_entity_decode($input);
 
         $input = strip_tags($input);
