@@ -259,11 +259,18 @@ public static function getAllOrdered($table, $column)
                 $query = 'UPDATE ?n SET ?u WHERE';
 
                 foreach ($primary as $item) {
-                    if (!isset($item['column']) && count($item) == 2) {
+
+                    if (is_string($item)) {
+                        $temp = $item;
+                        $item = [];
+                        $item['column'] = $temp;
+                        $item['value'] = $data[$temp];
+                        
+                    } else if (!isset($item['column']) && count($item) == 2) {
                         $item['column'] = @$item[0];
                         $item['value'] = @$item[1];
                     }
-                    
+
                     $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
                 }
                 $query .= ' 1';
