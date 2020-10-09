@@ -227,7 +227,7 @@ public static function getAllOrdered($table, $column)
      * Добавление записи или обновление в случае существования
      * @param $p_data array Данные для добавления
      * @param $table string Исходная Таблица
-     * @param string $primary Название первичного ключа
+     * @param string|array $primary Название первичного ключа
      * @return bool|FALSE|resource Результат операции
      */
     public static function save($p_data, $table, $primary = 'id')
@@ -242,7 +242,7 @@ public static function getAllOrdered($table, $column)
         $exist = false;
 
         if (is_array($primary)) {
-            $exist = self::getByColumnAndArray($table, $primary);
+            $exist = self::checkExist($table, $primary, $data);
         } else {
             if (!isset($data[$primary])) {
                 $exist = false;
@@ -260,15 +260,17 @@ public static function getAllOrdered($table, $column)
 
                 foreach ($primary as $item) {
 
-                    if (is_string($item)) {
-                        $temp = $item;
-                        $item = [];
-                        $item['column'] = $temp;
-                        $item['value'] = $data[$temp];
-                        
-                    } else if (!isset($item['column']) && count($item) == 2) {
-                        $item['column'] = @$item[0];
-                        $item['value'] = @$item[1];
+                    switch (true) {
+                        case is_string($item):
+                            $temp = $item;
+                            $item = [];
+                            $item['column'] = $temp;
+                            $item['value'] = $data[$temp];
+                            break;
+                        case empty($item['column']):
+                            $item['column'] = @$item[0];
+                            $item['value'] = @$item[1];
+                            break;
                     }
 
                     $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
@@ -362,14 +364,38 @@ public static function getAllOrdered($table, $column)
      * Проверить существование записи с указанным значением одного поля
      * @param $table string Таблица для проверки
      * @param $column string Поле для проверки
-     * @param $value string Контрольное Значение
+     * @param $value string|array Контрольное Значение
      * @return FALSE|string Существует или нет
      */
     public static function checkExist($table, $column, $value)
     {
-        $query = 'SELECT ?n FROM ?n WHERE ?n=?s';
-        $is_exist = self::$db->getOne($query, $column, $table, $column, $value);
-        return $is_exist;
+        if (is_array($column) && Helper::isAssoc($value)) {
+            $new_filter = [];
+
+            foreach ($column as $item) {
+                if (is_string($item)) {
+                    $new_filter[$item] = $value[$item];
+                }
+
+                switch (true) {
+                    case is_string($item):
+                        $new_filter[$item] = $value[$item];
+                        break;
+                    case !empty($item['column']):
+                        $new_filter[$item['column']] = $item['value'];
+                        break;
+                    case !empty($item[0]):
+                        $new_filter[$item[0]] = $item[1];
+                        break;
+                }
+            }
+
+            $query = 'SELECT ?n FROM ?n WHERE ?x';
+            return self::$db->getOne($query, $column, $table, $new_filter);
+        } else {
+            $query = 'SELECT ?n FROM ?n WHERE ?n=?s';
+            return self::$db->getOne($query, $column, $table, $column, $value);
+        }
     }
 
 
