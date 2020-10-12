@@ -934,10 +934,11 @@ public static function countingAdvanced($table, $cols)
             $value = $search['value'];
 
             $query .= " WHERE $column LIKE '%$value%'";
-
         }
 
-        $query .= " ORDER BY `$order_column` DESC";
+        if (!empty($order_column)) {
+            $query .= " ORDER BY `$order_column` DESC";
+        }
 
         if ($limit > 0) {
             $query .= " LIMIT $limit";
