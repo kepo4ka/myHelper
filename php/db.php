@@ -891,6 +891,46 @@ public static function countingAdvanced($table, $cols)
     }
 
 
+
+    public static function createAdminTables($db_name, $admin_table = 'admin_users', $admin_attemps = 'admin_auth_attempts')
+    {
+        $query = 'CREATE TABLE ?n.?n (
+          `id` int(11) NOT NULL,
+          `login` varchar(100) NOT NULL,
+          `password` varchar(100) NOT NULL,
+          `role` varchar(100) NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+
+        DB::$db->query($query, $db_name, $admin_table);
+
+
+        $query = 'ALTER TABLE ?n.?n
+          ADD PRIMARY KEY (`id`),
+          ADD UNIQUE KEY `login` (`login`);';
+
+        DB::$db->query($query, $db_name, $admin_table);
+
+
+        $query = 'CREATE TABLE ?n.?n (
+          `id` int(11) NOT NULL,
+          `ip` varchar(30) NOT NULL,
+          `count` int(11) NOT NULL DEFAULT 0,
+          `last_attempt_time` varchar(30) NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+
+        DB::$db->query($query, $db_name, $admin_attemps);
+
+
+        $query = 'ALTER TABLE ?n.?n
+          ADD PRIMARY KEY (`id`),
+          ADD UNIQUE KEY `ip` (`ip`),
+          ADD KEY `last_attempt_time` (`last_attempt_time`);';
+
+        DB::$db->query($query, $db_name, $admin_attemps);
+        return true;
+    }
+
+
     public static function qSELECT($query, $is_one = false)
     {
         if (preg_match('/select/iu', $query)) {
