@@ -892,10 +892,8 @@ class Helper
     /**
      * Сохранить в сессии данные $_POST
      */
-    public static function setPostToSession()
+    public static function setPostToSession($true__start_fields = null)
     {
-        global $true__start_fields;
-
         if (!empty($_POST)) {
             foreach ($_POST as $key => $item) {
                 if (empty($item)) {
