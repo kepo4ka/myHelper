@@ -144,8 +144,12 @@ class Helper
      * @return string Случайный UserAgent
      */
     public
-    static function getRandUserAgent($file = __DIR__ . '/assets/useragents.txt')
+    static function getRandUserAgent($file)
     {
+        if (empty($file)) {
+            $file = __DIR__ . '/assets/useragents.txt';
+        }
+
         $line = '';
         try {
             $f_contents = @file($file);
