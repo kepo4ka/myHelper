@@ -653,7 +653,7 @@ class Helper
      * @return array Список изображений
      */
     public
-    static function getFiles(string $directory): array
+    static function getFiles($directory)
     {
         $files = [];
 
@@ -1183,7 +1183,7 @@ class Helper
      * @param string $xml
      * @return mixed
      */
-    private function _xml_to_array(string $xml)
+    private function _xml_to_array($xml)
     {
         $xml = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
         $json = json_encode($xml);
