@@ -75,7 +75,7 @@ class Content
             }
             $pagination .= '';
 
-            $label = str_ireplace('[results]', '<b>' . $total_rows . '</b>', Lang::string('transactions-pagination'));
+          //  $label = str_ireplace('[results]', '<b>' . $total_rows . '</b>', Lang::string('transactions-pagination'));
             $label = str_ireplace('[num_pages]', '<b>' . $num_pages . '</b>', $label);
 
             $right_interval_page = $p_one_more < $num_pages ? $p_one_more : $num_pages;
