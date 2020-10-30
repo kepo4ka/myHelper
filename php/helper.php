@@ -693,7 +693,14 @@ class Helper
      */
     public static function isAjax()
     {
-        $is_ajax = 'xmlhttprequest' == strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '');
+        $with =  '';
+
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']))
+        {
+            $with = $_SERVER['HTTP_X_REQUESTED_WITH'];
+        }
+
+        $is_ajax = 'xmlhttprequest' == strtolower($with);
         return $is_ajax;
     }
 
