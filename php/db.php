@@ -14,7 +14,12 @@ class DB
 
     public function __construct($host, $db_name, $user, $password, $charset = 'utf8mb4')
     {
-        self::$db = new SafeMysql(array('user' => $user, 'pass' => $password, 'db' => $db_name, 'charset' => $charset));
+        try {
+            self::$db = new SafeMysql(array('user' => $user, 'pass' => $password, 'db' => $db_name, 'charset' => $charset));
+        } catch (Exception $exception) {
+            return false;
+        }
+        return false;
     }
 
     public static function getTables($db_name)
@@ -94,17 +99,17 @@ class DB
     }
 
 
-/**
- * Получить отсортированные данные из таблицы
- * @param $table string Исходная таблица
- * @param $column string Столбец, по которому идёт сортировка
- * @return array Отсортированный список записей
- */
-public static function getAllOrdered($table, $column)
-{
-    $query = 'SELECT * FROM ?n ORDER BY ?n';
-    return self::$db->getAll($query, $table, $column);
-}
+    /**
+     * Получить отсортированные данные из таблицы
+     * @param $table string Исходная таблица
+     * @param $column string Столбец, по которому идёт сортировка
+     * @return array Отсортированный список записей
+     */
+    public static function getAllOrdered($table, $column)
+    {
+        $query = 'SELECT * FROM ?n ORDER BY ?n';
+        return self::$db->getAll($query, $table, $column);
+    }
 
     /**
      * Получить запись по значению `column`
@@ -299,8 +304,7 @@ public static function getAllOrdered($table, $column)
 
             $type = @$type_info['DATA_TYPE'];
 
-            switch ($type)
-            {
+            switch ($type) {
                 case 'varchar':
                     $default = self::getColumnDefaultValue($db_name, $table, $column);
                     if (empty($default)) {
@@ -353,7 +357,7 @@ public static function getAllOrdered($table, $column)
         return $res ?: 0;
     }
 
-    
+
     public static function lastId()
     {
         return self::$db->insertId();
@@ -554,59 +558,59 @@ ALTER TABLE `$table`
         return self::$db->getOne($query, $db_name, $table, $column);
     }
 
-/**
- * @param $results
- * @param $keys_for_formatting
- * @return mixed
- */
-public static function formatDataForTableShowing($results, $keys_for_formatting)
-{
-    foreach ($results as &$item) {
-        foreach ($item as $key => &$obj) {
-            if (in_array($key, $keys_for_formatting)) {
-                $obj = Helper::inputFilter($obj);
-                if (strlen($obj) > 100) {
-                    $obj = mb_strcut($obj, 0, 200);
-                    $symbol_index = strrpos($obj, '.');
+    /**
+     * @param $results
+     * @param $keys_for_formatting
+     * @return mixed
+     */
+    public static function formatDataForTableShowing($results, $keys_for_formatting)
+    {
+        foreach ($results as &$item) {
+            foreach ($item as $key => &$obj) {
+                if (in_array($key, $keys_for_formatting)) {
+                    $obj = Helper::inputFilter($obj);
+                    if (strlen($obj) > 100) {
+                        $obj = mb_strcut($obj, 0, 200);
+                        $symbol_index = strrpos($obj, '.');
 
-                    if ($symbol_index === false) {
-                        $symbol_index = strrpos($obj, ' ');
+                        if ($symbol_index === false) {
+                            $symbol_index = strrpos($obj, ' ');
+                        }
+                        $obj = mb_strcut($obj, 0, $symbol_index + 1) . ' ...';
                     }
-                    $obj = mb_strcut($obj, 0, $symbol_index + 1) . ' ...';
                 }
             }
+            unset($obj);
         }
-        unset($obj);
-    }
-    unset($item);
+        unset($item);
 
-    return $results;
-}
-
-
-/**
- *  Отформатировать столбцы таблицы
- * @param $table string Исходная таблица
- * @return mixed Массив списков столбцов
- */
-public static function getColumnsReadable($table)
-{
-    $columns = self::getColumnNames($table);
-    $data_columns = array('action');
-    $max_columns = array();
-
-    foreach ($columns as $column) {
-        $data_columns[] = $column;
-        $max_columns[] = self::readableText($column);
+        return $results;
     }
 
-    $result['data_columns'] = $data_columns;
-    $result['columns'] = $max_columns;
-    return $result;
-}
+
+    /**
+     *  Отформатировать столбцы таблицы
+     * @param $table string Исходная таблица
+     * @return mixed Массив списков столбцов
+     */
+    public static function getColumnsReadable($table)
+    {
+        $columns = self::getColumnNames($table);
+        $data_columns = array('action');
+        $max_columns = array();
+
+        foreach ($columns as $column) {
+            $data_columns[] = $column;
+            $max_columns[] = self::readableText($column);
+        }
+
+        $result['data_columns'] = $data_columns;
+        $result['columns'] = $max_columns;
+        return $result;
+    }
 
 
-/**
+    /**
      * Форматирование строки перед выводом
      * @param $text string Исходная строка
      * @return mixed|string Отформатированная строка
@@ -618,38 +622,38 @@ public static function getColumnsReadable($table)
         return $formatted_text;
     }
 
-/**
- * Получить типы столбцов в таблице
- * @param $table string Исходная таблица
- * @return array Список типов
- */
-public static function getTableTypes($table)
-{
-    $columns = array();
+    /**
+     * Получить типы столбцов в таблице
+     * @param $table string Исходная таблица
+     * @return array Список типов
+     */
+    public static function getTableTypes($table)
+    {
+        $columns = array();
 
-    $q = self::$db->query("DESCRIBE `$table`");
-    while ($row = self::$db->fetch($q)) {
-        $temp['type'] = $row['Type'];
-        $temp['name'] = $row['Field'];
-        $temp['value'] = '';
-        $columns[] = $temp;
+        $q = self::$db->query("DESCRIBE `$table`");
+        while ($row = self::$db->fetch($q)) {
+            $temp['type'] = $row['Type'];
+            $temp['name'] = $row['Field'];
+            $temp['value'] = '';
+            $columns[] = $temp;
+        }
+        return $columns;
     }
-    return $columns;
-}
 
-/**
- * Получить тип столбца
- * @param $table string Исходная таблицы
- * @param $column string Исходный столбец
- * @return FALSE|string Тип столбца
- */
+    /**
+     * Получить тип столбца
+     * @param $table string Исходная таблицы
+     * @param $column string Исходный столбец
+     * @return FALSE|string Тип столбца
+     */
     public static function getColumnType($table, $column)
-{
-    $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+    {
+        $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
       WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
-    $res = self::$db->getOne($query, $table, $column);
-    return $res;
-}
+        $res = self::$db->getOne($query, $table, $column);
+        return $res;
+    }
 
     /**
      * Получить длину столбца
@@ -666,130 +670,129 @@ public static function getTableTypes($table)
     }
 
 
+    /**
+     * Получить столбцы таблицы, которые принимают только два значения: "Y" или "N"
+     * @param $table string Исходная таблицы
+     * @return array Список столбцов, подходящих под критерий
+     */
+    public static function filterEnumColumns($table)
+    {
+        $list = self::getTableTypes($table);
 
-/**
- * Получить столбцы таблицы, которые принимают только два значения: "Y" или "N"
- * @param $table string Исходная таблицы
- * @return array Список столбцов, подходящих под критерий
- */
-public static function filterEnumColumns($table)
-{
-    $list = self::getTableTypes($table);
-
-    $bolean_columns = array();
-    foreach ($list as $item) {
-        if ($item['type'] === "tinyint(1)") {
-            $bolean_columns[] = $item['name'];
-        }
-    }
-    return $bolean_columns;
-}
-
-/**
- * Получить данные для генерации формы
- * @param $table string Исходная таблица
- * @param $id int Id, по которой идёт выборка
- * @return array Данные для генерации
- */
-public static function rowWithTableTypes($table, $id)
-{
-    $empty_row = self::getTableTypes($table);
-
-    if (!$id) {
-        return $empty_row;
-    }
-
-    $row = self::getById($table, $id);
-
-    if (empty($row)) {
-        return $empty_row;
-    }
-
-
-    foreach ($empty_row as &$item) {
-        foreach ($row as $key => $value) {
-            if ($item['name'] == $key) {
-                $item['value'] = $value;
-                break;
+        $bolean_columns = array();
+        foreach ($list as $item) {
+            if ($item['type'] === "tinyint(1)") {
+                $bolean_columns[] = $item['name'];
             }
         }
+        return $bolean_columns;
     }
-    return $empty_row;
-}
+
+    /**
+     * Получить данные для генерации формы
+     * @param $table string Исходная таблица
+     * @param $id int Id, по которой идёт выборка
+     * @return array Данные для генерации
+     */
+    public static function rowWithTableTypes($table, $id)
+    {
+        $empty_row = self::getTableTypes($table);
+
+        if (!$id) {
+            return $empty_row;
+        }
+
+        $row = self::getById($table, $id);
+
+        if (empty($row)) {
+            return $empty_row;
+        }
 
 
-/**
- * Проверить имеет ли таблица возможность использования SelectBox
- * @param $table string Исходная таблица
- * @return array Список связей
- */
-public static function checkTableHavingSelectBox($table)
-{
-    $query = 'SELECT inner_column FROM relations WHERE table_name=?s';
-    return self::$db->getAll($query, $table);
-}
+        foreach ($empty_row as &$item) {
+            foreach ($row as $key => $value) {
+                if ($item['name'] == $key) {
+                    $item['value'] = $value;
+                    break;
+                }
+            }
+        }
+        return $empty_row;
+    }
 
 
-/**
- * Получить список связей "один ко многим"
- * @param $table string Исходная таблица
- * @param $key string Первичный ключ
- * @return array|FALSE|string
- */
+    /**
+     * Проверить имеет ли таблица возможность использования SelectBox
+     * @param $table string Исходная таблица
+     * @return array Список связей
+     */
+    public static function checkTableHavingSelectBox($table)
+    {
+        $query = 'SELECT inner_column FROM relations WHERE table_name=?s';
+        return self::$db->getAll($query, $table);
+    }
+
+
+    /**
+     * Получить список связей "один ко многим"
+     * @param $table string Исходная таблица
+     * @param $key string Первичный ключ
+     * @return array|FALSE|string
+     */
     public static function getTableRelationsOneToMany($table, $key)
-{
-    $array =
-        [
+    {
+        $array =
             [
-                'column' => 'table_name',
-                'value' => $table
-            ],
-            [
-                'column' => 'inner_column',
-                'value' => $key
-            ]
-        ];
-
-    $relation = self::getByColumnAndArray('relations', $array);
-    return $relation;
-}
-
-
-    public static function getTableRelationsManyToOne($table)
-{
-    $array =
-        [
-            [
-                'column' => 'foreign_table',
-                'value' => $table
-            ]
-        ];
-
-    $relations = self::getByColumnAndArray('relations', $array, false);
-
-    $result_array = [];
-    foreach ($relations as $relation) {
-        if ($relation['table_name'] !== $relation['foreign_table']) {
-
-            $filter = [
                 [
-                    'column' => 'name',
-                    'value' => $relation['table_name']
+                    'column' => 'table_name',
+                    'value' => $table
+                ],
+                [
+                    'column' => 'inner_column',
+                    'value' => $key
                 ]
             ];
 
-            $relation['foreign_table_name'] = DB::getByColumnAndArray('tables', $filter, true, 'full_name');
-
-            $result_array[] = $relation;
-
-        }
+        $relation = self::getByColumnAndArray('relations', $array);
+        return $relation;
     }
 
-    $relations = $result_array;
+
+    public static function getTableRelationsManyToOne($table)
+    {
+        $array =
+            [
+                [
+                    'column' => 'foreign_table',
+                    'value' => $table
+                ]
+            ];
+
+        $relations = self::getByColumnAndArray('relations', $array, false);
+
+        $result_array = [];
+        foreach ($relations as $relation) {
+            if ($relation['table_name'] !== $relation['foreign_table']) {
+
+                $filter = [
+                    [
+                        'column' => 'name',
+                        'value' => $relation['table_name']
+                    ]
+                ];
+
+                $relation['foreign_table_name'] = DB::getByColumnAndArray('tables', $filter, true, 'full_name');
+
+                $result_array[] = $relation;
+
+            }
+        }
+
+        $relations = $result_array;
 
 
-    return $relations;
-}
+        return $relations;
+    }
 
 
     public static function getForeignKeys($db_name, $table, $column)
@@ -799,37 +802,36 @@ public static function checkTableHavingSelectBox($table)
     }
 
 
+    /**
+     * Получить количество записей с учётом выборки по массиву
+     * @param $table string Таблица, по которой идёт подсчёт
+     * @param $cols array Массив для фильтрации
+     * @return string
+     */
+    public static function countingAdvanced($table, $cols)
+    {
+        $query = "SELECT COUNT(1) FROM ?n";
 
-/**
- * Получить количество записей с учётом выборки по массиву
- * @param $table string Таблица, по которой идёт подсчёт
- * @param $cols array Массив для фильтрации
- * @return string
- */
-public static function countingAdvanced($table, $cols)
-{
-    $query = "SELECT COUNT(1) FROM ?n";
+        $query .= ' WHERE';
 
-    $query .= ' WHERE';
-
-    foreach ($cols as $item) {
+        foreach ($cols as $item) {
 
 
-        $col = $item['column'];
-        $val = $item['value'];
+            $col = $item['column'];
+            $val = $item['value'];
 
-        if ($item['full']) {
-            $query .= " `$col`='$val' AND";
-        } else {
-            $query .= " `$col` LIKE '%$val%' AND";
+            if ($item['full']) {
+                $query .= " `$col`='$val' AND";
+            } else {
+                $query .= " `$col` LIKE '%$val%' AND";
+            }
         }
+
+        $query .= ' 1';
+
+        $res = self::$db->getOne($query, $table);
+        return $res ?: 0;
     }
-
-    $query .= ' 1';
-
-    $res = self::$db->getOne($query, $table);
-    return $res ?: 0;
-}
 
 
     /**
@@ -843,7 +845,7 @@ public static function countingAdvanced($table, $cols)
 
         $query = 'DROP TABLE IF EXISTS ?n.?n';
 
-       self::$db->query($query, $db_name, $control_table_name);
+        self::$db->query($query, $db_name, $control_table_name);
 
 
         $query = "CREATE TABLE ?n.?n (
@@ -889,7 +891,6 @@ public static function countingAdvanced($table, $cols)
 
         return $tables;
     }
-
 
 
     public static function createAdminTables($db_name, $admin_table = 'admin_users', $admin_attemps = 'admin_auth_attempts')
