@@ -444,7 +444,8 @@ class Helper
     public
     static function regexpFilter($input)
     {
-        return preg_replace('/[^_\w\s\-+=,.\\/@#$^&\(\)\{\}\[\]!:]/u', '', $input);
+        $input = preg_replace('/[^_\w\s\-+=,.\\/@#$^&\(\)\{\}\[\]!:]/u', '', $input);
+        return preg_replace('/0x/u', '', $input);
     }
 
 
