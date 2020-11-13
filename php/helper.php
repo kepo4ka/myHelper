@@ -1305,7 +1305,7 @@ class Helper
     }
 
 
-    public static function setEmpty(&$var, $value, $other = null)
+    public static function setVar(&$var, $value, $other = null)
     {
         if (!empty($value)) {
             $var = $value;
@@ -1316,7 +1316,7 @@ class Helper
     }
 
 
-    public static function setConstruct(&$var, $p_var,  $field,  $other = null)
+    public static function setVarField(&$var, $p_var,  $field,  $other = null)
     {
         if (!empty($p_var[$field])) {
             $var[$field] = $p_var[$field];
