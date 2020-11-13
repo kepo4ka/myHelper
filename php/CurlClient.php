@@ -29,6 +29,12 @@ class CurlClient
         $this->config = $config;
     }
 
+    /**
+     * Получить список прокси из string
+     * @param $str string string, не разделённый на строки
+     * @param string $type Указываем тип прокси насильно
+     * @return mixed Список прокси
+     */
     public function getProxyListFromStr($str, $type = 'http')
     {
         $this->config['proxy_list'] = [];
@@ -61,18 +67,9 @@ class CurlClient
         return $this->config['proxy_list'];
     }
 
-    public function updateProxyList($list = [])
-    {
-        $proxy_list = [];
-
-        foreach ($list as $item) {
-            if (!empty($item)) {
-                $proxy_list[] = $item;
-            }
-        }
-        $this->config['proxy_list'] = $proxy_list;
-    }
-
+    /**
+     * Получить список прокси из файла
+     */
     public function getProxyListFile($file = null)
     {
         if (empty($file)) {
@@ -89,6 +86,28 @@ class CurlClient
     }
 
 
+    /**
+     * Задать список прокси
+     * @param array $list Массив прокси
+     */
+    public function updateProxyList($list = [])
+    {
+        $proxy_list = [];
+
+        foreach ($list as $item) {
+            if (!empty($item)) {
+                $proxy_list[] = $item;
+            }
+        }
+        $this->config['proxy_list'] = $proxy_list;
+    }
+
+
+    /**
+     * Получить свой IP
+     * !ВНИМАНИЕ. Функция зависима от работоспособности сайта, который определяет IP
+     * @return bool|mixed
+     */
     public function getMyIp()
     {
         $url = 'https://api.myip.com/';
@@ -100,12 +119,20 @@ class CurlClient
         return Helper::json_decode($data);
     }
 
+    /*
+     * Проверка работоспособности Google
+     */
     public function getGoogle()
     {
         $url = 'https://google.ru/';
         return $this->fetch($url);
     }
 
+    /**
+     * Удалить прокси из списка
+     * @param $proxy string Ip значение прокси xxx.xxx.xxx.xxx
+     * @return bool
+     */
     public function deleteProxy($proxy)
     {
         $del_proxy = $proxy;
@@ -123,6 +150,11 @@ class CurlClient
         return false;
     }
 
+    /**
+     * Обновить текущий Прокси, который используется
+     * @param null $proxy Задать его вручную
+     * @return bool
+     */
     public function update($proxy = null)
     {
         if (!empty($proxy)) {
@@ -145,7 +177,10 @@ class CurlClient
         return true;
     }
 
-
+    /**
+     * Получить путь до папки, где хранятся Cookie
+     * @return bool|string
+     */
     public
     function getCookiePath()
     {
@@ -255,6 +290,12 @@ class CurlClient
         return $result;
     }
 
+
+    /**
+     * Проверить работоспособность прокси
+     * @param $proxy array Информация о прокси
+     * @return null
+     */
     public static function checkProxy($proxy)
     {
         $client = new CurlClient();
