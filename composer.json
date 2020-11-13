@@ -13,5 +13,7 @@
     "autoload": {
         "psr-4": {"Helper\\": "php/"}
     },
-    "require": {}
+    "require": {
+      "ext-curl": "*"
+    }
 }
