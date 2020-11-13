@@ -63,7 +63,14 @@ class CurlClient
 
     public function updateProxyList($list = [])
     {
-        $this->config['proxy_list'] = $list;
+        $proxy_list = [];
+
+        foreach ($list as $item) {
+            if (!empty($item)) {
+                $proxy_list[] = $item;
+            }
+        }
+        $this->config['proxy_list'] = $proxy_list;
     }
 
     public function getProxyListFile($file = null)
