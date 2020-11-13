@@ -17,15 +17,13 @@ class CurlClient
         Helper::setVarField($config, $p_config, 'current_proxy', []);
         Helper::setVarField($config, $p_config, 'proxy_list', []);
         Helper::setVarField($config, $p_config, 'query_count', 0);
-        Helper::setVarField($config, $p_config, 'query_count', 0);
         Helper::setVarField($config, $p_config, 'sleep_mode', false);
         Helper::setVarField($config, $p_config, 'delay_min', 2);
         Helper::setVarField($config, $p_config, 'delay_max', 5);
         Helper::setVarField($config, $p_config, 'max_try', 2);
-        Helper::setVarField($config, $p_config, 'max_try', 2);
-        Helper::setVarField($config, $p_config, 'enable_db', true);
-        Helper::setVarField($config, $p_config, 'enable_db', true);
-        Helper::setVarField($config, $p_config, 'enable_db', '2d0b9ef88d61355b18a369063e8d60ef');
+        Helper::setVarField($config, $p_config, 'rucaptcha_key', '2d0b9ef88d61355b18a369063e8d60ef');
+        Helper::setVarField($config, $p_config, 'enable_db', false);
+        Helper::setVarField($config, $p_config, 'project_dir', __DIR__);
 
         $config['proccess_id'] = substr(md5(microtime()), 0, 5);
         $this->config = $config;
@@ -144,14 +142,13 @@ class CurlClient
     }
 
 
-
     /**
      * Выполнить запрос
      * @param $url string Адрес, куда будет отправлен запрос
      * @param null $z Дополнительные параметры запроса
      * @return mixed Полученный ответ
      */
-    public  function fetch($url, $z = null)
+    public function fetch($url, $z = null)
     {
 
         $ch = curl_init();
@@ -194,8 +191,7 @@ class CurlClient
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($z['json']));
         }
 
-        if (!empty($z['app_form']))
-        {
+        if (!empty($z['app_form'])) {
             $headers = [
                 "Accept: */*",
                 "Accept-Encoding: gzip, deflate",
@@ -208,8 +204,7 @@ class CurlClient
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
-        if (!empty($z['app_json']))
-        {
+        if (!empty($z['app_json'])) {
             $headers = [
                 "application/json, text/plain, */*",
                 "Accept-Encoding: gzip, deflate, br",
