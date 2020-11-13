@@ -534,7 +534,6 @@ class Helper
     }
 
 
-
     /**
      * Перенаправление с помощью JS
      * @param $url string Ссылка, на которую идёт перенаправление
@@ -694,10 +693,9 @@ class Helper
      */
     public static function isAjax()
     {
-        $with =  '';
+        $with = '';
 
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']))
-        {
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
             $with = $_SERVER['HTTP_X_REQUESTED_WITH'];
         }
 
@@ -1301,4 +1299,14 @@ class Helper
         return array_keys($arr) !== range(0, count($arr) - 1);
     }
 
+
+    public static function setEmpty(&$var, $value, $other = null)
+    {
+        if (!empty($value)) {
+            $var = $value;
+        } elseif (!empty($other)) {
+            $var = $other;
+        }
+        return $var;
+    }
 }
