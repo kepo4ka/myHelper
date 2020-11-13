@@ -248,6 +248,20 @@ class CurlClient
         return $result;
     }
 
+    public static function checkProxy($proxy)
+    {
+        $client = new CurlClient();
+
+        $client->update($proxy);
+
+        $ip_info = $client->getMyIp();
+
+        if (!empty($ip_info['ip'])) {
+            return $proxy;
+        }
+        return null;
+    }
+
 }
 
 
