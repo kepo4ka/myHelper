@@ -151,6 +151,19 @@ class CurlClient
     }
 
     /**
+     * Получить случайное прокси из списка
+     * @return bool|mixed
+     */
+    public function getRandomProxy()
+    {
+        if (!empty($this->config['proxy_list'])) {
+            $index = rand(0, count($this->config['proxy_list']) - 1);
+            return $this->config['proxy_list'][$index];
+        }
+        return false;
+    }
+
+    /**
      * Обновить текущий Прокси, который используется
      * @param null $proxy Задать его вручную
      * @return bool
@@ -159,9 +172,8 @@ class CurlClient
     {
         if (!empty($proxy)) {
             $this->config['def_proxy_info'] = $proxy;
-        } elseif (!empty($this->config['proxy_list'])) {
-            $index = rand(0, count($this->config['proxy_list']) - 1);
-            $this->config['def_proxy_info'] = $this->config['proxy_list'][$index];
+        } else {
+            $this->config['def_proxy_info'] = $this->getRandomProxy();
         }
 
         if (empty($this->config['def_proxy_info'])) {
