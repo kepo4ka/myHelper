@@ -81,17 +81,17 @@ class CurlClient
     {
         $url = 'https://api.myip.com/';
 
-        $data = Helper::fetch($url);
+        $data = $this->fetch($url);
         if (empty(Helper::checkJson($data))) {
             return false;
         }
         return Helper::json_decode($data);
     }
 
-    static function getGoogle()
+    public function getGoogle()
     {
         $url = 'https://google.ru/';
-        return Helper::fetch($url);
+        return $this->fetch($url);
     }
 
     public function deleteProxy($proxy)
