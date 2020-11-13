@@ -14,7 +14,7 @@ class CurlClient
         Helper::setVarField($config, $p_config, 'cookiePath', __DIR__ . '/cookie.txt');
         Helper::setVarField($config, $p_config, 'current_user_agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36');
 
-        Helper::setVarField($config, $p_config, 'current_proxy', []);
+        Helper::setVarField($config, $p_config, 'def_proxy_info', []);
         Helper::setVarField($config, $p_config, 'proxy_list', []);
         Helper::setVarField($config, $p_config, 'query_count', 0);
         Helper::setVarField($config, $p_config, 'sleep_mode', false);
@@ -125,11 +125,15 @@ class CurlClient
             $this->config['def_proxy_info'] = $this->config['proxy_list'][$index];
         }
 
+        if (empty($this->config['def_proxy_info'])) {
+            return false;
+        }
+
         if (!empty($this->config['user_agents'])) {
             $index = rand(0, count($this->config['user_agents']) - 1);
             $this->config['current_user_agent'] = $this->config['user_agents'][$index];
         }
-        @unlink(Helper::getCookiePath(1));
+        @unlink($this->getCookiePath());
 
         return true;
     }
@@ -174,7 +178,8 @@ class CurlClient
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
 
-        if (!empty($this->config['def_proxy_info']) && empty($z['no_proxy'])) {
+        if (!empty($this->config['def_proxy_info'])) {
+
             curl_setopt($ch, CURLOPT_PROXYTYPE, $this->config['def_proxy_info']['type']);
             curl_setopt($ch, CURLOPT_PROXY, $this->config['def_proxy_info']['full']);
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->config['def_proxy_info']['auth']);
