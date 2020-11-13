@@ -951,6 +951,11 @@ class Helper
     public static function logFile($data, $title = 'Info', $type = 'info', $path = '')
     {
         global $config;
+
+        if (empty($path)) {
+            $path = __DIR__;
+        }
+
         $log_file = "$path/log.json";
 
         if (empty($type)) {
