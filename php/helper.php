@@ -1314,4 +1314,15 @@ class Helper
         }
         return $var;
     }
+
+
+    public static function setConstruct(&$var, $p_var,  $field,  $other = null)
+    {
+        if (!empty($p_var[$field])) {
+            $var[$field] = $p_var[$field];
+        } elseif (!empty($other)) {
+            $var[$field] = $other;
+        }
+        return $var;
+    }
 }
