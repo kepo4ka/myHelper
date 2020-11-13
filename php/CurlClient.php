@@ -310,6 +310,15 @@ class CurlClient
         return null;
     }
 
+    public static function fetchAsync($url, $z, $proxy = null)
+    {
+        $client = new CurlClient();
+        if (!empty($proxy)) {
+            $client->update($proxy);
+        }
+        return $client->fetch($url, $z);
+    }
+
 }
 
 
