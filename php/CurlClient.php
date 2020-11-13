@@ -322,7 +322,7 @@ class CurlClient
         return null;
     }
 
-    public static function fetchAsync($url, $z = null, $proxy = null)
+    public static function fetchAsync($url, $proxy = null, $z = null)
     {
         $client = new CurlClient();
         if (!empty($proxy)) {
