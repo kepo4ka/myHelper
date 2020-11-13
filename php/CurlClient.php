@@ -252,7 +252,7 @@ class CurlClient
         }
 
         if (!empty($z['json'])) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($z['json']));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, Helper::json_encode($z['json']));
         }
 
         if (!empty($z['app_form'])) {
@@ -322,7 +322,7 @@ class CurlClient
         return null;
     }
 
-    public static function fetchAsync($url, $z, $proxy = null)
+    public static function fetchAsync($url, $z = null, $proxy = null)
     {
         $client = new CurlClient();
         if (!empty($proxy)) {
