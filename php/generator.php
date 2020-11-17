@@ -512,7 +512,6 @@ class Generator
      */
     public static function generateForm($db_name, $table, $row, $info = [])
     {
-        global $table, $db_name;
         if (empty($info['primary'])) {
             $info['primary'] = 'id';
         }
