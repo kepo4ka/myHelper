@@ -410,7 +410,7 @@ class Helper
      * @return mixed|string "Очищенное" значение
      */
     public
-    static function inputFilter($input)
+    static function inputFilter($input, $type = null)
     {
         $input = trim($input);
         $input = htmlspecialchars($input, ENT_QUOTES | ENT_SUBSTITUTE, 'utf-8');
@@ -420,6 +420,19 @@ class Helper
 
         $input = self::regexpFilter($input);
         $input = self::scriptFilter($input);
+
+        if (!empty($type) && is_string($type)) {
+            $array = str_split($type, 1);
+
+            $regex = "/[^";
+
+            foreach ($array as $item) {
+                $regex .= '\\' . $item;
+            }
+            $regex .= ']/u';
+            $input = preg_replace($regex, '', $input);
+        }
+
         return $input;
     }
 
@@ -1319,7 +1332,7 @@ class Helper
     }
 
 
-    public static function setVarField(&$var, $p_var,  $field,  $other = null)
+    public static function setVarField(&$var, $p_var, $field, $other = null)
     {
         if (!empty($p_var[$field])) {
             $var[$field] = $p_var[$field];
