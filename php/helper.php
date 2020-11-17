@@ -855,13 +855,16 @@ class Helper
 
     /**
      * Получить часть зашифрованных в md5 данных
-     * @param $mixed mixed Данные
+     *
+     * @param     $mixed mixed Данные
+     * @param int $length Длина полученной строки
+     *
      * @return bool|string Краткий md5
      */
     public
-    static function getShortMd5($mixed)
+    static function getShortMd5($mixed, $length = 5)
     {
-        return substr(md5(json_encode($mixed)), 0, 5);
+        return substr(md5(json_encode($mixed)), 0, $length);
     }
 
     public
