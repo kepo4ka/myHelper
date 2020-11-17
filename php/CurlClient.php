@@ -322,6 +322,16 @@ class CurlClient
         return null;
     }
 
+
+    /**
+     * Функция `fetch` для использования в асинхронных вызовах
+     *
+     * @param      $url
+     * @param null $proxy Задать прокси для запроса
+     * @param null $z
+     *
+     * @return mixed Ответ от сервера
+     */
     public static function fetchAsync($url, $proxy = null, $z = null)
     {
         $client = new CurlClient();
