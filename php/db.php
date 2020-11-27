@@ -107,7 +107,7 @@ class DB
      */
     public static function getAllOrdered($table, $column)
     {
-        $query = 'SELECT * FROM ?n ORDER BY ?n';
+        $query = 'SELECT * FROM ?n ORDER BY ?n DESC';
         return self::$db->getAll($query, $table, $column);
     }
 
