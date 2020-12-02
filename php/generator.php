@@ -408,9 +408,9 @@ class Generator
      */
     public static function genSelectBox($table, $key, $value, $res_key, $res_name)
     {
-
-        $results = DB::getAllOrdered($table, $res_name);
         $res_key = 'id';
+        $results = DB::getAllOrdered($table, $res_key);
+
 
         $url = $table;
 
