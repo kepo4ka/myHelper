@@ -122,7 +122,7 @@ class DB
         $query = 'SELECT * FROM ?n';
 
         if (!empty($column)) {
-            $query .= "WHERE ?n=?s";
+            $query .= " WHERE ?n=?s";
             return self::$db->getRow($query, $table, $column, $value);
         }
         return self::$db->getRow($query, $table, $column, $value);
