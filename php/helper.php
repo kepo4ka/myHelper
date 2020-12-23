@@ -1347,4 +1347,112 @@ class Helper
         return date('Y-m-d H:i:s', strtotime($date));
     }
 
+	public static function getUrlLastPart()
+	{
+		$matches = array();
+		$url = preg_match("/\/([\w\-]+)\.php/u", $_SERVER['REQUEST_URI'], $matches);
+		if (!empty($matches[1])) {
+			return $matches[1];
+		}
+		return false;
+	}
+
+	/**
+	 * Получить сообщение из Сессии
+	 * @return string
+	 */
+	public static function getMessageFromSession()
+	{
+		$message = '';
+
+		if (!empty($_SESSION['message_full_name'])) {
+			$message = $_SESSION['message_full_name'];
+			$_SESSION['message_full_name'] = '';
+		}
+
+		return $message;
+	}
+
+
+	/**
+	 * Сохранить сообщение в Сессии
+	 * @param $name string Название сообщения
+	 * @return mixed
+	 */
+	public static function setMessageToSession($name, $type = 'error')
+	{
+
+		@$_SESSION['message_full_name'] = lang($name);
+		@$_SESSION['message_type'] = $type;
+		return $_SESSION['message_full_name'];
+	}
+
+	/**
+	 * Отменить Транзакцию БД
+	 * @param $message string Текст ошибки
+	 * @param string $url URL для редиректа
+	 */
+	public static function badEnd($message, $url = '', $error = null, $rollback = false)
+	{
+		if (!empty($rollback))
+		{
+			DB::transactionRollback();
+		}
+
+		if (!empty($error)) {
+			errorLog($error);
+		}
+
+		if (empty($url)) {
+			echo $message;
+		} else {
+			setMessageToSession($message);
+			header('location: ' . $url);
+		}
+		exit;
+	}
+	
+	
+	/**
+	 * Получить разницу между сегодняшним днём и заданной датой
+	 * @param $date string Дата
+	 * @return int Разница в днях. (0 - если дата - это сегодняшний день)
+	 */
+	public static function diffDays($date)
+	{
+		$timestamp = $date;
+
+		$today = new DateTime(); // This object represents current date/time
+		$today->setTime(0, 0, 0); // reset time part, to prevent partial comparison
+
+		$match_date = DateTime::createFromFormat('Y-m-d', $timestamp);
+		$match_date->setTime(0, 0, 0); // reset time part, to prevent partial comparison
+
+		$diff = $today->diff($match_date);
+		$diffDays = (integer)$diff->format("%R%a"); // Extract days count in interval
+
+	//    switch( $diffDays ) {
+	//        case 0:
+	//            echo "//Today";
+	//            break;
+	//        case -1:
+	//            echo "//Yesterday";
+	//            break;
+	//        case +1:
+	//            echo "//Tomorrow";
+	//            break;
+	//        default:
+	//            break;
+	//    }
+		return $diffDays;
+	}
+	
+	/*
+	 * Находится ли число в указанном интервале (включая границы)
+	 */
+	public static function checkNumberInInterval($number, $min, $max)
+	{
+		return $number >= $min && $number <= $max;
+	}
+
 }
