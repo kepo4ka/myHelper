@@ -84,15 +84,23 @@ class Generator
      * @param $link
      * @param $name
      */
-    public static function simpleFilter(&$item, $object, $column, $link, $name)
+     public static function simpleFilter($id, $info)
     {
-        if (!empty($object)) {
-            $id = $object['id'];
-            $item[$column] = "<a class='btn btn-link' href = 'edit-$link.php?act=edit&id=$id'>
-                   $id</a>";
+        $table = $info['foreign_table'];
+        $res_key = 'id';
+        $res_name = $info['foreign_column'];
+        $key = $info['inner_column'];
+
+        $row = DB::getByColumn($table, $res_key, $id);
+
+        if (!empty($id) && !empty($table) && !empty($row)) {
+            $foreign_column = @$row[$res_name];
+            $str = "<a target='_blank' class='btn btn-link' href = 'edit.php?cat=$table&act=edit&id=$id'>
+                   [<strong>#$id</strong>] $foreign_column</a>";
         } else {
-            $item[$column] = "<strong class='text-danger'> $name not found </strong>";
+            $str = "<strong class='text-danger'> - </strong>";
         }
+        return $str;
     }
 
 
