@@ -22,7 +22,7 @@ class Generator
         foreach ($list as $list_item) {
             if ($list_item['id'] == $item[$column]) {
                 $is_exist = true;
-                $item[$column] = $list_item[$list_column] . ' [<strong>' . $list_item['id'] . '</strong>]';
+                $item[$column] = $list_item[$list_column] . ' [' . $list_item['id'] . ']';
                 break;
             }
         }
