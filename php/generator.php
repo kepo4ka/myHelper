@@ -96,7 +96,7 @@ class Generator
         if (!empty($id) && !empty($table) && !empty($row)) {
             $foreign_column = @$row[$res_name];
             $str = "<a target='_blank' class='btn btn-link' href = 'edit.php?cat=$table&act=edit&id=$id'>
-                   [<strong>#$id</strong>] $foreign_column</a>";
+                   [#$id] $foreign_column</a>";
         } else {
             $str = "<strong class='text-danger'> - </strong>";
         }
