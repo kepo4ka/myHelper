@@ -1376,13 +1376,13 @@ class Helper
 
 	/**
 	 * Сохранить сообщение в Сессии
-	 * @param $name string Название сообщения
+	 * @param $message string Название сообщения
 	 * @return mixed
 	 */
-	public static function setMessageToSession($name, $type = 'error')
+	public static function setMessageToSession($message, $type = 'error')
 	{
 
-		@$_SESSION['message_full_name'] = lang($name);
+		@$_SESSION['message_full_name'] = $message;
 		@$_SESSION['message_type'] = $type;
 		return $_SESSION['message_full_name'];
 	}
