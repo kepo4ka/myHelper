@@ -1413,6 +1413,32 @@ class Helper
 	}
 	
 	
+	public static function errorLog($error)
+	{
+		try {
+			$count = DB::counting('error_log');
+			
+			if ($count > 500) {
+				DB::clearTable('error_log');
+			}
+
+			if (is_string($error)) {
+				$error_data['data'] = $error;
+			} else {
+				$error_data['data'] = Helper::json_encode($error);
+			}
+			$error_data['ip'] = Helper::getIp();
+			
+			return DB::save($error_data, 'error_log');
+		}
+		catch(Exception $ex)
+		{
+			return false;
+		}
+	}
+	
+	
+	
 	/**
 	 * Получить разницу между сегодняшним днём и заданной датой
 	 * @param $date string Дата
