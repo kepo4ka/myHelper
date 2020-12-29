@@ -1400,13 +1400,13 @@ class Helper
 		}
 
 		if (!empty($error)) {
-			errorLog($error);
+			self::errorLog($error);
 		}
 
 		if (empty($url)) {
 			echo $message;
 		} else {
-			setMessageToSession($message);
+			self::setMessageToSession($message);
 			header('location: ' . $url);
 		}
 		exit;
