@@ -1347,138 +1347,134 @@ class Helper
         return date('Y-m-d H:i:s', strtotime($date));
     }
 
-	public static function getUrlLastPart()
-	{
-		$matches = array();
-		$url = preg_match("/\/([\w\-]+)\.php/u", $_SERVER['REQUEST_URI'], $matches);
-		if (!empty($matches[1])) {
-			return $matches[1];
-		}
-		return false;
-	}
+    public static function getUrlLastPart()
+    {
+        $matches = array();
+        $url = preg_match("/\/([\w\-]+)\.php/u", $_SERVER['REQUEST_URI'], $matches);
+        if (!empty($matches[1])) {
+            return $matches[1];
+        }
+        return false;
+    }
 
-	/**
-	 * Получить сообщение из Сессии
-	 * @return string
-	 */
-	public static function getMessageFromSession()
-	{
-		$message = '';
+    /**
+     * Получить сообщение из Сессии
+     * @return string
+     */
+    public static function getMessageFromSession()
+    {
+        $message = '';
 
-		if (!empty($_SESSION['message_full_name'])) {
-			$message = $_SESSION['message_full_name'];
-			$_SESSION['message_full_name'] = '';
-		}
+        if (!empty($_SESSION['message_full_name'])) {
+            $message = $_SESSION['message_full_name'];
+            $_SESSION['message_full_name'] = '';
+        }
 
-		return $message;
-	}
+        return $message;
+    }
 
 
-	/**
-	 * Сохранить сообщение в Сессии
-	 * @param $message string Название сообщения
-	 * @return mixed
-	 */
-	public static function setMessageToSession($message, $type = 'error')
-	{
+    /**
+     * Сохранить сообщение в Сессии
+     * @param $message string Название сообщения
+     * @return mixed
+     */
+    public static function setMessageToSession($message, $type = 'error')
+    {
 
-		@$_SESSION['message_full_name'] = $message;
-		@$_SESSION['message_type'] = $type;
-		return $_SESSION['message_full_name'];
-	}
+        @$_SESSION['message_full_name'] = $message;
+        @$_SESSION['message_type'] = $type;
+        return $_SESSION['message_full_name'];
+    }
 
-	/**
-	 * Отменить Транзакцию БД
-	 * @param $message string Текст ошибки
-	 * @param string $url URL для редиректа
-	 */
-	public static function badEnd($message, $url = '', $error = null, $rollback = false)
-	{
-		if (!empty($rollback))
-		{
-			DB::transactionRollback();
-		}
+    /**
+     * Отменить Транзакцию БД
+     * @param $message string Текст ошибки
+     * @param string $url URL для редиректа
+     */
+    public static function badEnd($message, $url = '', $error = null, $rollback = false)
+    {
+        if (!empty($rollback)) {
+            DB::transactionRollback();
+        }
 
-		if (!empty($error)) {
-			self::errorLog($error);
-		}
+        if (!empty($error)) {
+//            self::errorLog($error);
+        }
 
-		if (empty($url)) {
-			echo $message;
-		} else {
-			self::setMessageToSession($message);
-			header('location: ' . $url);
-		}
-		exit;
-	}
-	
-	
-	public static function errorLog($error)
-	{
-		try {
-			$count = DB::counting('error_log');
-			
-			if ($count > 500) {
-				DB::clearTable('error_log');
-			}
+        if (empty($url)) {
+            echo $message;
+        } else {
+            self::setMessageToSession($message);
+            header('location: ' . $url);
+        }
+        exit;
+    }
 
-			if (is_string($error)) {
-				$error_data['data'] = $error;
-			} else {
-				$error_data['data'] = Helper::json_encode($error);
-			}
-			$error_data['ip'] = Helper::getIp();
-			
-			return DB::save($error_data, 'error_log');
-		}
-		catch(Exception $ex)
-		{
-			return false;
-		}
-	}
-	
-	
-	
-	/**
-	 * Получить разницу между сегодняшним днём и заданной датой
-	 * @param $date string Дата
-	 * @return int Разница в днях. (0 - если дата - это сегодняшний день)
-	 */
-	public static function diffDays($date)
-	{
-		$timestamp = $date;
 
-		$today = new DateTime(); // This object represents current date/time
-		$today->setTime(0, 0, 0); // reset time part, to prevent partial comparison
+    public static function errorLog($error, $table = 'error_log')
+    {
+        try {
+            $count = DB::counting('error_log');
 
-		$match_date = DateTime::createFromFormat('Y-m-d', $timestamp);
-		$match_date->setTime(0, 0, 0); // reset time part, to prevent partial comparison
+            if ($count > 5000) {
+                DB::clearTable('error_log');
+            }
 
-		$diff = $today->diff($match_date);
-		$diffDays = (integer)$diff->format("%R%a"); // Extract days count in interval
+            if (is_string($error)) {
+                $error_data['data'] = $error;
+            } else {
+                $error_data['data'] = Helper::json_encode($error);
+            }
+            $error_data['ip'] = Helper::getIp();
 
-	//    switch( $diffDays ) {
-	//        case 0:
-	//            echo "//Today";
-	//            break;
-	//        case -1:
-	//            echo "//Yesterday";
-	//            break;
-	//        case +1:
-	//            echo "//Tomorrow";
-	//            break;
-	//        default:
-	//            break;
-	//    }
-		return $diffDays;
-	}
-	
-	/*
-	 * Находится ли число в указанном интервале (включая границы)
-	 */
-	public static function checkNumberInInterval($number, $min, $max)
-	{
-		return $number >= $min && $number <= $max;
-	}
+            return DB::save($error_data, 'error_log');
+        } catch (Exception $ex) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Получить разницу между сегодняшним днём и заданной датой
+     * @param $date string Дата
+     * @return int Разница в днях. (0 - если дата - это сегодняшний день)
+     */
+    public static function diffDays($date)
+    {
+        $timestamp = $date;
+
+        $today = new DateTime(); // This object represents current date/time
+        $today->setTime(0, 0, 0); // reset time part, to prevent partial comparison
+
+        $match_date = DateTime::createFromFormat('Y-m-d', $timestamp);
+        $match_date->setTime(0, 0, 0); // reset time part, to prevent partial comparison
+
+        $diff = $today->diff($match_date);
+        $diffDays = (integer)$diff->format("%R%a"); // Extract days count in interval
+
+        //    switch( $diffDays ) {
+        //        case 0:
+        //            echo "//Today";
+        //            break;
+        //        case -1:
+        //            echo "//Yesterday";
+        //            break;
+        //        case +1:
+        //            echo "//Tomorrow";
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        return $diffDays;
+    }
+
+    /*
+     * Находится ли число в указанном интервале (включая границы)
+     */
+    public static function checkNumberInInterval($number, $min, $max)
+    {
+        return $number >= $min && $number <= $max;
+    }
 
 }
