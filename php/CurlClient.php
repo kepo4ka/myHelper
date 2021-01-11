@@ -199,8 +199,8 @@ class CurlClient
         if (empty($this->config['proccess_id'])) {
             return false;
         }
-        Helper::makeDir($this->config['project_dir'] . '\cookies');
-        $full_path = $this->config['project_dir'] . '\cookies/' . $this->config['proccess_id'] . '.txt';
+        Helper::makeDir($this->config['project_dir'] . '/cookies');
+        $full_path = $this->config['project_dir'] . '/cookies/' . $this->config['proccess_id'] . '.txt';
         return $full_path;
     }
 

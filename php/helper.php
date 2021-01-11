@@ -339,11 +339,11 @@ class Helper
             return false;
         }
 
-        self::makeDir($config['project_dir'] . '\cookies');
+        self::makeDir($config['project_dir'] . '/cookies');
 
-        $full_path = $config['project_dir'] . '\cookies/' . $config['proccess_id'] . '.txt';
+        $full_path = $config['project_dir'] . '/cookies/' . $config['proccess_id'] . '.txt';
         if ($second) {
-            $full_path = $config['project_dir'] . '\cookies\\' . $config['proccess_id'] . '.txt';
+            $full_path = $config['project_dir'] . '/cookies/' . $config['proccess_id'] . '.txt';
         }
 
         return $full_path;
