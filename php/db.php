@@ -5,6 +5,7 @@ namespace Helper;
 require_once(__DIR__ . '/safemysql.php');
 
 use Exception;
+use Throwable;
 
 
 class DB
@@ -16,6 +17,8 @@ class DB
     {
         try {
             self::$db = new SafeMysql(array('user' => $user, 'pass' => $password, 'db' => $db_name, 'charset' => $charset));
+        } catch (Throwable $throwable) {
+            return false;
         } catch (Exception $exception) {
             return false;
         }
@@ -418,6 +421,8 @@ class DB
             while ($row = self::$db->fetch($result)) {
                 $columns[] = $row['Field'];
             }
+        } catch (Throwable $throwable) {
+
         } catch (Exception $ex) {
 
         }
@@ -459,6 +464,8 @@ ALTER TABLE `$table`
 
         try {
             return self::$db->query($query) && self::$db->query($query1);
+        } catch (Throwable $throwable) {
+            return false;
         } catch (Exception $exception) {
             return false;
         }
@@ -498,6 +505,8 @@ ALTER TABLE `$table`
             $element['proccess_id'] = '';
 
             return self::$db->query('INSERT INTO ?n SET ?u', $table, $element);
+        } catch (Throwable $throwable) {
+            return ['error' => true, 'message' => $throwable->getMessage()];
         } catch (Exception $exception) {
             return ['error' => true, 'message' => $exception->getMessage()];
         }

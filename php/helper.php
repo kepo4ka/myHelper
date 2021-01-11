@@ -6,6 +6,7 @@ namespace Helper;
 use DateTime;
 use Exception;
 use SimpleXMLElement;
+use Throwable;
 
 class Helper
 {
@@ -133,7 +134,12 @@ class Helper
         try {
             $f_contents = @file($file);
             $line = @$f_contents[rand(0, count($f_contents) - 1)];
-        } catch (Exception $exception) {
+        }
+        catch (Throwable $throwable)
+        {
+
+        }
+        catch (Exception $exception) {
 
         }
         return $line;
@@ -155,7 +161,12 @@ class Helper
         try {
             $f_contents = @file($file);
             $line = @$f_contents[rand(0, count($f_contents) - 1)];
-        } catch (Exception $exception) {
+        }
+        catch (Throwable $throwable)
+        {
+
+        }
+        catch (Exception $exception) {
 
         }
         return $line;
@@ -190,7 +201,12 @@ class Helper
         try {
             $cookiePath = self::getCookiePath();
             file_put_contents($cookiePath, '');
-        } catch (Exception $exception) {
+        } catch (Throwable $throwable)
+        {
+
+        }
+
+        catch (Exception $exception) {
 //            self::logDB($exception, 'clearCookie - error', 'error');
         }
         return true;
@@ -216,7 +232,12 @@ class Helper
                     $result = $matches[$index];
                 }
             }
-        } catch (Exception $exception) {
+        }
+        catch (Throwable $throwable)
+        {
+
+        }
+        catch (Exception $exception) {
 
         }
         return $result;
@@ -861,6 +882,8 @@ class Helper
                 }
                 fclose($file);
             }
+        } catch (Throwable $throwable) {
+
         } catch (Exception $exception) {
 
         }
@@ -1430,6 +1453,8 @@ class Helper
             $error_data['ip'] = Helper::getIp();
 
             return DB::save($error_data, 'error_log');
+        } catch (Throwable $throwable) {
+            return false;
         } catch (Exception $ex) {
             return false;
         }
