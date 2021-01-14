@@ -1503,4 +1503,20 @@ class Helper
         return $number >= $min && $number <= $max;
     }
 
+    /**
+     * Replace &, ", <, > to HTML entity
+     * Offical document: https://core.telegram.org/bots/api#html-style
+     *
+     * @param string $str
+     *
+     * @return string $str Encoded string
+     */
+    public static function enHTML($str = '')
+    {
+        $search = Array('&', '"', '<', '>');
+        $replace = Array('&amp;', '&quot;', '&lt;', '&gt');
+        $str = str_replace($search, $replace, $str);
+        return $str;
+    }
+
 }
