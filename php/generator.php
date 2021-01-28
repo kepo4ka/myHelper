@@ -640,9 +640,14 @@ class Generator
             case 'selectbox':
                 $relation = DB::getTableRelationsOneToMany($table, $key);
 
-                if (!empty($relation)) {
+                if (!empty($relation) && !empty($relation['is_small'])) {
                     if ($relation['inner_column'] == $key) {
-                        self::genSelectBox($relation['foreign_table'], $relation['inner_column'], $value, $relation['foreign_column'], $relation['foreign_column']);
+                        self::genSelectBox(
+                            $relation['foreign_table'],
+                            $relation['inner_column'], $value,
+                            $relation['foreign_column'],
+                            $relation['foreign_column']
+                        );
                         break;
                     }
                 } else {
