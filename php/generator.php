@@ -98,7 +98,7 @@ class Generator
             $str = "<a target='_blank' class='btn btn-link' href = 'edit.php?cat=$table&act=edit&id=$id'>
                    [#$id] $foreign_column</a>";
         } else {
-            $str = "<strong class='text-danger'> - </strong>";
+            $str = "<span class=''> $id </span>";
         }
         return $str;
     }
