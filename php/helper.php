@@ -1668,7 +1668,7 @@ class Helper
                             $relation, $value, $item['id']
                         );
                     } else {
-                        $item[$key] = Generator::genTableForeignLink(
+                        $item[$key] = Generator::simpleFilter(
                             $relation, $value
                         );
                     }
