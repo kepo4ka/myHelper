@@ -1669,7 +1669,7 @@ class Helper
                         );
                     } else {
                         $item[$key] = Generator::simpleFilter(
-                            $relation, $value
+                            $value, $relation
                         );
                     }
                     continue;
