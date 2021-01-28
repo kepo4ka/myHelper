@@ -1519,4 +1519,190 @@ class Helper
         return $str;
     }
 
+
+
+    public static function serverProccessingAuto()
+    {
+
+        $draw = 0;
+        $limit = 10;
+        $offset = 0;
+        $order = [];
+
+        $search = '';
+        $search_array = [];
+        $table = '';
+        $get_user_id = '';
+
+
+        if (!empty($_GET['table'])) {
+            $table = Helper::inputFilter($_GET['table']);
+        } else {
+            exit;
+        }
+
+
+// Данные, которые передаёт библиотека DataTables
+        if (!empty($_REQUEST['draw'])) {
+            $draw = (int)$_REQUEST['draw'];
+            $offset = (int)$_REQUEST['start'];
+
+            $limit = (int)$_REQUEST['length'];
+
+            if (!empty($_REQUEST['order'][0]['dir'])
+                && in_array(
+                    $_REQUEST['order'][0]['dir'], array('desc', 'asc')
+                )
+            ) {
+                $order['dir'] = strtoupper($_REQUEST['order'][0]['dir']);
+
+                $index = (int)$_REQUEST['order'][0]['column'];
+                if ($index == 0) {
+                    $index = 1;
+                }
+                $order['column'] = $_REQUEST['columns'][$index]['data'];
+            }
+
+            $search = [];
+
+            $get_column = '';
+
+
+            if (empty($_REQUEST['search']['value'])) {
+                if (!empty($_REQUEST['get_column'])
+                    && !empty($_REQUEST['get_value'])
+                ) {
+                    $search['column'] = Helper::inputFilter(
+                        $_GET['get_column']
+                    );
+                    $search['value'] = Helper::inputFilter($_GET['get_value']);
+                    $search['full'] = true;
+                    $search_array[] = $search;
+
+                    $get_column = $search['column'];
+                }
+
+                foreach ($_REQUEST['columns'] as $column) {
+                    if ($column['search']['value'] == '0'
+                        || (!empty($column['search']['value']))
+                        && $column['data'] !== $get_column
+                    ) {
+                        $temp = trim($column['data']);
+                        $temp = preg_replace('/[^\w\/.,-@\s)]/u', '', $temp);
+                        $search['column'] = $temp;
+
+                        $temp = trim($column['search']['value']);
+                        $temp = preg_replace('/[^\w\/.,-@\s)]/u', '', $temp);
+                        $search['value'] = $temp;
+
+                        $search['full'] = false;
+                        $search_array[] = $search;
+                    }
+                }
+
+                $results = DB::getAllLimitAdvanced(
+                    $table, $limit, $offset, $search_array, $order
+                );
+                $full_count = DB::countingAdvanced($table, $search_array);
+            } else {
+                // Медленный поиск по всем полям
+                $search = Helper::inputFilter($_REQUEST['search']['value']);
+
+                $columns = DB::getColumnNames($table);
+
+                $rows = [];
+                foreach ($columns as $column) {
+                    $find = DB::getAllByColLike($table, $column, $search);
+                    $rows = array_merge($rows, $find);
+                }
+                $rows = array_map(
+                    "unserialize", array_unique(array_map("serialize", $rows))
+                );
+                $full_count = count($rows);
+                $results = $rows;
+            }
+        }
+
+
+//if (!empty($search_array[0]['value'])) {
+//    $params['table'] = $table;
+//    $params['column'] = $search_array[0]['column'];
+//    $params['text'] = $search_array[0]['value'];
+//    $results = fuzzySearchDB($params);
+//}
+
+
+// данные, необходимые для библиотеки DataTables
+        $response['draw'] = $draw;
+        $response['recordsTotal'] = $full_count;
+        $response['recordsFiltered'] = $full_count;
+
+
+        $bolean_columns = DB::filterEnumColumns($table);
+
+//        $select_info = DB::checkTableHavingSelectBox($table);
+
+
+        foreach ($results as &$item) {
+            $item['action'] = Generator::genActionButtons(
+                $table, $table, $item, $table
+            );
+
+
+            foreach ($item as $key => $value) {
+                // Проверка на возможность сгенерировать checkbox
+                if (in_array($key, $bolean_columns)) {
+                    $item[$key] = Generator::genTableCheckbox(
+                        $item, $key, $value
+                    );
+                    continue;
+                }
+
+                $relation = DB::getTableRelationsOneToMany($table, $key);
+
+                // Проверка на возможность сгенерировать SelectBox
+                if (!empty($relation)) {
+
+                    if (!empty($relation['is_small'])) {
+                        $item[$key] = Generator::genTableSelectBox(
+                            $relation, $value, $item['id']
+                        );
+                    } else {
+                        $item[$key] = Generator::genTableForeignLink(
+                            $relation, $value
+                        );
+                    }
+                    continue;
+                }
+
+                if (strlen($item[$key]) < 100) {
+                    continue;
+                }
+
+                $column_type = DB::getColumnType($table, $key);
+                if (preg_match('/text|varchar/ui', $column_type)) {
+                    $item[$key] = mb_strcut($item[$key], 0, 100);
+                    $symbol_index = strrpos($item[$key], '.');
+
+                    if ($symbol_index === false) {
+                        $symbol_index = strrpos($item[$key], ' ');
+                    }
+                    $item[$key] = mb_strcut($item[$key], 0, $symbol_index + 1)
+                        . ' ...';
+                }
+            }
+        }
+
+        unset($item);
+
+        $response['data'] = $results;
+        $json = Helper::json_encode($response);
+
+        /*$log['get'] = $_GET;
+        $log['sent'] = $response;
+        mylog($log);*/
+
+        return $json;
+    }
+
 }
