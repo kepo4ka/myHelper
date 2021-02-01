@@ -994,10 +994,10 @@ class Generator
         <?php if ($act == 'edit' && !empty($id)) {
         ?>
 
-        <a class="btn btn-outline-secondary"
+        <a class="btn btn-outline-danger"
            href="save.php?act=delete&id=<?= $id ?>&cat=<?= $table ?>"
            onclick="return navConfirm(this.href, 'Удалить запись #<?= $id ?>?');">
-            <i class="fa fa-arrow-circle-left"></i>
+            <i class="fa fa-trash"></i>
             Удалить запись <?= $id ?>
         </a>
         </div>
