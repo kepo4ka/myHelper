@@ -983,6 +983,7 @@ class Generator
 
         ?>
 
+        <div class="d-flex justify-content-between">
         <a class="btn btn-outline-secondary" href="list.php?cat=<?= $table ?>"
            onclick="return navConfirm(this.href, 'Изменения не будут сохранены. Продолжить?');">
             <i class="fa fa-arrow-circle-left"></i>
@@ -999,6 +1000,7 @@ class Generator
             <i class="fa fa-arrow-circle-left"></i>
             Удалить запись <?= $id ?>
         </a>
+        </div>
 
         <?php
     } ?>
