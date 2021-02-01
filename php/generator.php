@@ -10,25 +10,29 @@ class Generator
     /**
      * Форматированный вывод элемента списка, который является внешним ключом для $item
      * Formatted output of a list item that is a foreign key for `$item`
-     * @param $item mixed Объект, в котором есть внешний ключ
-     * @param $list mixed Список, по которому идёт поиск элемента
-     * @param $column string Название Столбца внешнего ключа
+     *
+     * @param $item        mixed Объект, в котором есть внешний ключ
+     * @param $list        mixed Список, по которому идёт поиск элемента
+     * @param $column      string Название Столбца внешнего ключа
      * @param $list_column string Название Столбца элемента, который будет выведен
-     * @param $name mixed Условное название элемента, в случае, если он не был найден в списке
+     * @param $name        mixed Условное название элемента, в случае, если он не был найден в списке
      */
-    public static function listFilterOnlyValue(&$item, $list, $column, $list_column, $name)
-    {
+    public static function listFilterOnlyValue(
+        &$item, $list, $column, $list_column, $name
+    ) {
         $is_exist = false;
         foreach ($list as $list_item) {
             if ($list_item['id'] == $item[$column]) {
                 $is_exist = true;
-                $item[$column] = $list_item[$list_column] . ' [' . $list_item['id'] . ']';
+                $item[$column] = $list_item[$list_column] . ' ['
+                    . $list_item['id'] . ']';
                 break;
             }
         }
 
         if (!$is_exist) {
-            $item[$column] = "<strong class='text-center'>[" . $item[$column] . "] <span class='text-danger'> $name not found </span> </strong>";
+            $item[$column] = "<strong class='text-center'>[" . $item[$column]
+                . "] <span class='text-danger'> $name not found </span> </strong>";
         }
     }
 
@@ -36,6 +40,7 @@ class Generator
     /**
      * Вывод всего списка, ассоциируемого с элементом
      * List the entire list associated with an item
+     *
      * @param $item
      * @param $list
      * @param $column
@@ -46,11 +51,13 @@ class Generator
         $item_column = $item[$column];
         $item_id = $item['id'];
 
-        $select_html = "<select name='$column' data-id='$item_id' class='nice-select-table table_select_handler selectpicker' data-live-search='true'>";
+        $select_html
+            = "<select name='$column' data-id='$item_id' class='nice-select-table table_select_handler selectpicker' data-live-search='true'>";
 
         if (!Helper::checkListItemExist($list, 'id', $item_column)) {
 
-            $select_html .= "<option value='NONE' selected>
+            $select_html
+                .= "<option value='NONE' selected>
             NONE
         </option>";
         }
@@ -63,7 +70,8 @@ class Generator
 
             $selected = $item_column == $list_item_id ? 'selected' : '';
 
-            $select_html .= "
+            $select_html
+                .= "
         <option value='$list_item_id' $selected>
             $list_item_column
         </option>";
@@ -78,13 +86,14 @@ class Generator
     /**
      * Вывод ссылки на редактирование записи
      * Link to edit post
+     *
      * @param $item mixed Объект, который содержит в себе внешний ключ
      * @param $user
      * @param $column
      * @param $link
      * @param $name
      */
-     public static function simpleFilter($id, $info)
+    public static function simpleFilter($id, $info)
     {
         $table = $info['foreign_table'];
         $res_key = 'id';
@@ -95,7 +104,8 @@ class Generator
 
         if (!empty($id) && !empty($table) && !empty($row)) {
             $foreign_column = @$row[$res_name];
-            $str = "<a target='_blank' class='btn btn-link' href = 'edit.php?cat=$table&act=edit&id=$id'>
+            $str
+                = "<a target='_blank' class='btn btn-link' href = 'edit.php?cat=$table&act=edit&id=$id'>
                    [#$id] $foreign_column</a>";
         } else {
             $str = "<span class=''> $id </span>";
@@ -107,8 +117,10 @@ class Generator
     /**
      * Сгенерировать поле Input без особенностей
      * Generate Input field without features
-     * @param $key string Ключ поля
+     *
+     * @param $key   string Ключ поля
      * @param $value string Значение поля
+     *
      * @return bool
      */
     public static function genSimpleInput($key, $value)
@@ -118,7 +130,8 @@ class Generator
             <label>
                 <?= Helper::readableText($key) ?>
             </label>
-            <input type="text" class="form-control" name="<?= $key ?>" value='<?= $value ?>'>
+            <input type="text" class="form-control" name="<?= $key ?>"
+                   value='<?= $value ?>'>
         </div>
         <?php
         return true;
@@ -127,8 +140,10 @@ class Generator
     /**
      * Сгенерировать поле, предполагающее значение типа Int
      * Generate Input field without features...
-     * @param $key string Ключ поля
+     *
+     * @param $key   string Ключ поля
      * @param $value string Значение поля
+     *
      * @return bool
      */
     public static function genIntInput($key, $value)
@@ -141,7 +156,8 @@ class Generator
             <label>
                 <?= Helper::readableText($key) ?>
             </label>
-            <input type="text" class="form-control" name="<?= $key ?>" value="<?= $value ?>">
+            <input type="text" class="form-control" name="<?= $key ?>"
+                   value="<?= $value ?>">
         </div>
         <?php
         return true;
@@ -151,8 +167,10 @@ class Generator
     /**
      * Сгенерировать поле, предполагающее значение типa Float|Double
      * Generate a field suggesting a value of type Float | Double
-     * @param $key string Ключ поля
+     *
+     * @param $key   string Ключ поля
      * @param $value string Значение поля
+     *
      * @return bool
      */
     public static function genFloatInput($key, $value)
@@ -165,7 +183,8 @@ class Generator
             <label>
                 <?= Helper::readableText($key) ?>
             </label>
-            <input type="text" class="form-control" name="<?= $key ?>" value="<?= $value ?>">
+            <input type="text" class="form-control" name="<?= $key ?>"
+                   value="<?= $value ?>">
         </div>
         <?php
         return true;
@@ -174,8 +193,10 @@ class Generator
     /**
      * Сгенерировать поле с возможностью выбора Даты
      * Generate a field with a choice of Dates
-     * @param $key string Ключ поля
+     *
+     * @param $key   string Ключ поля
      * @param $value string Значение поля
+     *
      * @return bool
      */
     public static function genDateInput($key, $value, $with_time = false)
@@ -192,7 +213,8 @@ class Generator
             <label>
                 <?= Helper::readableText($key) ?>
             </label>
-            <input type="text" class="form-control <?= $class ?>" name="<?= $key ?>" value="<?= $value ?>">
+            <input type="text" class="form-control <?= $class ?>"
+                   name="<?= $key ?>" value="<?= $value ?>">
         </div>
         <?php
         return true;
@@ -202,14 +224,17 @@ class Generator
     /**
      * Сгенерировать поле с аттрибутом Disabled
      * Generate a field with attribute Disabled
-     * @param $key string Ключ поля
+     *
+     * @param $key   string Ключ поля
      * @param $value string Значение поля
+     *
      * @return bool
      */
     public static function genDisabledInput($key, $value)
     {
         ?>
-        <input type="hidden" class="form-control disabled" disabled name="<?= $key ?>" value='<?= $value ?>'>
+        <input type="hidden" class="form-control disabled" disabled
+               name="<?= $key ?>" value='<?= $value ?>'>
         <?php
         return true;
     }
@@ -218,8 +243,10 @@ class Generator
     /**
      * Сгенерировать поле, с доступом только для чтения
      * Generate read-only field
-     * @param $key string Ключ поля
+     *
+     * @param $key   string Ключ поля
      * @param $value string Значение поля
+     *
      * @return bool
      */
     public static function genReadonlyInput($key, $value)
@@ -229,7 +256,8 @@ class Generator
             <label>
                 <?= Helper::readableText($key) ?>
             </label>
-            <input type="text" class="form-control" readonly name="<?= $key ?>" value='<?= $value ?>'>
+            <input type="text" class="form-control" readonly name="<?= $key ?>"
+                   value='<?= $value ?>'>
         </div>
         <?php
         return true;
@@ -238,9 +266,11 @@ class Generator
     /**
      * Сгенерировать TextArea
      * Generate TextArea
-     * @param $key string Ключ поля
-     * @param $value string Значение поля
+     *
+     * @param      $key         string Ключ поля
+     * @param      $value       string Значение поля
      * @param bool $with_editor Использовать ли JS редактор для поля
+     *
      * @return bool
      */
     public static function genTextarea($key, $value, $with_editor = false)
@@ -256,7 +286,8 @@ class Generator
             <label>
                 <?= Helper::readableText($key) ?>
             </label>
-            <textarea type="text" cols="10" rows="5" class="form-control <?= $editor_class ?>"
+            <textarea type="text" cols="10" rows="5"
+                      class="form-control <?= $editor_class ?>"
                       name="<?= $key ?>"><?= $value ?></textarea>
         </div>
         <?php
@@ -267,12 +298,15 @@ class Generator
     /**
      * Сгенерировать TextArea
      * Generate TextArea
-     * @param $key string Ключ поля
+     *
+     * @param $key   string Ключ поля
      * @param $value string Значение поля
+     *
      * @return bool
      */
-    public static function genJsonEditor($db_name, $table, $input_key, $input_value, $is_bad = false)
-    {
+    public static function genJsonEditor(
+        $db_name, $table, $input_key, $input_value, $is_bad = false
+    ) {
         if (DB::getColumnComment($db_name, $table, $input_key) == 'json') {
             $is_json_input = true;
         }
@@ -282,7 +316,8 @@ class Generator
 
         <div class="col-12 mb-5">
             <label>
-                <?= Helper::readableText($input_key) ?> (<b class='text-warning font-weight-bold'>JSON</b>)
+                <?= Helper::readableText($input_key) ?> (<b
+                        class='text-warning font-weight-bold'>JSON</b>)
             </label>
 
             <?php if ($is_bad) {
@@ -293,15 +328,18 @@ class Generator
                 <?php
             } ?>
 
-            <div class="tab-content" id="json_container_<?= $input_key ?>Content">
+            <div class="tab-content"
+                 id="json_container_<?= $input_key ?>Content">
 
                 <?php if ($is_json_input) {
                     ?>
                     <div class="tab-pane fade show active"
-                         id="json_editor_json_viewer_<?= $input_key ?>" role="tabpanel"
+                         id="json_editor_json_viewer_<?= $input_key ?>"
+                         role="tabpanel"
                          aria-labelledby="json_editor_content<?= $input_key ?>-tab">
 
-                        <div id="jsoneditor_<?= $input_key ?>" style=" height: 400px;"></div>
+                        <div id="jsoneditor_<?= $input_key ?>"
+                             style=" height: 400px;"></div>
                         <script>
 
                             // create the editor
@@ -314,15 +352,19 @@ class Generator
                             };
                             const editor_<?= $input_key ?> = new JSONEditor(container_<?= $input_key ?>, options_<?= $input_key ?>);
 
-                            let val_<?= $input_key ?> = <?= $input_value ?: '[1]' ?>;
+                            let val_<?= $input_key ?> = <?= $input_value
+                                ?: '[1]' ?>;
                             editor_<?= $input_key ?>.set(val_<?= $input_key ?>);
 
                         </script>
                     </div>
-                    <div class="tab-pane fade" id="json_editor_text_viewer_<?= $input_key ?>" role="tabpanel"
+                    <div class="tab-pane fade"
+                         id="json_editor_text_viewer_<?= $input_key ?>"
+                         role="tabpanel"
                          aria-labelledby="json_editor_text_viewer_<?= $input_key ?>-tab">
 
-                <textarea type="text" id="json_textarea<?= $input_key ?>" cols="10" rows="10"
+                <textarea type="text" id="json_textarea<?= $input_key ?>"
+                          cols="10" rows="10"
                           class="form-control border-radius-0"
                           name="<?= $input_key ?>"
                 ><?= stripslashes($input_value) ?></textarea>
@@ -339,8 +381,10 @@ class Generator
     /**
      * Сгенерировать CheckBox
      * Generate CheckBox
-     * @param $key string Ключ поля
+     *
+     * @param $key   string Ключ поля
      * @param $value string Значение поля
+     *
      * @return bool
      */
     public static function genCheckbox($key, $value)
@@ -354,7 +398,8 @@ class Generator
 
                 <label class="d-flex align-items-center">
                     <input type="hidden" name="<?= $key ?>" value="0">
-                    <input type="checkbox" name="<?= $key ?>" <?= @$value ? 'checked' : '' ?>
+                    <input type="checkbox" name="<?= $key ?>" <?= @$value
+                        ? 'checked' : '' ?>
                            value="1">
                     <span class="cr"><i class="cr-icon fa fa-check"></i></span>
                     <?= Helper::readableText($key) ?>
@@ -369,9 +414,11 @@ class Generator
     /**
      * Сгеренировать поле Checkbox для записи DataTable
      * Generate Checkbox field for DataTable record
+     *
      * @param $item
      * @param $key
      * @param $value
+     *
      * @return string
      */
     public static function genTableCheckbox(&$item, $key, $value)
@@ -389,7 +436,8 @@ class Generator
             $item_id = $item['id'];
         }
 
-        $check_html = "            
+        $check_html
+            = "            
             <div class='checkbox form-control d-flex align-items-center border-0 table_checkbox_container'>        
                 <label class='d-flex align-items-center mb-0'>
                     <input type = 'hidden' name = '$key' value='0'>
@@ -407,15 +455,18 @@ class Generator
     /**
      * Сгенерировать SelectBox для формы
      * Generate SelectBox for the form
-     * @param $table string Таблица, из которой берутся элементы
-     * @param $key string Ключ поля
-     * @param $value string Текущее значение поля
-     * @param $res_key string Ключ, по которому идёт проверка списка, полученного из таблицы
+     *
+     * @param $table    string Таблица, из которой берутся элементы
+     * @param $key      string Ключ поля
+     * @param $value    string Текущее значение поля
+     * @param $res_key  string Ключ, по которому идёт проверка списка, полученного из таблицы
      * @param $res_name string Столбец, значение которого будет отображаться в элементе option
+     *
      * @return bool
      */
-    public static function genSelectBox($table, $key, $value, $res_key, $res_name)
-    {
+    public static function genSelectBox(
+        $table, $key, $value, $res_key, $res_name
+    ) {
         $res_key = 'id';
         $results = DB::getAllOrdered($table, $res_key);
 
@@ -431,7 +482,9 @@ class Generator
                 <?= Helper::readableText($key) ?>
             </label>
             <br>
-            <select name="<?= $key ?>" class="nice-select selectpicker col-12 px-0" data-live-search='true'
+            <select name="<?= $key ?>"
+                    class="nice-select selectpicker col-12 px-0"
+                    data-live-search='true'
                     data-url="<?= $url ?>">
                 <option <?= empty($value) ? 'selected' : '' ?>
                         value="">
@@ -440,7 +493,8 @@ class Generator
 
                 <?php foreach ($results as $item) {
 
-                    $item[$res_name] = '[' . @$item[$res_key] . '] ' . $item[$res_name];
+                    $item[$res_name] = '[' . @$item[$res_key] . '] '
+                        . $item[$res_name];
 
                     ?>
                     <option <?= $item[$res_key] == @$value ? 'selected' : '' ?>
@@ -461,11 +515,13 @@ class Generator
     /**
      * Сгенерировать SelectBox для таблицы
      * Generate SelectBox for the form
-     * @param $table string Таблица, из которой берутся элементы
-     * @param $key string Ключ поля
-     * @param $value string Текущее значение поля
-     * @param $res_key string Ключ, по которому идёт проверка списка, полученного из таблицы
+     *
+     * @param $table    string Таблица, из которой берутся элементы
+     * @param $key      string Ключ поля
+     * @param $value    string Текущее значение поля
+     * @param $res_key  string Ключ, по которому идёт проверка списка, полученного из таблицы
      * @param $res_name string Столбец, значение которого будет отображаться в элементе option
+     *
      * @return bool
      */
     public static function genTableSelectBox($info, $value, $id)
@@ -486,7 +542,8 @@ class Generator
         ?>
         <div class="col-12">
             <select name="<?= $key ?>" data-id="<?= $id ?>"
-                    class="nice-select-table nice-select table_select_handler selectpicker" data-live-search='true'>
+                    class="nice-select-table nice-select table_select_handler selectpicker"
+                    data-live-search='true'>
 
                 <option <?= empty($value) ? 'selected' : '' ?>
                         value="">
@@ -494,7 +551,8 @@ class Generator
                 </option>
 
                 <?php foreach ($results as $item) {
-                    $item[$res_name] = '[' . @$item[$res_key] . '] ' . $item[$res_name];
+                    $item[$res_name] = '[' . @$item[$res_key] . '] '
+                        . $item[$res_name];
                     ?>
                     <option <?= $item[$res_key] == @$value ? 'selected' : '' ?>
                             value="<?= $item[$res_key] ?>">
@@ -515,7 +573,8 @@ class Generator
     /**
      * Сгенерировать форму
      * Generate form
-     * @param $row mixed Данные для формы
+     *
+     * @param       $row  mixed Данные для формы
      * @param array $info Дополнительные данные
      */
     public static function generateForm($db_name, $table, $row, $info = [])
@@ -530,7 +589,11 @@ class Generator
             $relations = DB::getTableRelationsOneToMany($table, $value['name']);
             $comment = DB::getColumnComment($db_name, $table, $value['name']);
 
-            if ($value['name'] == 'id' && preg_match('/int\(/', $value['type'])) {
+            if ($value['name'] == 'id'
+                && preg_match(
+                    '/int\(/', $value['type']
+                )
+            ) {
                 $type = 'disabled';
             } else if ($comment == 'json') {
                 if (!Helper::checkJson($value['value'])) {
@@ -569,7 +632,9 @@ class Generator
 //                $type = 'disabled';
 //                break;
 //        }
-            self::generateFormInput($db_name, $table, $value['name'], $value['value'], $type);
+            self::generateFormInput(
+                $db_name, $table, $value['name'], $value['value'], $type
+            );
         }
     }
 
@@ -577,12 +642,14 @@ class Generator
     /**
      * Сгенерировать поле формы
      * Generate form field
-     * @param $key string Название поля
+     *
+     * @param $key   string Название поля
      * @param $value string значение поля
-     * @param $type string Тип поля
+     * @param $type  string Тип поля
      */
-    public static function generateFormInput($db_name, $table, $key, $value, $type)
-    {
+    public static function generateFormInput(
+        $db_name, $table, $key, $value, $type
+    ) {
         $act = 'add';
 
         if (!empty($_GET['act'] && $_GET['act'] === 'edit')) {
@@ -591,70 +658,70 @@ class Generator
 
 
         switch ($type) {
-            case 'simple':
-                self::genSimpleInput($key, $value);
-                break;
+        case 'simple':
+            self::genSimpleInput($key, $value);
+            break;
 
-            case 'readonly':
-                self::genReadonlyInput($key, $value);
-                break;
+        case 'readonly':
+            self::genReadonlyInput($key, $value);
+            break;
 
-            case 'blob':
-                self::genTextarea($key, $value, true);
-                break;
-            case 'text':
-                self::genTextarea($key, $value);
-                break;
+        case 'blob':
+            self::genTextarea($key, $value, true);
+            break;
+        case 'text':
+            self::genTextarea($key, $value);
+            break;
 
-            case 'int':
-                self::genIntInput($key, $value);
-                break;
+        case 'int':
+            self::genIntInput($key, $value);
+            break;
 
-            case 'float':
-            case 'double':
-                self::genFloatInput($key, $value);
-                break;
-            case 'disabled':
-                self::genDisabledInput($key, $value);
-                break;
+        case 'float':
+        case 'double':
+            self::genFloatInput($key, $value);
+            break;
+        case 'disabled':
+            self::genDisabledInput($key, $value);
+            break;
 
-            case 'checkbox':
-                self::genCheckbox($key, $value);
-                break;
+        case 'checkbox':
+            self::genCheckbox($key, $value);
+            break;
 
-            case 'datetime':
-                self::genDateInput($key, $value, true);
-                break;
-            case 'date':
-                self::genDateInput($key, $value);
-                break;
+        case 'datetime':
+            self::genDateInput($key, $value, true);
+            break;
+        case 'date':
+            self::genDateInput($key, $value);
+            break;
 
-            case 'json':
-                self::genJsonEditor($db_name, $table, $key, $value);
-                break;
+        case 'json':
+            self::genJsonEditor($db_name, $table, $key, $value);
+            break;
 
-            case 'bad_json':
-                self::genJsonEditor($db_name, $table, $key, $value, true);
-                break;
+        case 'bad_json':
+            self::genJsonEditor($db_name, $table, $key, $value, true);
+            break;
 
-            case 'selectbox':
-                $relation = DB::getTableRelationsOneToMany($table, $key);
+        case 'selectbox':
+            $relation = DB::getTableRelationsOneToMany($table, $key);
 
-                if (!empty($relation) && !empty($relation['is_small'])) {
-                    if ($relation['inner_column'] == $key) {
-                        self::genSelectBox(
-                            $relation['foreign_table'],
-                            $relation['inner_column'], $value,
-                            $relation['foreign_column'],
-                            $relation['foreign_column']
-                        );
-                        break;
-                    }
-                } else {
-                    self::genSimpleInput($key, $value);
+            if (!empty($relation) && !empty($relation['is_small'])) {
+                if ($relation['inner_column'] == $key) {
+                    self::genSelectBox(
+                        $relation['foreign_table'],
+                        $relation['inner_column'], $value,
+                        $relation['foreign_column'],
+                        $relation['foreign_column']
+                    );
+                    break;
                 }
+            } else {
+                self::genSimpleInput($key, $value);
+            }
 
-                break;
+            break;
         }
     }
 
@@ -662,7 +729,9 @@ class Generator
     /**
      * Сгенерировать CRUD кнопки для записи
      * Generate CRUD buttons for recording
+     *
      * @param array $info Информация, необходимая для генерации
+     *
      * @return bool|string Сгенерированный html код
      */
     public static function getActionButtons(array $info = array())
@@ -670,7 +739,8 @@ class Generator
 
         if (empty($info) || empty($info['page_name'])
             || empty($info['table'])
-            || empty($info['data_type'])) {
+            || empty($info['data_type'])
+        ) {
             return false;
         }
 
@@ -680,14 +750,16 @@ class Generator
 
 
         if (!empty($info['edit'])) {
-            $html .= " <a class='btn btn-primary' href='edit.php?cat=$page_name&act=edit&id=$id'>
+            $html
+                .= " <a class='btn btn-primary' href='edit.php?cat=$page_name&act=edit&id=$id'>
                 <i class='fa fa-edit'></i>
                      Редактировать
             </a>";
         }
 
         if (!empty($info['relations'])) {
-            $html .= '<div class="btn-group" role="group">
+            $html
+                .= '<div class="btn-group" role="group">
     <button  type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <i class="fa fa-boxes"></i>
       Связи
@@ -695,11 +767,14 @@ class Generator
     <div class="dropdown-menu">';
             foreach ($info['relations'] as $relation_info) {
                 $table_name = $relation_info['table_name'];
-                $table_full_name = !empty($relation_info['foreign_table_name']) ? $relation_info['foreign_table_name'] : Helper::readableText($table_name);
+                $table_full_name = !empty($relation_info['foreign_table_name'])
+                    ? $relation_info['foreign_table_name']
+                    : Helper::readableText($table_name);
                 $get_column = $relation_info['inner_column'];
                 $get_value = $id;
 
-                $html .= "
+                $html
+                    .= "
             <a class='dropdown-item' href='list.php?cat=$table_name&get_column=$get_column&get_value=$get_value'>";
                 $html .= $table_full_name;
                 $html .= "</a>";
@@ -709,7 +784,8 @@ class Generator
         }
 
         if (!empty($info['copy'])) {
-            $html .= "
+            $html
+                .= "
             <a class='btn btn-dark' href='edit.php?cat=$page_name&act=add&id=$id'>
                 <i class='far fa-copy'></i>
                     Копировать 
@@ -718,7 +794,8 @@ class Generator
 
 
         if (!empty($info['delete'])) {
-            $html .= " 
+            $html
+                .= " 
             <a class='btn btn-danger delete_row_handler' href = 'save.php?act=delete&id=$id&cat=$page_name&method=ajax'>
                 <i class='fa fa-trash'></i> 
                 Удалить
@@ -750,11 +827,13 @@ class Generator
         $columns = $columns_array['columns'];
         ?>
 
-        <input type="hidden" class="table_columns" value='<?= json_encode($data_columns) ?>'>
+        <input type="hidden" class="table_columns"
+               value='<?= json_encode($data_columns) ?>'>
 
         <div class="d-flex justify-content-between">
             <div>
-                <a class="btn btn-primary" href="edit.php?cat=<?= $table ?>&act=add">
+                <a class="btn btn-primary"
+                   href="edit.php?cat=<?= $table ?>&act=add">
                     <i class="fa fa-plus-circle"></i>
                     Добавить запись
                 </a>
@@ -764,14 +843,16 @@ class Generator
 
                 <?php if (!empty($_GET['get_column'])) {
                     ?>
-                    <a class="btn btn-primary" href="list.php?cat=<?= $table ?>">
+                    <a class="btn btn-primary"
+                       href="list.php?cat=<?= $table ?>">
                         <i class="fa fa-list"></i>
                         Все записи <?= $table_info['name'] ?>
                     </a>
                     <?php
                 } ?>
 
-                <a class="btn btn-danger" href="save.php?cat=<?= $table ?>&act=clear"
+                <a class="btn btn-danger"
+                   href="save.php?cat=<?= $table ?>&act=clear"
                    onclick="return navConfirm(this.href, 'The Table will be cleared! Continue?');">
                     <i class="fa fa-ban"></i>
                     Очистить таблицу <?= $table_info['name'] ?>
@@ -831,7 +912,9 @@ class Generator
 
         <div class="row">
             <div class="col-12 ">
-                <table id="serverside" class="table table-striped table-bordered display " style="width:100%">
+                <table id="serverside"
+                       class="table table-striped table-bordered display "
+                       style="width:100%">
                     <thead>
                     <tr>
                         <th class="no-sort">
@@ -849,7 +932,10 @@ class Generator
 
                     <tfoot>
                     <tr>
-                        <th>Поиск <br><span class='text-danger'>(не менее 3-5 символов)</span></th>
+                        <th>Поиск <br>
+                            <span class='text-danger'>(не менее 3-5 символов)
+                            </span>
+                        </th>
                         <?php foreach ($columns as $column) {
                             ?>
                             <th>
@@ -870,6 +956,7 @@ class Generator
     /**
      * Сгенерировать страницу для Редактирования информации о Записи в таблицы
      * Generate a page for editing table entry information
+     *
      * @param bool $read_user_id
      */
     public static function generateStandartEditPage($db_name, $table)
@@ -901,6 +988,21 @@ class Generator
             <i class="fa fa-arrow-circle-left"></i>
             Вернуться в список <?= Helper::readableText($table) ?>
         </a>
+
+
+        <?php if ($act == 'edit' && !empty($id)) {
+        ?>
+
+        <a class="btn btn-outline-secondary"
+           href="save.php?act=delete&id=<?= $id ?>&cat=<?= $table ?>"
+           onclick="return navConfirm(this.href, 'Удалить запись #<?= $id ?>?');">
+            <i class="fa fa-arrow-circle-left"></i>
+            Удалить запись <?= $id ?>
+        </a>
+
+        <?php
+    } ?>
+
         <hr>
 
         <form method="post" action="save.php" enctype='multipart/form-data'>
@@ -956,8 +1058,9 @@ class Generator
     }
 
 
-    public static function generateAnotherKeyEditPage($table, $cat, $list_name, $key_name)
-    {
+    public static function generateAnotherKeyEditPage(
+        $table, $cat, $list_name, $key_name
+    ) {
         $act = $_GET['act'];
         @$id = (int)$_GET['id'];
 
@@ -1025,7 +1128,8 @@ class Generator
 
                 <div class="row">
                     <div class="col-12">
-                        <input type="submit" value=" Сохранить " class="btn btn-success">
+                        <input type="submit" value=" Сохранить "
+                               class="btn btn-success">
                     </div>
                 </div>
         </form>
@@ -1034,20 +1138,21 @@ class Generator
     }
 
 
-    public static function uniqueColumnUpDownButtons($item, $column, $min_value, $max_value, $page_name)
-    {
+    public static function uniqueColumnUpDownButtons(
+        $item, $column, $min_value, $max_value, $page_name
+    ) {
         $id = $item['id'];
 
         $up_position = $item[$column] + 1;
         $down_position = $item[$column] - 1;
 
 
-        $temp =
-            "<div class='btn-group-vertical'>";
+        $temp = "<div class='btn-group-vertical'>";
 
 
         if ($item[$column] > $min_value) {
-            $temp .= "<a href = 'save.php?act=edit&id=$id&cat=$page_name&$column=$down_position' class='btn btn-lg btn-outline-info w-min-content' >
+            $temp
+                .= "<a href = 'save.php?act=edit&id=$id&cat=$page_name&$column=$down_position' class='btn btn-lg btn-outline-info w-min-content' >
                     <i class='fa fa-arrow-up mr-0 py-1' ></i >
                 </a >";
         }
@@ -1058,7 +1163,8 @@ class Generator
 
 
         if ($item[$column] < $max_value && $item[$column] >= 1) {
-            $temp .= "<a href='save.php?act=edit&id=$id&cat=$page_name&$column=$up_position' class='btn btn-lg btn-outline-info w-min-content'>
+            $temp
+                .= "<a href='save.php?act=edit&id=$id&cat=$page_name&$column=$up_position' class='btn btn-lg btn-outline-info w-min-content'>
                     <i class='fa fa-arrow-down mr-0 py-1'></i>
                 </a>";
         }
@@ -1073,10 +1179,12 @@ class Generator
     /**
      * Сгенерировать Кнопки для строки DataTable
      * Generate Action buttons for Datatable row
+     *
      * @param $page_name
      * @param $table string Source table
-     * @param $item mixed Table row
-     * @param $type string page url
+     * @param $item  mixed Table row
+     * @param $type  string page url
+     *
      * @return bool|string generated html
      */
     public static function genActionButtons($page_name, $table, &$item, $type)
