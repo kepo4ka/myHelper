@@ -998,7 +998,7 @@ class Generator
            href="save.php?act=delete&id=<?= $id ?>&cat=<?= $table ?>"
            onclick="return navConfirm(this.href, 'Удалить запись #<?= $id ?>?');">
             <i class="fa fa-trash"></i>
-            Удалить запись <?= $id ?>
+            Удалить запись #<?= $id ?>
         </a>
         </div>
 
