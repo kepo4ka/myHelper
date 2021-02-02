@@ -984,26 +984,26 @@ class Generator
         ?>
 
         <div class="d-flex justify-content-between">
-        <a class="btn btn-outline-secondary" href="list.php?cat=<?= $table ?>"
-           onclick="return navConfirm(this.href, 'Изменения не будут сохранены. Продолжить?');">
-            <i class="fa fa-arrow-circle-left"></i>
-            Вернуться в список <?= Helper::readableText($table) ?>
-        </a>
+            <a class="btn btn-outline-secondary"
+               href="list.php?cat=<?= $table ?>"
+               onclick="return navConfirm(this.href, 'Изменения не будут сохранены. Продолжить?');">
+                <i class="fa fa-arrow-circle-left"></i>
+                Вернуться в список <?= Helper::readableText($table) ?>
+            </a>
 
 
-        <?php if ($act == 'edit' && !empty($id)) {
-        ?>
+            <?php if ($act == 'edit' && !empty($id)) {
+                ?>
 
-        <a class="btn btn-outline-danger"
-           href="save.php?act=delete&id=<?= $id ?>&cat=<?= $table ?>"
-           onclick="return navConfirm(this.href, 'Удалить запись #<?= $id ?>?');">
-            <i class="fa fa-trash"></i>
-            Удалить запись #<?= $id ?>
-        </a>
+                <a class="btn btn-outline-danger"
+                   href="save.php?act=delete&id=<?= $id ?>&cat=<?= $table ?>"
+                   onclick="return navConfirm(this.href, 'Удалить запись #<?= $id ?>?');">
+                    <i class="fa fa-trash"></i>
+                    Удалить запись #<?= $id ?>
+                </a>
+                <?php
+            } ?>
         </div>
-
-        <?php
-    } ?>
 
         <hr>
 
