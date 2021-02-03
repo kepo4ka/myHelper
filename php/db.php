@@ -13,10 +13,16 @@ class DB
 
     public static $db;
 
-    public function __construct($host, $db_name, $user, $password, $charset = 'utf8mb4')
-    {
+    public function __construct(
+        $host, $db_name, $user, $password, $charset = 'utf8mb4'
+    ) {
         try {
-            self::$db = new SafeMysql(array('user' => $user, 'pass' => $password, 'db' => $db_name, 'charset' => $charset));
+            self::$db = new SafeMysql(
+                array(
+                    'user'    => $user, 'pass' => $password, 'db' => $db_name,
+                    'charset' => $charset
+                )
+            );
         } catch (Throwable $throwable) {
             return false;
         } catch (Exception $exception) {
@@ -34,15 +40,18 @@ class DB
 
     /**
      * Получить все записи из таблицы (расширенная)
-     * @param $table string Название таблицы
-     * @param int $limit Ограничение
-     * @param int $offset Отступ
+     *
+     * @param                  $table        string Название таблицы
+     * @param int              $limit        Ограничение
+     * @param int              $offset       Отступ
      * @param array|bool|mixed $search_array Список для поиска
-     * @param $order
+     * @param                  $order
+     *
      * @return array|bool|mixed Список записей
      */
-    public static function getAllLimitAdvanced($table, $limit = 0, $offset = 0, $search_array, $order)
-    {
+    public static function getAllLimitAdvanced(
+        $table, $limit = 0, $offset = 0, $search_array, $order
+    ) {
         if ($limit > 0) {
         } else {
             $limit = 1000;
@@ -91,8 +100,10 @@ class DB
 
     /**
      * Получить запись по значению `id`
+     *
      * @param $table string Исходная таблица
-     * @param $id string Значение `id`
+     * @param $id    string Значение `id`
+     *
      * @return array|FALSE Запись
      */
     public static function getById($table, $id)
@@ -104,8 +115,10 @@ class DB
 
     /**
      * Получить отсортированные данные из таблицы
-     * @param $table string Исходная таблица
+     *
+     * @param $table  string Исходная таблица
      * @param $column string Столбец, по которому идёт сортировка
+     *
      * @return array Отсортированный список записей
      */
     public static function getAllOrdered($table, $column)
@@ -116,8 +129,10 @@ class DB
 
     /**
      * Получить запись по значению `column`
+     *
      * @param $table string Исходная таблица
-     * @param $id string Значение `column`
+     * @param $id    string Значение `column`
+     *
      * @return array|FALSE Запись
      */
     public static function getByColumn($table, $column, $value)
@@ -147,14 +162,17 @@ class DB
 
     /**
      * Получить записи, фильтруя по нескольким полям
-     * @param $table string Исходная таблица
-     * @param $array array Массив вида [['column'=>'col_example', 'value'=>'value_example']] ИЛИ [['col_example', 'value_example']]
-     * @param bool $is_one Получить только одну запись
+     *
+     * @param      $table         string Исходная таблица
+     * @param      $array         array Массив вида [['column'=>'col_example', 'value'=>'value_example']] ИЛИ [['col_example', 'value_example']]
+     * @param bool $is_one        Получить только одну запись
      * @param null $needed_column Выбирать определённую колонку
+     *
      * @return array|FALSE|string
      */
-    public static function getByColumnAndArray($table, $array, $is_one = true, $needed_column = null)
-    {
+    public static function getByColumnAndArray(
+        $table, $array, $is_one = true, $needed_column = null
+    ) {
 
         if (!empty($needed_column)) {
             $needed_column = "`$needed_column`";
@@ -191,8 +209,10 @@ class DB
 
     /**
      * Добавить запись в таблицу связей таблиц
+     *
      * @param $p_data array Данные для добавления
-     * @param $table string Исходная таблица
+     * @param $table  string Исходная таблица
+     *
      * @return bool|FALSE|resource Результат операции
      */
     public static function saveRelation($p_data, $table)
@@ -211,15 +231,18 @@ class DB
 
     /**
      * Получить все записи с указанных значением внешнего ключа
-     * @param $table string Исходная таблица
-     * @param $column string Название внешнего ключа
-     * @param $value string Значение внешнего ключа
-     * @param $needed_column string Название поля, которое нужно получить
-     * @param int $limit Ограничение количества записей
+     *
+     * @param     $table         string Исходная таблица
+     * @param     $column        string Название внешнего ключа
+     * @param     $value         string Значение внешнего ключа
+     * @param     $needed_column string Название поля, которое нужно получить
+     * @param int $limit         Ограничение количества записей
+     *
      * @return array Результат выборки
      */
-    public static function getOneToMany($table, $column, $value, $needed_column, $limit = 0)
-    {
+    public static function getOneToMany(
+        $table, $column, $value, $needed_column, $limit = 0
+    ) {
         $query = 'SELECT ?n FROM ?n WHERE ?n=?s';
         $limit = (int)$limit;
 
@@ -227,48 +250,55 @@ class DB
             $query .= "LIMIT $limit";
         }
 
-        return self::$db->getCol($query, $needed_column, $table, $column, $value);
+        return self::$db->getCol(
+            $query, $needed_column, $table, $column, $value
+        );
     }
 
 
     /**
      * Добавление записи или обновление в случае существования
-     * @param $p_data array Данные для добавления
-     * @param $table string Исходная Таблица
+     *
+     * @param              $p_data  array Данные для добавления
+     * @param              $table   string Исходная Таблица
      * @param string|array $primary Название первичного ключа
+     *
      * @return bool|FALSE|resource Результат операции
      */
     public static function save($p_data, $table, $primary = 'id')
     {
-        if (empty($p_data)) {
-            return false;
-        }
-
-        $columns = self::getColumnNames($table);
-        $data = self::$db->filterArray($p_data, $columns);
-
-        $exist = false;
-
-        if (is_array($primary)) {
-            $exist = self::checkExist($table, $primary, $data);
-        } else {
-            if (!isset($data[$primary])) {
-                $exist = false;
-            } else {
-                $exist = self::checkExist($table, $primary, $data[$primary]);
+        try {
+            if (empty($p_data)) {
+                return false;
             }
-        }
 
-        if (!$exist) {
-            $query = 'INSERT INTO ?n SET ?u';
-            return self::$db->query($query, $table, $data);
-        } else {
+            $columns = self::getColumnNames($table);
+            $data = self::$db->filterArray($p_data, $columns);
+
+            $exist = false;
+
             if (is_array($primary)) {
-                $query = 'UPDATE ?n SET ?u WHERE';
+                $exist = self::checkExist($table, $primary, $data);
+            } else {
+                if (!isset($data[$primary])) {
+                    $exist = false;
+                } else {
+                    $exist = self::checkExist(
+                        $table, $primary, $data[$primary]
+                    );
+                }
+            }
 
-                foreach ($primary as $item) {
+            if (!$exist) {
+                $query = 'INSERT INTO ?n SET ?u';
+                return self::$db->query($query, $table, $data);
+            } else {
+                if (is_array($primary)) {
+                    $query = 'UPDATE ?n SET ?u WHERE';
 
-                    switch (true) {
+                    foreach ($primary as $item) {
+
+                        switch (true) {
                         case is_string($item):
                             $temp = $item;
                             $item = [];
@@ -279,17 +309,23 @@ class DB
                             $item['column'] = @$item[0];
                             $item['value'] = @$item[1];
                             break;
+                        }
+
+                        $query .= ' ' . $item['column'] . '="' . $item['value']
+                            . '" AND';
                     }
+                    $query .= ' 1';
 
-                    $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
+                    return self::$db->query($query, $table, $data);
+                } else {
+                    $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
+                    return self::$db->query(
+                        $query, $table, $data, $primary, $data[$primary]
+                    );
                 }
-                $query .= ' 1';
-
-                return self::$db->query($query, $table, $data);
-            } else {
-                $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
-                return self::$db->query($query, $table, $data, $primary, $data[$primary]);
             }
+        } catch (Throwable $exception) {
+            return false;
         }
     }
 
@@ -301,27 +337,32 @@ class DB
         $types = [];
 
         foreach ($columns as $column) {
-            $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ?s AND table_name = ?s AND COLUMN_NAME = ?s limit 1";
+            $query
+                = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ?s AND table_name = ?s AND COLUMN_NAME = ?s limit 1";
 
             $type_info = self::$db->getRow($query, $db_name, $table, $column);
 
             $type = @$type_info['DATA_TYPE'];
 
             switch ($type) {
-                case 'varchar':
-                    $default = self::getColumnDefaultValue($db_name, $table, $column);
-                    if (empty($default)) {
-                        $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ''";
-                        self::$db->query($query, $table, $column);
-                    }
-                    break;
-                case 'int':
-                    $default = self::getColumnDefaultValue($db_name, $table, $column);
-                    if (!is_int($default)) {
-                        $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT 0";
-                        self::$db->query($query, $table, $column);
-                    }
-                    break;
+            case 'varchar':
+                $default = self::getColumnDefaultValue(
+                    $db_name, $table, $column
+                );
+                if (empty($default)) {
+                    $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ''";
+                    self::$db->query($query, $table, $column);
+                }
+                break;
+            case 'int':
+                $default = self::getColumnDefaultValue(
+                    $db_name, $table, $column
+                );
+                if (!is_int($default)) {
+                    $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT 0";
+                    self::$db->query($query, $table, $column);
+                }
+                break;
             }
         }
         return $types;
@@ -330,9 +371,11 @@ class DB
 
     /**
      * Удалить запись
-     * @param $table string Исходная таблица
+     *
+     * @param $table  string Исходная таблица
      * @param $column string Столбец, по которому идёт фильрация
-     * @param $value string Значение стоблца
+     * @param $value  string Значение стоблца
+     *
      * @return FALSE|\mysqli|resource Удалось ли удалить запись
      */
     public static function deleteRow($table, $column, $value)
@@ -344,9 +387,11 @@ class DB
 
     /**
      * Получить количество записей в таблице
-     * @param $table string Таблица, по которой идёт подсчёт
-     * @param bool $col Название столбца, по которому идёт выбор (опционально)
-     * @param bool $val Значение стоблца, по которому идёт выбор
+     *
+     * @param      $table string Таблица, по которой идёт подсчёт
+     * @param bool $col   Название столбца, по которому идёт выбор (опционально)
+     * @param bool $val   Значение стоблца, по которому идёт выбор
+     *
      * @return int Количество записей
      */
     public static function counting($table, $col = false, $val = false)
@@ -369,9 +414,11 @@ class DB
 
     /**
      * Проверить существование записи с указанным значением одного поля
-     * @param $table string Таблица для проверки
+     *
+     * @param $table  string Таблица для проверки
      * @param $column string Поле для проверки
-     * @param $value string|array Контрольное Значение
+     * @param $value  string|array Контрольное Значение
+     *
      * @return FALSE|string Существует или нет
      */
     public static function checkExist($table, $column, $value)
@@ -385,15 +432,15 @@ class DB
                 }
 
                 switch (true) {
-                    case is_string($item):
-                        $new_filter[$item] = $value[$item];
-                        break;
-                    case !empty($item['column']):
-                        $new_filter[$item['column']] = $item['value'];
-                        break;
-                    case !empty($item[0]):
-                        $new_filter[$item[0]] = $item[1];
-                        break;
+                case is_string($item):
+                    $new_filter[$item] = $value[$item];
+                    break;
+                case !empty($item['column']):
+                    $new_filter[$item['column']] = $item['value'];
+                    break;
+                case !empty($item[0]):
+                    $new_filter[$item[0]] = $item[1];
+                    break;
                 }
             }
 
@@ -408,7 +455,9 @@ class DB
 
     /**
      * Получить столбцы таблицы
+     *
      * @param $table_name string Исходная таблица
+     *
      * @return array Список столбцов
      */
     public static function getColumnNames($table_name)
@@ -439,7 +488,8 @@ class DB
 
     public static function createLogTable($table = 'debug_log')
     {
-        $query = "
+        $query
+            = "
 CREATE TABLE `$table` (
   `id` int(11) NOT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp(),
@@ -452,7 +502,8 @@ CREATE TABLE `$table` (
 ";
 
 
-        $query1 = "
+        $query1
+            = "
 ALTER TABLE `$table`
   ADD PRIMARY KEY (`id`),
   ADD KEY `date` (`date`),
@@ -473,13 +524,16 @@ ALTER TABLE `$table`
 
     /**
      * Записать данные в Лог-базу
-     * @param $data mixed Данные для записи
+     *
+     * @param        $data  mixed Данные для записи
      * @param string $title Заголовок
-     * @param string $type Тип
+     * @param string $type  Тип
+     *
      * @return array|FALSE|resource
      */
-    public static function logDB($data, $title = 'Info', $type = 'info', $table = 'debug_log')
-    {
+    public static function logDB(
+        $data, $title = 'Info', $type = 'info', $table = 'debug_log'
+    ) {
 
         try {
             $count = self::counting($table);
@@ -489,7 +543,9 @@ ALTER TABLE `$table`
                 $id = self::$db->getOne('SELECT ?n FROM ?n', $primary, $table);
 
                 if (!empty($id)) {
-                    self::$db->query('DELETE FROM ?n WHERE ?n=?i', $table, $primary, $id);
+                    self::$db->query(
+                        'DELETE FROM ?n WHERE ?n=?i', $table, $primary, $id
+                    );
                 }
             }
 
@@ -514,6 +570,7 @@ ALTER TABLE `$table`
 
     /**
      * Получить записи Лог-базы
+     *
      * @return array Список логирования
      */
     public static function getlogDB($site = false, $table = 'debug_log')
@@ -536,6 +593,7 @@ ALTER TABLE `$table`
 
     /**
      * Удаляет текущую директорию и все файлы и папки в ней, включая скрытые файлы (.extension)...
+     *
      * @param string $folder_path Путь до папки которую нужно удалить
      */
     public static function delete_folder($folder_path, $delete_self = true)
@@ -543,37 +601,43 @@ ALTER TABLE `$table`
 
         $glod = glob("$folder_path/{,.}[!.,!..]*", GLOB_BRACE);
         foreach ($glod as $file) {
-            if (is_dir($file))
+            if (is_dir($file)) {
                 call_user_func(__FUNCTION__, $file);
-            else
+            } else {
                 unlink($file);
+            }
         }
 
-        if ($delete_self)
+        if ($delete_self) {
             rmdir($folder_path);
+        }
     }
 
 
     public static function getColumnComment($db_name, $table, $column)
     {
-        $query = "SELECT `COLUMN_COMMENT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
+        $query
+            = "SELECT `COLUMN_COMMENT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
         return self::$db->getOne($query, $db_name, $table, $column);
     }
 
 
     public static function getColumnDefaultValue($db_name, $table, $column)
     {
-        $query = "SELECT `COLUMN_DEFAULT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
+        $query
+            = "SELECT `COLUMN_DEFAULT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
         return self::$db->getOne($query, $db_name, $table, $column);
     }
 
     /**
      * @param $results
      * @param $keys_for_formatting
+     *
      * @return mixed
      */
-    public static function formatDataForTableShowing($results, $keys_for_formatting)
-    {
+    public static function formatDataForTableShowing(
+        $results, $keys_for_formatting
+    ) {
         foreach ($results as &$item) {
             foreach ($item as $key => &$obj) {
                 if (in_array($key, $keys_for_formatting)) {
@@ -599,7 +663,9 @@ ALTER TABLE `$table`
 
     /**
      *  Отформатировать столбцы таблицы
+     *
      * @param $table string Исходная таблица
+     *
      * @return mixed Массив списков столбцов
      */
     public static function getColumnsReadable($table)
@@ -621,7 +687,9 @@ ALTER TABLE `$table`
 
     /**
      * Форматирование строки перед выводом
+     *
      * @param $text string Исходная строка
+     *
      * @return mixed|string Отформатированная строка
      */
     private static function readableText($text)
@@ -633,7 +701,9 @@ ALTER TABLE `$table`
 
     /**
      * Получить типы столбцов в таблице
+     *
      * @param $table string Исходная таблица
+     *
      * @return array Список типов
      */
     public static function getTableTypes($table)
@@ -652,13 +722,16 @@ ALTER TABLE `$table`
 
     /**
      * Получить тип столбца
-     * @param $table string Исходная таблицы
+     *
+     * @param $table  string Исходная таблицы
      * @param $column string Исходный столбец
+     *
      * @return FALSE|string Тип столбца
      */
     public static function getColumnType($table, $column)
     {
-        $query = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+        $query
+            = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
       WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
         $res = self::$db->getOne($query, $table, $column);
         return $res;
@@ -666,13 +739,16 @@ ALTER TABLE `$table`
 
     /**
      * Получить длину столбца
-     * @param $table string Исходная таблицы
+     *
+     * @param $table  string Исходная таблицы
      * @param $column string Исходный столбец
+     *
      * @return FALSE|string Тип столбца
      */
     public static function getColumnLength($table, $column)
     {
-        $query = "SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS 
+        $query
+            = "SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS 
           WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
         $res = self::$db->getOne($query, $table, $column);
         return $res;
@@ -681,7 +757,9 @@ ALTER TABLE `$table`
 
     /**
      * Получить столбцы таблицы, которые принимают только два значения: "Y" или "N"
+     *
      * @param $table string Исходная таблицы
+     *
      * @return array Список столбцов, подходящих под критерий
      */
     public static function filterEnumColumns($table)
@@ -699,8 +777,10 @@ ALTER TABLE `$table`
 
     /**
      * Получить данные для генерации формы
+     *
      * @param $table string Исходная таблица
-     * @param $id int Id, по которой идёт выборка
+     * @param $id    int Id, по которой идёт выборка
+     *
      * @return array Данные для генерации
      */
     public static function rowWithTableTypes($table, $id)
@@ -732,7 +812,9 @@ ALTER TABLE `$table`
 
     /**
      * Проверить имеет ли таблица возможность использования SelectBox
+     *
      * @param $table string Исходная таблица
+     *
      * @return array Список связей
      */
     public static function checkTableHavingSelectBox($table)
@@ -744,23 +826,24 @@ ALTER TABLE `$table`
 
     /**
      * Получить список связей "один ко многим"
+     *
      * @param $table string Исходная таблица
-     * @param $key string Первичный ключ
+     * @param $key   string Первичный ключ
+     *
      * @return array|FALSE|string
      */
     public static function getTableRelationsOneToMany($table, $key)
     {
-        $array =
+        $array = [
             [
-                [
-                    'column' => 'table_name',
-                    'value' => $table
-                ],
-                [
-                    'column' => 'inner_column',
-                    'value' => $key
-                ]
-            ];
+                'column' => 'table_name',
+                'value'  => $table
+            ],
+            [
+                'column' => 'inner_column',
+                'value'  => $key
+            ]
+        ];
 
         $relation = self::getByColumnAndArray('relations', $array);
         return $relation;
@@ -769,13 +852,12 @@ ALTER TABLE `$table`
 
     public static function getTableRelationsManyToOne($table)
     {
-        $array =
+        $array = [
             [
-                [
-                    'column' => 'foreign_table',
-                    'value' => $table
-                ]
-            ];
+                'column' => 'foreign_table',
+                'value'  => $table
+            ]
+        ];
 
         $relations = self::getByColumnAndArray('relations', $array, false);
 
@@ -786,11 +868,13 @@ ALTER TABLE `$table`
                 $filter = [
                     [
                         'column' => 'name',
-                        'value' => $relation['table_name']
+                        'value'  => $relation['table_name']
                     ]
                 ];
 
-                $relation['foreign_table_name'] = DB::getByColumnAndArray('tables', $filter, true, 'full_name');
+                $relation['foreign_table_name'] = DB::getByColumnAndArray(
+                    'tables', $filter, true, 'full_name'
+                );
 
                 $result_array[] = $relation;
 
@@ -806,15 +890,18 @@ ALTER TABLE `$table`
 
     public static function getForeignKeys($db_name, $table, $column)
     {
-        $query = "select REFERENCED_TABLE_NAME as ref_table, REFERENCED_COLUMN_NAME as ref_column from INFORMATION_SCHEMA.KEY_COLUMN_USAGE where  REFERENCED_COLUMN_NAME<>'' AND TABLE_SCHEMA=?s AND TABLE_NAME = ?s AND COLUMN_NAME=?s";
+        $query
+            = "select REFERENCED_TABLE_NAME as ref_table, REFERENCED_COLUMN_NAME as ref_column from INFORMATION_SCHEMA.KEY_COLUMN_USAGE where  REFERENCED_COLUMN_NAME<>'' AND TABLE_SCHEMA=?s AND TABLE_NAME = ?s AND COLUMN_NAME=?s";
         return self::$db->getRow($query, $db_name, $table, $column);
     }
 
 
     /**
      * Получить количество записей с учётом выборки по массиву
+     *
      * @param $table string Таблица, по которой идёт подсчёт
-     * @param $cols array Массив для фильтрации
+     * @param $cols  array Массив для фильтрации
+     *
      * @return string
      */
     public static function countingAdvanced($table, $cols)
@@ -845,19 +932,23 @@ ALTER TABLE `$table`
 
     /**
      * Создать таблицу для контроля других таблиц
-     * @param $db_name string Исходная база
+     *
+     * @param        $db_name            string Исходная база
      * @param string $control_table_name Название контрольной таблицы
+     *
      * @return array|FALSE Создана ли база
      */
-    public static function createControlTable($db_name, $control_table_name = 'tables')
-    {
+    public static function createControlTable(
+        $db_name, $control_table_name = 'tables'
+    ) {
 
         $query = 'DROP TABLE IF EXISTS ?n.?n';
 
         self::$db->query($query, $db_name, $control_table_name);
 
 
-        $query = "CREATE TABLE ?n.?n (
+        $query
+            = "CREATE TABLE ?n.?n (
           `id` int(11) NOT NULL AUTO_INCREMENT,
           `name` varchar(100) NOT NULL,
           `full_name` varchar(150) NOT NULL,
@@ -874,7 +965,8 @@ ALTER TABLE `$table`
 
         $relations_table = 'relations';
 
-        $query = 'CREATE TABLE ?n.?n (
+        $query
+            = 'CREATE TABLE ?n.?n (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `table_name` varchar(130) NOT NULL,
       `inner_column` varchar(130) NOT NULL,
@@ -902,9 +994,12 @@ ALTER TABLE `$table`
     }
 
 
-    public static function createAdminTables($db_name, $admin_table = 'admin_users', $admin_attemps = 'admin_auth_attempts')
-    {
-        $query = 'CREATE TABLE ?n.?n (
+    public static function createAdminTables(
+        $db_name, $admin_table = 'admin_users',
+        $admin_attemps = 'admin_auth_attempts'
+    ) {
+        $query
+            = 'CREATE TABLE ?n.?n (
           `id` int(11) NOT NULL,
           `login` varchar(100) NOT NULL,
           `password` varchar(100) NOT NULL,
@@ -914,14 +1009,16 @@ ALTER TABLE `$table`
         DB::$db->query($query, $db_name, $admin_table);
 
 
-        $query = 'ALTER TABLE ?n.?n
+        $query
+            = 'ALTER TABLE ?n.?n
           ADD PRIMARY KEY (`id`),
           ADD UNIQUE KEY `login` (`login`);';
 
         DB::$db->query($query, $db_name, $admin_table);
 
 
-        $query = 'CREATE TABLE ?n.?n (
+        $query
+            = 'CREATE TABLE ?n.?n (
           `id` int(11) NOT NULL,
           `ip` varchar(30) NOT NULL,
           `count` int(11) NOT NULL DEFAULT 0,
@@ -931,7 +1028,8 @@ ALTER TABLE `$table`
         DB::$db->query($query, $db_name, $admin_attemps);
 
 
-        $query = 'ALTER TABLE ?n.?n
+        $query
+            = 'ALTER TABLE ?n.?n
           ADD PRIMARY KEY (`id`),
           ADD UNIQUE KEY `ip` (`ip`),
           ADD KEY `last_attempt_time` (`last_attempt_time`);';
@@ -961,14 +1059,17 @@ ALTER TABLE `$table`
 
     /**
      * Получить все записи из таблицы (расширенная)
-     * @param $table string Название таблицы
-     * @param int $limit Ограничение
-     * @param int $offset Отступ
+     *
+     * @param      $table  string Название таблицы
+     * @param int  $limit  Ограничение
+     * @param int  $offset Отступ
      * @param bool $search Выражение для поиска
+     *
      * @return array|bool|mixed Список записей
      */
-    public static function getAllLimit($table, $order_column = 'id', $limit = 0, $offset = 0, $search = false)
-    {
+    public static function getAllLimit(
+        $table, $order_column = 'id', $limit = 0, $offset = 0, $search = false
+    ) {
         if ($limit > 0) {
         } else {
             $limit = 1000;
@@ -1024,6 +1125,7 @@ ALTER TABLE `$table`
 
     /**
      * Очистить таблицу
+     *
      * @param $table string Название очищаемой таблицы
      */
     public static function clearTable($table)
