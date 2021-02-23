@@ -108,6 +108,9 @@ class DB
      */
     public static function getById($table, $id)
     {
+		 if (!is_integer($id)) {
+            return false;
+        }
         $query = 'SELECT * FROM ?n WHERE `id`=?i';
         return self::$db->getRow($query, $table, $id);
     }
