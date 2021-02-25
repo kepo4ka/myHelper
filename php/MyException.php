@@ -1,4 +1,6 @@
 <?php
+namespace Helper;
+use Exception;
 
 class MyException extends Exception
 {
