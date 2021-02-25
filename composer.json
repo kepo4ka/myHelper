@@ -14,6 +14,7 @@
         "psr-4": {"Helper\\": "php/"}
     },
     "require": {
-      "ext-curl": "*"
+      "ext-curl": "*",
+	   "catfan/medoo": "*",
     }
 }
