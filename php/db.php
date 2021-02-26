@@ -108,7 +108,7 @@ class DB
      */
     public static function getById($table, $id)
     {
-		 $id = (int)$id;
+        $id = (int)$id;
         $query = 'SELECT * FROM ?n WHERE `id`=?i';
         return self::$db->getRow($query, $table, $id);
     }
@@ -675,9 +675,38 @@ ALTER TABLE `$table`
         $data_columns = array('action');
         $max_columns = array();
 
+        try {
+            $columns_props = DB::getByColAll(
+                'table_fields', 'table_name', $table
+            );
+        } catch (Throwable $exception) {
+            $columns_props = [];
+        }
+
+
         foreach ($columns as $column) {
+            $showed = true;
+
+            $full_name = '';
+            if (!empty($columns_props)) {
+                foreach ($columns_props as $columnsProp) {
+                    if ($columnsProp['field'] == $column) {
+                        $full_name = $columnsProp['full_name'];
+                        $showed = $columnsProp['showed'];
+                        break;
+                    }
+                }
+                if (empty($showed)) {
+                    continue;
+                }
+            }
+
+            if (empty($full_name)) {
+                $full_name = self::readableText($column);
+            }
+
             $data_columns[] = $column;
-            $max_columns[] = self::readableText($column);
+            $max_columns[] = $full_name;
         }
 
         $result['data_columns'] = $data_columns;
