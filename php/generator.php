@@ -879,6 +879,10 @@ class Generator
 
         $table_info = DB::getByColumn('tables', 'name', $table);
 
+        if (empty($table_info)) {
+            return false;
+        }
+
         $columns_array = DB::getColumnsReadable($table);
 
         $data_columns = $columns_array['data_columns'];
@@ -927,7 +931,7 @@ class Generator
         <div class="row">
             <div class="col-6">
                 <h1>
-                    <?= $table_info['full_name'] ?>
+                    <?= @$table_info['full_name'] ?>
                 </h1>
                 <p>
                     <span>
@@ -1025,6 +1029,10 @@ class Generator
     {
 
         $table_info = DB::getByColumn('tables', 'name', $table);
+
+        if (empty($table_info)) {
+            return false;
+        }
 
         $act = @$_GET['act'];
 
