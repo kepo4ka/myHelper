@@ -93,20 +93,29 @@ class Generator
      * @param $link
      * @param $name
      */
-    public static function simpleFilter($id, $info)
+    public static function simpleFilter($primary, $info)
     {
         $table = $info['foreign_table'];
-        $res_key = 'id';
+
+        $res_key = @$info['primary_field'] ?: 'id';
         $res_name = $info['foreign_column'];
         $key = $info['inner_column'];
+        $hide_primary = @$info['hide_primary'];
+        $primary_view = '';
 
-        $row = DB::getByColumn($table, $res_key, $id);
+        if (empty($hide_primary)) {
+            $primary_view = "[$primary]";
+        }
 
-        if (!empty($id) && !empty($table) && !empty($row)) {
+        $row = DB::getByColumn($table, $res_key, $primary);
+
+        if (!empty($primary) && !empty($table) && !empty($row)) {
+            $id = @$row['id'];
+
             $foreign_column = @$row[$res_name];
             $str
-                = "<a target='_blank' class='btn btn-link' href = 'edit.php?cat=$table&act=edit&id=$id'>
-                   [#$id] $foreign_column</a>";
+                = "<a target='_blank' class='btn-link' href = 'edit.php?cat=$table&act=edit&id=$id'>
+                   $primary_view $foreign_column</a>";
         } else {
             $str = "<span class=''> $id </span>";
         }
@@ -527,9 +536,10 @@ class Generator
     public static function genTableSelectBox($info, $value, $id)
     {
         $table = $info['foreign_table'];
-        $res_key = 'id';
+        $res_key = @$info['primary_field'] ?: 'id';
         $res_name = $info['foreign_column'];
         $key = $info['inner_column'];
+        $hide_primary = @$info['hide_primary'];
 
         $results = DB::getAllOrdered($table, $res_name);
 
@@ -551,7 +561,12 @@ class Generator
                 </option>
 
                 <?php foreach ($results as $item) {
-                    $item[$res_name] = '[' . @$item[$res_key] . '] '
+                    $primary_view = '';
+                    if (empty($hide_primary)) {
+                        $primary_view = '[' . @$item[$res_key] . '] ';
+                    }
+
+                    $item[$res_name] = $primary_view
                         . $item[$res_name];
                     ?>
                     <option <?= $item[$res_key] == @$value ? 'selected' : '' ?>
@@ -813,10 +828,16 @@ class Generator
      * Generate a standard page with a Table containing a list of records (the source is transmitted through global)
      * Например, список новостей
      */
-    public static function generateStandartTablePage($table)
+    public static function generateStandartTablePage($table, $options = [])
     {
         if (empty($table)) {
             return false;
+        }
+
+        $all_delete_button = false;
+
+        if (!empty($options['all_delete'])) {
+            $all_delete_button = true;
         }
 
         $table_info = DB::getByColumn('tables', 'name', $table);
@@ -851,12 +872,16 @@ class Generator
                     <?php
                 } ?>
 
-                <a class="btn btn-danger"
-                   href="save.php?cat=<?= $table ?>&act=clear"
-                   onclick="return navConfirm(this.href, 'The Table will be cleared! Continue?');">
-                    <i class="fa fa-ban"></i>
-                    Очистить таблицу <?= $table_info['name'] ?>
-                </a>
+                <?php if (!empty($all_delete_button)) {
+                    ?>
+                    <a class="btn btn-danger"
+                       href="save.php?cat=<?= $table ?>&act=clear"
+                       onclick="return navConfirm(this.href, 'The Table will be cleared! Continue?');">
+                        <i class="fa fa-ban"></i>
+                        Очистить таблицу <?= $table_info['name'] ?>
+                    </a>
+                    <?php
+                } ?>
             </div>
         </div>
 
