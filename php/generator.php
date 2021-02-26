@@ -304,6 +304,36 @@ class Generator
     }
 
 
+    function genImageBox($key, $value, $title = '')
+    {
+        ?>
+
+        <div class="col-4 mb-3 d-flex flex-column">
+            <label>
+                <?= Helper::readableText($key) ?>
+            </label>
+            <img class="img-thumbnail w-50" src="<?= $value ?>"
+                 alt="<?= $title ?>">
+
+        </div>
+
+        <?php
+    }
+
+    function genTableImageBox($key, $value, $title = '')
+    {
+        ob_start();
+        ?>
+
+        <img class="img-thumbnail" src="<?= $value ?>"
+             alt="<?= $title ?>">
+
+        <?php
+        $html = ob_get_clean();
+
+        return $html;
+    }
+
     /**
      * Сгенерировать TextArea
      * Generate TextArea
@@ -492,7 +522,7 @@ class Generator
             </label>
             <br>
             <select name="<?= $key ?>"
-                    class="nice-select selectpicker col-12 px-0"
+                    class="select2 col-12 px-0"
                     data-live-search='true'
                     data-url="<?= $url ?>">
                 <option <?= empty($value) ? 'selected' : '' ?>
@@ -552,7 +582,7 @@ class Generator
         ?>
         <div class="col-12">
             <select name="<?= $key ?>" data-id="<?= $id ?>"
-                    class="nice-select-table nice-select table_select_handler selectpicker"
+                    class="nice-select-table table_select_handler selectpicker"
                     data-live-search='true'>
 
                 <option <?= empty($value) ? 'selected' : '' ?>
@@ -616,6 +646,8 @@ class Generator
                 } else {
                     $type = 'json';
                 }
+            } else if ($comment == 'base64_img') {
+                $type = 'base64_img';
             } else if ($comment == 'editor') {
                 $type = 'blob';
             } else if (!empty($relations)) {
@@ -632,7 +664,8 @@ class Generator
                 $type = 'float';
             } else if (false !== strpos($value['type'], 'datetime')) {
                 $type = 'datetime';
-                $type = 'float';
+            } else if (false !== strpos($value['type'], 'timestamp')) {
+                $type = 'datetime';
             } else if (false !== strpos($value['type'], 'date')) {
                 $type = 'date';
             } else if (false !== strpos($value['type'], 'blob')) {
@@ -687,6 +720,9 @@ class Generator
         case 'text':
             self::genTextarea($key, $value);
             break;
+        case 'base64_img':
+            self::genImageBox($key, $value);
+            break;
 
         case 'int':
             self::genIntInput($key, $value);
@@ -705,6 +741,7 @@ class Generator
             break;
 
         case 'datetime':
+
             self::genDateInput($key, $value, true);
             break;
         case 'date':
@@ -920,9 +957,9 @@ class Generator
                         $class = 'alert-error';
 
                         if ($_GET['message'] === 'add') {
-                            $message = 'Row Not Added!';
+                            $message = 'Запись не была добавлена!';
                         } else {
-                            $message = 'Row Not Updated!';
+                            $message = 'Запись не была обновлена!';
                         }
                     }
                     ?>
@@ -987,7 +1024,14 @@ class Generator
     public static function generateStandartEditPage($db_name, $table)
     {
 
-        $act = $_GET['act'];
+        $table_info = DB::getByColumn('tables', 'name', $table);
+
+        $act = @$_GET['act'];
+
+        if (empty($act)) {
+            return false;
+        }
+
         @$id = (int)$_GET['id'];
         $row = DB::rowWithTableTypes($table, $id);
 
@@ -1013,7 +1057,7 @@ class Generator
                href="list.php?cat=<?= $table ?>"
                onclick="return navConfirm(this.href, 'Изменения не будут сохранены. Продолжить?');">
                 <i class="fa fa-arrow-circle-left"></i>
-                Вернуться в список <?= Helper::readableText($table) ?>
+                Вернуться в список <?= @$table_info['full_name'] ?>
             </a>
 
 
