@@ -504,11 +504,17 @@ class Generator
      * @return bool
      */
     public static function genSelectBox(
-        $table, $key, $value, $res_key, $res_name
+        $relation, $key, $value
     ) {
         $res_key = 'id';
-        $results = DB::getAllOrdered($table, $res_key);
+        $res_name = $relation['foreign_column'];
+        $table = $relation['foreign_table'];
 
+        if (!empty($relation['primary_field'])) {
+            $res_key = $relation['primary_field'];
+        }
+
+        $results = DB::getAllOrdered($table, $res_key);
 
         $url = $table;
 
@@ -518,11 +524,20 @@ class Generator
         ?>
         <div class="col-12 col-md-4">
             <label>
-                <?= Helper::readableText($key) ?>
+
+                <span>
+                    <?= Helper::readableText($key) ?>
+                </span>
+
+                <a class="badge btn-link" target="_blank"
+                   href="edit.php?act=add&cat=<?= $table ?>">
+                    Добавить запись
+                </a>
+
             </label>
             <br>
             <select name="<?= $key ?>"
-                    class="select2 col-12 px-0"
+                    class=" col-12 px-0"
                     data-live-search='true'
                     data-url="<?= $url ?>">
                 <option <?= empty($value) ? 'selected' : '' ?>
@@ -762,10 +777,8 @@ class Generator
             if (!empty($relation) && !empty($relation['is_small'])) {
                 if ($relation['inner_column'] == $key) {
                     self::genSelectBox(
-                        $relation['foreign_table'],
-                        $relation['inner_column'], $value,
-                        $relation['foreign_column'],
-                        $relation['foreign_column']
+                        $relation,
+                        $key, $value
                     );
                     break;
                 }
