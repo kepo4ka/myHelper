@@ -867,7 +867,7 @@ class Generator
             </a>";
         }
 
-        $html .= "</div";
+        $html .= "</div>";
 
         return $html;
     }
