@@ -132,12 +132,14 @@ class Generator
      *
      * @return bool
      */
-    public static function genSimpleInput($key, $value)
+    public static function genSimpleInput($key, $value, $title = '')
     {
+        $title = $title ?: Helper::readableText($key);
+
         ?>
         <div class="col-12 col-md-4 mb-3">
             <label>
-                <?= Helper::readableText($key) ?>
+                <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
                    value='<?= $value ?>'>
@@ -155,15 +157,17 @@ class Generator
      *
      * @return bool
      */
-    public static function genIntInput($key, $value)
+    public static function genIntInput($key, $value, $title = '')
     {
+        $title = $title ?: Helper::readableText($key);
+
         if (empty($value)) {
             $value = 0;
         }
         ?>
         <div class="col-12 col-md-4 mb-3">
             <label>
-                <?= Helper::readableText($key) ?>
+                <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
                    value="<?= $value ?>">
@@ -182,15 +186,16 @@ class Generator
      *
      * @return bool
      */
-    public static function genFloatInput($key, $value)
+    public static function genFloatInput($key, $value, $title = '')
     {
+        $title = $title ?: Helper::readableText($key);
         if (empty($value)) {
             $value = 0.00;
         }
         ?>
         <div class="col-12 col-md-4 mb-3">
             <label>
-                <?= Helper::readableText($key) ?>
+                <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
                    value="<?= $value ?>">
@@ -208,8 +213,10 @@ class Generator
      *
      * @return bool
      */
-    public static function genDateInput($key, $value, $with_time = false)
-    {
+    public static function genDateInput(
+        $key, $value, $with_time = false, $title = ''
+    ) {
+        $title = $title ?: Helper::readableText($key);
         // класс `datepicker` используется самой библиотекой, поэтому даём другое название
         $class = 'onlydatepicker';
 
@@ -220,7 +227,7 @@ class Generator
         ?>
         <div class="col-12 col-md-4 mb-3">
             <label>
-                <?= Helper::readableText($key) ?>
+                <?= $title ?>
             </label>
             <input type="text" class="form-control <?= $class ?>"
                    name="<?= $key ?>" value="<?= $value ?>">
@@ -239,9 +246,11 @@ class Generator
      *
      * @return bool
      */
-    public static function genDisabledInput($key, $value)
+    public static function genDisabledInput($key, $value, $title = '')
     {
+        $title = $title ?: Helper::inputFilter($key);
         ?>
+
         <input type="hidden" class="form-control disabled" disabled
                name="<?= $key ?>" value='<?= $value ?>'>
         <?php
@@ -258,12 +267,13 @@ class Generator
      *
      * @return bool
      */
-    public static function genReadonlyInput($key, $value)
+    public static function genReadonlyInput($key, $value, $title = '')
     {
+        $title = $title ?: Helper::readableText($key);
         ?>
         <div class="col-12 col-md-4 mb-3">
             <label>
-                <?= Helper::readableText($key) ?>
+                <?= $title ?>
             </label>
             <input type="text" class="form-control" readonly name="<?= $key ?>"
                    value='<?= $value ?>'>
@@ -282,9 +292,12 @@ class Generator
      *
      * @return bool
      */
-    public static function genTextarea($key, $value, $with_editor = false)
-    {
+    public static function genTextarea(
+        $key, $value, $with_editor = false, $title = ''
+    ) {
         $editor_class = '';
+
+        $title = $title ?: Helper::readableText($key);
 
         if ($with_editor) {
             $editor_class = 'ckeditor';
@@ -293,7 +306,7 @@ class Generator
         ?>
         <div class="col-12 mb-3">
             <label>
-                <?= Helper::readableText($key) ?>
+                <?= $title ?>
             </label>
             <textarea type="text" cols="10" rows="5"
                       class="form-control <?= $editor_class ?>"
@@ -306,11 +319,12 @@ class Generator
 
     function genImageBox($key, $value, $title = '')
     {
+        $title = $title ?: Helper::readableText($key);
         ?>
 
         <div class="col-4 mb-3 d-flex flex-column">
             <label>
-                <?= Helper::readableText($key) ?>
+                <?= $title ?>
             </label>
             <img class="img-thumbnail w-50" src="<?= $value ?>"
                  alt="<?= $title ?>">
@@ -344,18 +358,20 @@ class Generator
      * @return bool
      */
     public static function genJsonEditor(
-        $db_name, $table, $input_key, $input_value, $is_bad = false
+        $db_name, $table, $input_key, $input_value, $is_bad = false, $title = ''
     ) {
         if (DB::getColumnComment($db_name, $table, $input_key) == 'json') {
             $is_json_input = true;
         }
+
+        $title = $title ?: Helper::readableText($input_key);
 
         ?>
 
 
         <div class="col-12 mb-5">
             <label>
-                <?= Helper::readableText($input_key) ?> (<b
+                <?= $title ?> (<b
                         class='text-warning font-weight-bold'>JSON</b>)
             </label>
 
@@ -426,12 +442,13 @@ class Generator
      *
      * @return bool
      */
-    public static function genCheckbox($key, $value)
+    public static function genCheckbox($key, $value, $title = '')
     {
+        $title = $title ?: Helper::readableText($key);
         ?>
         <div class="col-12 col-md-4 mb-3 ">
             <label for="">
-                <?= Helper::readableText($key) ?>
+                <?= $title ?>
             </label>
             <div class="checkbox form-control border-0">
 
@@ -441,7 +458,7 @@ class Generator
                         ? 'checked' : '' ?>
                            value="1">
                     <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-                    <?= Helper::readableText($key) ?>
+                    <?= $title ?>
                 </label>
             </div>
         </div>
@@ -460,9 +477,9 @@ class Generator
      *
      * @return string
      */
-    public static function genTableCheckbox(&$item, $key, $value)
+    public static function genTableCheckbox(&$item, $key, $value, $title)
     {
-        $text = Helper::readableText($key);
+        $title = $title ?: Helper::readableText($key);
 
         $checked = $value ? 'checked' : '';
         $item_id = '';
@@ -482,7 +499,7 @@ class Generator
                     <input type = 'hidden' name = '$key' value='0'>
                     <input type = 'checkbox' data-id='$item_id' $disabled class='table_checkbox_handler $disabled' name='$key' $checked>       
                     <span class='cr'><i class='cr-icon fa fa-check'></i></span>
-                   $text
+                   $title
                 </label>    
             </div>
         ";
@@ -504,8 +521,9 @@ class Generator
      * @return bool
      */
     public static function genSelectBox(
-        $relation, $key, $value
+        $relation, $key, $value, $title = ''
     ) {
+        $title = $title ?: Helper::readableText($key);
         $res_key = 'id';
         $res_name = $relation['foreign_column'];
         $table = $relation['foreign_table'];
@@ -526,7 +544,7 @@ class Generator
             <label>
 
                 <span>
-                    <?= Helper::readableText($key) ?>
+                    <?= $title ?>
                 </span>
 
                 <a class="badge btn-link" target="_blank"
@@ -537,7 +555,7 @@ class Generator
             </label>
             <br>
             <select name="<?= $key ?>"
-                    class=" col-12 px-0"
+                    class="select2 col-12 px-0"
                     data-live-search='true'
                     data-url="<?= $url ?>">
                 <option <?= empty($value) ? 'selected' : '' ?>
@@ -643,7 +661,34 @@ class Generator
             $info['primary'] = 'id';
         }
 
+        try {
+            $columns_props = DB::getByColAll(
+                'table_fields', 'table_name', $table
+            );
+        } catch (Throwable $exception) {
+            $columns_props = [];
+        }
+
         foreach ($row as $key => $value) {
+
+            $title = '';
+
+            if (!empty($columns_props)) {
+                $showed = true;
+
+                foreach ($columns_props as $columnsProp) {
+
+                    if ($columnsProp['field'] == $value['name']) {
+                        $title = $columnsProp['full_name'];
+                        $showed = $columnsProp['showed'];
+                        break;
+                    }
+                }
+                if (!$showed) {
+                    continue;
+                }
+            }
+
 
             $type = 'simple';
             $relations = DB::getTableRelationsOneToMany($table, $value['name']);
@@ -696,7 +741,7 @@ class Generator
 //                break;
 //        }
             self::generateFormInput(
-                $db_name, $table, $value['name'], $value['value'], $type
+                $db_name, $table, $value['name'], $value['value'], $type, $title
             );
         }
     }
@@ -711,7 +756,7 @@ class Generator
      * @param $type  string Тип поля
      */
     public static function generateFormInput(
-        $db_name, $table, $key, $value, $type
+        $db_name, $table, $key, $value, $type, $title = ''
     ) {
         $act = 'add';
 
@@ -722,68 +767,68 @@ class Generator
 
         switch ($type) {
         case 'simple':
-            self::genSimpleInput($key, $value);
+            self::genSimpleInput($key, $value, $title);
             break;
 
         case 'readonly':
-            self::genReadonlyInput($key, $value);
+            self::genReadonlyInput($key, $value, $title);
             break;
 
         case 'blob':
-            self::genTextarea($key, $value, true);
+            self::genTextarea($key, $value, true, $title);
             break;
         case 'text':
-            self::genTextarea($key, $value);
+            self::genTextarea($key, $value, $title);
             break;
         case 'base64_img':
-            self::genImageBox($key, $value);
+            self::genImageBox($key, $value, $title);
             break;
 
         case 'int':
-            self::genIntInput($key, $value);
+            self::genIntInput($key, $value, $title);
             break;
 
         case 'float':
         case 'double':
-            self::genFloatInput($key, $value);
+            self::genFloatInput($key, $value, $title);
             break;
         case 'disabled':
-            self::genDisabledInput($key, $value);
+            self::genDisabledInput($key, $value, $title);
             break;
 
         case 'checkbox':
-            self::genCheckbox($key, $value);
+            self::genCheckbox($key, $value, $title);
             break;
 
         case 'datetime':
 
-            self::genDateInput($key, $value, true);
+            self::genDateInput($key, $value, true, $title);
             break;
         case 'date':
-            self::genDateInput($key, $value);
+            self::genDateInput($key, $value, $title);
             break;
 
         case 'json':
-            self::genJsonEditor($db_name, $table, $key, $value);
+            self::genJsonEditor($db_name, $table, $key, $value, $title);
             break;
 
         case 'bad_json':
-            self::genJsonEditor($db_name, $table, $key, $value, true);
+            self::genJsonEditor($db_name, $table, $key, $value, true, $title);
             break;
 
         case 'selectbox':
-            $relation = DB::getTableRelationsOneToMany($table, $key);
+            $relation = DB::getTableRelationsOneToMany($table, $key, $title);
 
             if (!empty($relation) && !empty($relation['is_small'])) {
                 if ($relation['inner_column'] == $key) {
                     self::genSelectBox(
                         $relation,
-                        $key, $value
+                        $key, $value, $title
                     );
                     break;
                 }
             } else {
-                self::genSimpleInput($key, $value);
+                self::genSimpleInput($key, $value, $title);
             }
 
             break;
@@ -824,7 +869,7 @@ class Generator
 
         if (!empty($info['relations'])) {
             $html
-                .= '<div class="btn-group" role="group">
+                .= '<div class="btn-group btn btn-secondary p-0" role="group">
     <button  type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <i class="fa fa-boxes"></i>
       Связи
