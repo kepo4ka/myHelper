@@ -339,7 +339,7 @@ class Generator
         <?php
     }
 
-    function genTableImageBox($key, $value, $title = '')
+    public static function genTableImageBox($key, $value, $title = '')
     {
         ob_start();
         ?>
@@ -613,7 +613,6 @@ class Generator
             return false;
         }
 
-
         ob_start();
         ?>
         <div class="col-12">
@@ -627,6 +626,7 @@ class Generator
                 </option>
 
                 <?php foreach ($results as $item) {
+
                     $primary_view = '';
                     $title = $item[$res_name];
 
@@ -638,12 +638,12 @@ class Generator
                         $primary_view = '[' . @$item[$res_key] . '] ';
                     }
 
-                    $item[$res_name] = $primary_view
+                    $title = $primary_view
                         . $title;
                     ?>
                     <option <?= $item[$res_key] == @$value ? 'selected' : '' ?>
                             value="<?= $item[$res_key] ?>">
-                        <?=  $item[$res_name] ?>
+                        <?= $title ?>
                     </option>
                     <?php
                 }
