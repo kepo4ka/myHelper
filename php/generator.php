@@ -4,6 +4,8 @@
 namespace Helper;
 
 
+use Throwable;
+
 class Generator
 {
 
@@ -19,7 +21,8 @@ class Generator
      */
     public static function listFilterOnlyValue(
         &$item, $list, $column, $list_column, $name
-    ) {
+    )
+    {
         $is_exist = false;
         foreach ($list as $list_item) {
             if ($list_item['id'] == $item[$column]) {
@@ -215,7 +218,8 @@ class Generator
      */
     public static function genDateInput(
         $key, $value, $with_time = false, $title = ''
-    ) {
+    )
+    {
         $title = $title ?: Helper::readableText($key);
         // класс `datepicker` используется самой библиотекой, поэтому даём другое название
         $class = 'onlydatepicker';
@@ -294,7 +298,8 @@ class Generator
      */
     public static function genTextarea(
         $key, $value, $with_editor = false, $title = ''
-    ) {
+    )
+    {
         $editor_class = '';
 
         $title = $title ?: Helper::readableText($key);
@@ -359,7 +364,8 @@ class Generator
      */
     public static function genJsonEditor(
         $db_name, $table, $input_key, $input_value, $is_bad = false, $title = ''
-    ) {
+    )
+    {
         if (DB::getColumnComment($db_name, $table, $input_key) == 'json') {
             $is_json_input = true;
         }
@@ -477,7 +483,7 @@ class Generator
      *
      * @return string
      */
-    public static function genTableCheckbox(&$item, $key, $value, $title)
+    public static function genTableCheckbox(&$item, $key, $value, $title = '')
     {
         $title = $title ?: Helper::readableText($key);
 
@@ -522,7 +528,8 @@ class Generator
      */
     public static function genSelectBox(
         $relation, $key, $value, $title = ''
-    ) {
+    )
+    {
         $title = $title ?: Helper::readableText($key);
         $res_key = 'id';
         $res_name = $relation['foreign_column'];
@@ -546,11 +553,6 @@ class Generator
                 <span>
                     <?= $title ?>
                 </span>
-
-                <a class="badge btn-link" target="_blank"
-                   href="edit.php?act=add&cat=<?= $table ?>">
-                    Добавить запись
-                </a>
 
             </label>
             <br>
@@ -757,7 +759,8 @@ class Generator
      */
     public static function generateFormInput(
         $db_name, $table, $key, $value, $type, $title = ''
-    ) {
+    )
+    {
         $act = 'add';
 
         if (!empty($_GET['act'] && $_GET['act'] === 'edit')) {
@@ -766,72 +769,72 @@ class Generator
 
 
         switch ($type) {
-        case 'simple':
-            self::genSimpleInput($key, $value, $title);
-            break;
-
-        case 'readonly':
-            self::genReadonlyInput($key, $value, $title);
-            break;
-
-        case 'blob':
-            self::genTextarea($key, $value, true, $title);
-            break;
-        case 'text':
-            self::genTextarea($key, $value, $title);
-            break;
-        case 'base64_img':
-            self::genImageBox($key, $value, $title);
-            break;
-
-        case 'int':
-            self::genIntInput($key, $value, $title);
-            break;
-
-        case 'float':
-        case 'double':
-            self::genFloatInput($key, $value, $title);
-            break;
-        case 'disabled':
-            self::genDisabledInput($key, $value, $title);
-            break;
-
-        case 'checkbox':
-            self::genCheckbox($key, $value, $title);
-            break;
-
-        case 'datetime':
-
-            self::genDateInput($key, $value, true, $title);
-            break;
-        case 'date':
-            self::genDateInput($key, $value, $title);
-            break;
-
-        case 'json':
-            self::genJsonEditor($db_name, $table, $key, $value, $title);
-            break;
-
-        case 'bad_json':
-            self::genJsonEditor($db_name, $table, $key, $value, true, $title);
-            break;
-
-        case 'selectbox':
-            $relation = DB::getTableRelationsOneToMany($table, $key);
-
-            if (!empty($relation) && !empty($relation['is_small'])) {
-                if ($relation['inner_column'] == $key) {
-                    self::genSelectBox(
-                        $relation,
-                        $key, $value, $title
-                    );
-                    break;
-                }
-            } else {
+            case 'simple':
                 self::genSimpleInput($key, $value, $title);
-            }
+                break;
 
-            break;
+            case 'readonly':
+                self::genReadonlyInput($key, $value, $title);
+                break;
+
+            case 'blob':
+                self::genTextarea($key, $value, true, $title);
+                break;
+            case 'text':
+                self::genTextarea($key, $value, $title);
+                break;
+            case 'base64_img':
+                self::genImageBox($key, $value, $title);
+                break;
+
+            case 'int':
+                self::genIntInput($key, $value, $title);
+                break;
+
+            case 'float':
+            case 'double':
+                self::genFloatInput($key, $value, $title);
+                break;
+            case 'disabled':
+                self::genDisabledInput($key, $value, $title);
+                break;
+
+            case 'checkbox':
+                self::genCheckbox($key, $value, $title);
+                break;
+
+            case 'datetime':
+
+                self::genDateInput($key, $value, true, $title);
+                break;
+            case 'date':
+                self::genDateInput($key, $value, $title);
+                break;
+
+            case 'json':
+                self::genJsonEditor($db_name, $table, $key, $value, $title);
+                break;
+
+            case 'bad_json':
+                self::genJsonEditor($db_name, $table, $key, $value, true, $title);
+                break;
+
+            case 'selectbox':
+                $relation = DB::getTableRelationsOneToMany($table, $key);
+
+                if (!empty($relation) && !empty($relation['is_small'])) {
+                    if ($relation['inner_column'] == $key) {
+                        self::genSelectBox(
+                            $relation,
+                            $key, $value, $title
+                        );
+                        break;
+                    }
+                } else {
+                    self::genSimpleInput($key, $value, $title);
+                }
+
+                break;
         }
     }
 
@@ -951,7 +954,6 @@ class Generator
                value='<?= json_encode($data_columns) ?>'>
 
 
-
         <hr>
 
         <div class="row">
@@ -968,7 +970,6 @@ class Generator
                     </span>
                 </p>
             </div>
-
 
 
             <div class="col-12">
@@ -1200,7 +1201,8 @@ class Generator
 
     public static function generateAnotherKeyEditPage(
         $table, $cat, $list_name, $key_name
-    ) {
+    )
+    {
         $act = $_GET['act'];
         @$id = (int)$_GET['id'];
 
@@ -1280,7 +1282,8 @@ class Generator
 
     public static function uniqueColumnUpDownButtons(
         $item, $column, $min_value, $max_value, $page_name
-    ) {
+    )
+    {
         $id = $item['id'];
 
         $up_position = $item[$column] + 1;
