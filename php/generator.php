@@ -605,6 +605,7 @@ class Generator
         $res_name = $info['foreign_column'];
         $key = $info['inner_column'];
         $hide_primary = @$info['hide_primary'];
+        $hide_title = @$info['hide_title'];
 
         $results = DB::getAllOrdered($table, $res_name);
 
@@ -627,16 +628,22 @@ class Generator
 
                 <?php foreach ($results as $item) {
                     $primary_view = '';
+                    $title = $item[$res_name];
+
+                    if (!empty($hide_title)) {
+                        $title = '';
+                    }
+
                     if (empty($hide_primary)) {
                         $primary_view = '[' . @$item[$res_key] . '] ';
                     }
 
                     $item[$res_name] = $primary_view
-                        . $item[$res_name];
+                        . $title;
                     ?>
                     <option <?= $item[$res_key] == @$value ? 'selected' : '' ?>
                             value="<?= $item[$res_key] ?>">
-                        <?= $item[$res_name] ?>
+                        <?=  $item[$res_name] ?>
                     </option>
                     <?php
                 }
