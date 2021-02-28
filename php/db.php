@@ -15,11 +15,12 @@ class DB
 
     public function __construct(
         $host, $db_name, $user, $password, $charset = 'utf8mb4'
-    ) {
+    )
+    {
         try {
             self::$db = new SafeMysql(
                 array(
-                    'user'    => $user, 'pass' => $password, 'db' => $db_name,
+                    'user' => $user, 'pass' => $password, 'db' => $db_name,
                     'charset' => $charset
                 )
             );
@@ -42,8 +43,8 @@ class DB
      * Получить все записи из таблицы (расширенная)
      *
      * @param                  $table        string Название таблицы
-     * @param int              $limit        Ограничение
-     * @param int              $offset       Отступ
+     * @param int $limit Ограничение
+     * @param int $offset Отступ
      * @param array|bool|mixed $search_array Список для поиска
      * @param                  $order
      *
@@ -51,7 +52,8 @@ class DB
      */
     public static function getAllLimitAdvanced(
         $table, $limit = 0, $offset = 0, $search_array, $order
-    ) {
+    )
+    {
         if ($limit > 0) {
         } else {
             $limit = 1000;
@@ -166,14 +168,15 @@ class DB
      *
      * @param      $table         string Исходная таблица
      * @param      $array         array Массив вида [['column'=>'col_example', 'value'=>'value_example']] ИЛИ [['col_example', 'value_example']]
-     * @param bool $is_one        Получить только одну запись
+     * @param bool $is_one Получить только одну запись
      * @param null $needed_column Выбирать определённую колонку
      *
      * @return array|FALSE|string
      */
     public static function getByColumnAndArray(
         $table, $array, $is_one = true, $needed_column = null
-    ) {
+    )
+    {
 
         if (!empty($needed_column)) {
             $needed_column = "`$needed_column`";
@@ -237,13 +240,14 @@ class DB
      * @param     $column        string Название внешнего ключа
      * @param     $value         string Значение внешнего ключа
      * @param     $needed_column string Название поля, которое нужно получить
-     * @param int $limit         Ограничение количества записей
+     * @param int $limit Ограничение количества записей
      *
      * @return array Результат выборки
      */
     public static function getOneToMany(
         $table, $column, $value, $needed_column, $limit = 0
-    ) {
+    )
+    {
         $query = 'SELECT ?n FROM ?n WHERE ?n=?s';
         $limit = (int)$limit;
 
@@ -300,16 +304,16 @@ class DB
                     foreach ($primary as $item) {
 
                         switch (true) {
-                        case is_string($item):
-                            $temp = $item;
-                            $item = [];
-                            $item['column'] = $temp;
-                            $item['value'] = $data[$temp];
-                            break;
-                        case empty($item['column']):
-                            $item['column'] = @$item[0];
-                            $item['value'] = @$item[1];
-                            break;
+                            case is_string($item):
+                                $temp = $item;
+                                $item = [];
+                                $item['column'] = $temp;
+                                $item['value'] = $data[$temp];
+                                break;
+                            case empty($item['column']):
+                                $item['column'] = @$item[0];
+                                $item['value'] = @$item[1];
+                                break;
                         }
 
                         $query .= ' ' . $item['column'] . '="' . $item['value']
@@ -346,24 +350,24 @@ class DB
             $type = @$type_info['DATA_TYPE'];
 
             switch ($type) {
-            case 'varchar':
-                $default = self::getColumnDefaultValue(
-                    $db_name, $table, $column
-                );
-                if (empty($default)) {
-                    $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ''";
-                    self::$db->query($query, $table, $column);
-                }
-                break;
-            case 'int':
-                $default = self::getColumnDefaultValue(
-                    $db_name, $table, $column
-                );
-                if (!is_int($default)) {
-                    $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT 0";
-                    self::$db->query($query, $table, $column);
-                }
-                break;
+                case 'varchar':
+                    $default = self::getColumnDefaultValue(
+                        $db_name, $table, $column
+                    );
+                    if (empty($default)) {
+                        $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT ''";
+                        self::$db->query($query, $table, $column);
+                    }
+                    break;
+                case 'int':
+                    $default = self::getColumnDefaultValue(
+                        $db_name, $table, $column
+                    );
+                    if (!is_int($default)) {
+                        $query = "ALTER TABLE ?n ALTER COLUMN ?n SET DEFAULT 0";
+                        self::$db->query($query, $table, $column);
+                    }
+                    break;
             }
         }
         return $types;
@@ -390,8 +394,8 @@ class DB
      * Получить количество записей в таблице
      *
      * @param      $table string Таблица, по которой идёт подсчёт
-     * @param bool $col   Название столбца, по которому идёт выбор (опционально)
-     * @param bool $val   Значение стоблца, по которому идёт выбор
+     * @param bool $col Название столбца, по которому идёт выбор (опционально)
+     * @param bool $val Значение стоблца, по которому идёт выбор
      *
      * @return int Количество записей
      */
@@ -433,15 +437,15 @@ class DB
                 }
 
                 switch (true) {
-                case is_string($item):
-                    $new_filter[$item] = $value[$item];
-                    break;
-                case !empty($item['column']):
-                    $new_filter[$item['column']] = $item['value'];
-                    break;
-                case !empty($item[0]):
-                    $new_filter[$item[0]] = $item[1];
-                    break;
+                    case is_string($item):
+                        $new_filter[$item] = $value[$item];
+                        break;
+                    case !empty($item['column']):
+                        $new_filter[$item['column']] = $item['value'];
+                        break;
+                    case !empty($item[0]):
+                        $new_filter[$item[0]] = $item[1];
+                        break;
                 }
             }
 
@@ -528,13 +532,14 @@ ALTER TABLE `$table`
      *
      * @param        $data  mixed Данные для записи
      * @param string $title Заголовок
-     * @param string $type  Тип
+     * @param string $type Тип
      *
      * @return array|FALSE|resource
      */
     public static function logDB(
         $data, $title = 'Info', $type = 'info', $table = 'debug_log'
-    ) {
+    )
+    {
 
         try {
             $count = self::counting($table);
@@ -638,7 +643,8 @@ ALTER TABLE `$table`
      */
     public static function formatDataForTableShowing(
         $results, $keys_for_formatting
-    ) {
+    )
+    {
         foreach ($results as &$item) {
             foreach ($item as $key => &$obj) {
                 if (in_array($key, $keys_for_formatting)) {
@@ -669,9 +675,10 @@ ALTER TABLE `$table`
      *
      * @return mixed Массив списков столбцов
      */
-    public static function getColumnsReadable($table)
+    public static function getColumnsReadable($table, $user_showed = true)
     {
         $columns = self::getColumnNames($table);
+
         $data_columns = array('action');
         $max_columns = array();
 
@@ -696,7 +703,7 @@ ALTER TABLE `$table`
                         break;
                     }
                 }
-                if (empty($showed)) {
+                if (empty($showed) && !empty($user_showed)) {
                     continue;
                 }
             }
@@ -867,11 +874,11 @@ ALTER TABLE `$table`
         $array = [
             [
                 'column' => 'table_name',
-                'value'  => $table
+                'value' => $table
             ],
             [
                 'column' => 'inner_column',
-                'value'  => $key
+                'value' => $key
             ]
         ];
 
@@ -885,7 +892,7 @@ ALTER TABLE `$table`
         $array = [
             [
                 'column' => 'foreign_table',
-                'value'  => $table
+                'value' => $table
             ]
         ];
 
@@ -898,7 +905,7 @@ ALTER TABLE `$table`
                 $filter = [
                     [
                         'column' => 'name',
-                        'value'  => $relation['table_name']
+                        'value' => $relation['table_name']
                     ]
                 ];
 
@@ -970,7 +977,8 @@ ALTER TABLE `$table`
      */
     public static function createControlTable(
         $db_name, $control_table_name = 'tables'
-    ) {
+    )
+    {
 
         $query = 'DROP TABLE IF EXISTS ?n.?n';
 
@@ -1027,7 +1035,8 @@ ALTER TABLE `$table`
     public static function createAdminTables(
         $db_name, $admin_table = 'admin_users',
         $admin_attemps = 'admin_auth_attempts'
-    ) {
+    )
+    {
         $query
             = 'CREATE TABLE ?n.?n (
           `id` int(11) NOT NULL,
@@ -1091,15 +1100,16 @@ ALTER TABLE `$table`
      * Получить все записи из таблицы (расширенная)
      *
      * @param      $table  string Название таблицы
-     * @param int  $limit  Ограничение
-     * @param int  $offset Отступ
+     * @param int $limit Ограничение
+     * @param int $offset Отступ
      * @param bool $search Выражение для поиска
      *
      * @return array|bool|mixed Список записей
      */
     public static function getAllLimit(
         $table, $order_column = 'id', $limit = 0, $offset = 0, $search = false
-    ) {
+    )
+    {
         if ($limit > 0) {
         } else {
             $limit = 1000;
