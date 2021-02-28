@@ -317,7 +317,7 @@ class Generator
     }
 
 
-    function genImageBox($key, $value, $title = '')
+    public static function genImageBox($key, $value, $title = '')
     {
         $title = $title ?: Helper::readableText($key);
         ?>
@@ -817,7 +817,7 @@ class Generator
             break;
 
         case 'selectbox':
-            $relation = DB::getTableRelationsOneToMany($table, $key, $title);
+            $relation = DB::getTableRelationsOneToMany($table, $key);
 
             if (!empty($relation) && !empty($relation['is_small'])) {
                 if ($relation['inner_column'] == $key) {
@@ -950,39 +950,7 @@ class Generator
         <input type="hidden" class="table_columns"
                value='<?= json_encode($data_columns) ?>'>
 
-        <div class="d-flex justify-content-between">
-            <div>
-                <a class="btn btn-primary"
-                   href="edit.php?cat=<?= $table ?>&act=add">
-                    <i class="fa fa-plus-circle"></i>
-                    Добавить запись
-                </a>
-            </div>
 
-            <div>
-
-                <?php if (!empty($_GET['get_column'])) {
-                    ?>
-                    <a class="btn btn-primary"
-                       href="list.php?cat=<?= $table ?>">
-                        <i class="fa fa-list"></i>
-                        Все записи <?= $table_info['name'] ?>
-                    </a>
-                    <?php
-                } ?>
-
-                <?php if (!empty($all_delete_button)) {
-                    ?>
-                    <a class="btn btn-danger"
-                       href="save.php?cat=<?= $table ?>&act=clear"
-                       onclick="return navConfirm(this.href, 'The Table will be cleared! Continue?');">
-                        <i class="fa fa-ban"></i>
-                        Очистить таблицу <?= $table_info['name'] ?>
-                    </a>
-                    <?php
-                } ?>
-            </div>
-        </div>
 
         <hr>
 
@@ -1000,6 +968,7 @@ class Generator
                     </span>
                 </p>
             </div>
+
 
 
             <div class="col-12">
@@ -1029,6 +998,40 @@ class Generator
                     <div class="alert <?= $class ?>" role="alert">
                         <?= $message ?>
                     </div>
+                    <?php
+                } ?>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <a class="btn btn-primary"
+                   href="edit.php?cat=<?= $table ?>&act=add">
+                    <i class="fa fa-plus-circle"></i>
+                    Добавить запись
+                </a>
+            </div>
+
+            <div>
+
+                <?php if (!empty($_GET['get_column'])) {
+                    ?>
+                    <a class="btn btn-primary"
+                       href="list.php?cat=<?= $table ?>">
+                        <i class="fa fa-list"></i>
+                        Все записи <?= $table_info['name'] ?>
+                    </a>
+                    <?php
+                } ?>
+
+                <?php if (!empty($all_delete_button)) {
+                    ?>
+                    <a class="btn btn-danger"
+                       href="save.php?cat=<?= $table ?>&act=clear"
+                       onclick="return navConfirm(this.href, 'The Table will be cleared! Continue?');">
+                        <i class="fa fa-ban"></i>
+                        Очистить таблицу <?= $table_info['name'] ?>
+                    </a>
                     <?php
                 } ?>
             </div>
