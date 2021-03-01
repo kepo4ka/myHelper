@@ -120,7 +120,7 @@ class Generator
                 = "<a target='_blank' class='btn-link' href = 'edit.php?cat=$table&act=edit&id=$id'>
                    $primary_view $foreign_column</a>";
         } else {
-            $str = "<span class=''> $id </span>";
+            $str = "<span class=''> " . $info[$res_key] . " </span>";
         }
         return $str;
     }
