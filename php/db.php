@@ -333,6 +333,81 @@ class DB
             return false;
         }
     }
+	
+	
+	/**
+     * Добавление записи или обновление в случае существования
+     *
+     * @param              $p_data  array Данные для добавления
+     * @param              $table   string Исходная Таблица
+     * @param string|array $primary Название первичного ключа
+     *
+     * @return bool|FALSE|resource Результат операции
+     */
+    public static function update($p_data, $table, $primary = 'id')
+    {
+        try {
+            if (empty($p_data)) {
+                return false;
+            }
+
+            $columns = self::getColumnNames($table);
+            $data = self::$db->filterArray($p_data, $columns);
+
+            $exist = false;
+
+            if (is_array($primary)) {
+                $exist = self::checkExist($table, $primary, $data);
+            } else {
+                if (!isset($data[$primary])) {
+                    $exist = false;
+                } else {
+                    $exist = self::checkExist(
+                        $table, $primary, $data[$primary]
+                    );
+                }
+            }
+
+            if (!$exist) {
+                return false;
+            }
+
+            if (is_array($primary)) {
+                $query = 'UPDATE ?n SET ?u WHERE';
+
+                foreach ($primary as $item) {
+
+                    switch (true) {
+                        case is_string($item):
+                            $temp = $item;
+                            $item = [];
+                            $item['column'] = $temp;
+                            $item['value'] = $data[$temp];
+                            break;
+                        case empty($item['column']):
+                            $item['column'] = @$item[0];
+                            $item['value'] = @$item[1];
+                            break;
+                    }
+
+                    $query .= ' ' . $item['column'] . '="' . $item['value']
+                        . '" AND';
+                }
+                $query .= ' 1';
+
+                return self::$db->query($query, $table, $data);
+            } else {
+                $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
+                return self::$db->query(
+                    $query, $table, $data, $primary, $data[$primary]
+                );
+            }
+
+        } catch
+        (Throwable $exception) {
+            return false;
+        }
+    }
 
 
     public static function setDefaultColumnValue($db_name, $table)
