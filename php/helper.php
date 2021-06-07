@@ -627,7 +627,7 @@ class Helper
     ) {
         foreach ($list as $item) {
             if ($item[$list_key] == $value) {
-                return true;
+                return $item;
             }
         }
         return false;
