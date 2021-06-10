@@ -67,11 +67,17 @@ class Helper
         }
 
 
-        curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+		if (!empty($useragent))
+		{
+			curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+		}
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiePath);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiePath);
+		if (!empty($cookiePath))
+		{
+			curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiePath);
+			curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiePath);
+		}
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         if (!empty($z['headers'])) {
@@ -363,6 +369,11 @@ class Helper
         if (empty($config['proccess_id'])) {
             return false;
         }
+
+		if (empty($config['project_dir']))
+		{
+			return false;
+		}
 
         self::makeDir($config['project_dir'] . '/cookies');
 
