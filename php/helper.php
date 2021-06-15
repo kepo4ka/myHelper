@@ -1905,8 +1905,20 @@ class Helper
     }
 
 
-	public function sendTGMessage($token, $chatID, $message)
+	public static function sendTGMessage($message, $token=null, $chatID=null)
     {
+		if (defined(MY_TELEGRAM_TOKEN))
+		{
+			$token = @MY_TELEGRAM_TOKEN;
+			$chatID = @MY_TELEGRAM_CHAT;
+		}
+		
+		if (empty($token) || empty($chatID))
+		{
+			return false;
+		}
+		
+		
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

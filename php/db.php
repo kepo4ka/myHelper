@@ -330,6 +330,9 @@ class DB
                 }
             }
         } catch (Throwable $exception) {
+			 $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ': MYSQL: '
+                . $exception->getMessage();
+            Helper::sendTGMessage($message);   
             return false;
         }
     }
@@ -405,6 +408,9 @@ class DB
 
         } catch
         (Throwable $exception) {
+			 $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ': MYSQL: '
+                . $exception->getMessage();
+            Helper::sendTGMessage($message);  
             return false;
         }
     }
