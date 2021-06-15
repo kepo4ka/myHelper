@@ -1905,34 +1905,34 @@ class Helper
     }
 
 
-	public static function sendTGMessage($message, $token=null, $chatID=null)
-    {
-		if (defined(MY_TELEGRAM_TOKEN))
-		{
-			$token = @MY_TELEGRAM_TOKEN;
-			$chatID = @MY_TELEGRAM_CHAT;
-		}
-		
-		if (!defined (TELEGRAM_ACTIVE) || empty(TELEGRAM_ACTIVE))
-		{
-			return false;
-		}
-		
-		if (empty($token) || empty($chatID))
-		{
-			return false;
-		}
-		
-		
+	   public static function sendTGMessage($message, $token = null, $chatID = null
+    ) {
+        if (!empty(@MY_TELEGRAM_TOKEN)) {
+            $token = @MY_TELEGRAM_TOKEN;
+            $chatID = @MY_TELEGRAM_CHAT;
+        }
+
+        if ( empty(TELEGRAM_ACTIVE)) {
+            return false;
+        }
+
+        if (empty($token) || empty($chatID)) {
+            return false;
+        }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: multipart/form-data']);
-        curl_setopt($ch, CURLOPT_URL, 'https://api.telegram.org/bot' . $token . '/sendMessage');
+        curl_setopt(
+            $ch, CURLOPT_HTTPHEADER, ['Content-Type: multipart/form-data']
+        );
+        curl_setopt(
+            $ch, CURLOPT_URL,
+            'https://api.telegram.org/bot' . $token . '/sendMessage'
+        );
         $postFields = array(
-            'chat_id' => '-' . $chatID,
-            'text' => $message,
-            'parse_mode' => 'HTML',
+            'chat_id'                  => '-' . $chatID,
+            'text'                     => $message,
+            'parse_mode'               => 'HTML',
             'disable_web_page_preview' => false,
         );
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
