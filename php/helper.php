@@ -1904,4 +1904,24 @@ class Helper
         return $json;
     }
 
+
+	public function sendTGMessage($token, $chatID, $message)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: multipart/form-data']);
+        curl_setopt($ch, CURLOPT_URL, 'https://api.telegram.org/bot' . $token . '/sendMessage');
+        $postFields = array(
+            'chat_id' => '-' . $chatID,
+            'text' => $message,
+            'parse_mode' => 'HTML',
+            'disable_web_page_preview' => false,
+        );
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        $res = curl_exec($ch);
+        curl_close($ch);
+
+        return $res;
+    }
 }
