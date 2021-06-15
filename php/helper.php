@@ -1913,6 +1913,11 @@ class Helper
 			$chatID = @MY_TELEGRAM_CHAT;
 		}
 		
+		if (!defined (TELEGRAM_ACTIVE) || empty(TELEGRAM_ACTIVE))
+		{
+			return false;
+		}
+		
 		if (empty($token) || empty($chatID))
 		{
 			return false;
