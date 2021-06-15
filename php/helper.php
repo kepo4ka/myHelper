@@ -1916,9 +1916,19 @@ class Helper
             return false;
         }
 
-        if (empty($token) || empty($chatID)) {
+       if (empty($token) || empty($chatID) || empty($message)) {
             return false;
         }
+
+        if (!is_string($message)) {
+            $message = Helper::json_encode($message);
+        }
+
+        // max size 4096
+        if (strlen($message) > 4000) {
+            $message = substr($message, 0, 4000);
+        }
+		
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
