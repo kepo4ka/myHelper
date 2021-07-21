@@ -1527,6 +1527,11 @@ class Helper
     {
         return date('Y-m-d H:i:s', strtotime($date));
     }
+	
+	 public static function formatDateFromSeconds($seconds)
+    {
+        return date('Y-m-d H:i:s', $seconds);
+    }
 
     public static function getUrlLastPart()
     {
