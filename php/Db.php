@@ -8,7 +8,7 @@ use Exception;
 use Throwable;
 
 
-class DB
+class Db
 {
 
     public static $db;
