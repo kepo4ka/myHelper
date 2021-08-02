@@ -272,6 +272,7 @@ class Db
      */
     public static function save($p_data, $table, $primary = 'id')
     {
+        global $meDoo;
         try {
             if (empty($p_data)) {
                 return false;
@@ -295,11 +296,11 @@ class Db
             }
 
             if (!$exist) {
-                $query = 'INSERT INTO ?n SET ?u';
-                return self::$db->query($query, $table, $data);
+                return $meDoo->insert($table, $data);
             } else {
                 if (is_array($primary)) {
-                    $query = 'UPDATE ?n SET ?u WHERE';
+
+                    $filter = [];
 
                     foreach ($primary as $item) {
 
@@ -315,30 +316,25 @@ class Db
                                 $item['value'] = @$item[1];
                                 break;
                         }
-
-                        $query .= ' ' . $item['column'] . '="' . $item['value']
-                            . '" AND';
+                        $filter[$item['column']] = $item['value'];
                     }
-                    $query .= ' 1';
-
-                    return self::$db->query($query, $table, $data);
                 } else {
-                    $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
-                    return self::$db->query(
-                        $query, $table, $data, $primary, $data[$primary]
-                    );
+                    $filter = [$primary => $data[$primary]];
                 }
+
+                $res = $meDoo->update($table, $data, $filter);
+                return $res;
             }
         } catch (Throwable $exception) {
-			 $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ': MYSQL: '
+            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ': MYSQL: '
                 . $exception->getMessage();
-            Helper::sendTGMessage($message);   
+            Helper::sendTGMessage($message);
             return false;
         }
     }
-	
-	
-	/**
+
+
+    /**
      * Добавление записи или обновление в случае существования
      *
      * @param              $p_data  array Данные для добавления
@@ -349,6 +345,7 @@ class Db
      */
     public static function update($p_data, $table, $primary = 'id')
     {
+        global $meDoo;
         try {
             if (empty($p_data)) {
                 return false;
@@ -376,7 +373,7 @@ class Db
             }
 
             if (is_array($primary)) {
-                $query = 'UPDATE ?n SET ?u WHERE';
+                $filter = [];
 
                 foreach ($primary as $item) {
 
@@ -392,25 +389,20 @@ class Db
                             $item['value'] = @$item[1];
                             break;
                     }
-
-                    $query .= ' ' . $item['column'] . '="' . $item['value']
-                        . '" AND';
+                    $filter[$item['column']] = $item['value'];
                 }
-                $query .= ' 1';
-
-                return self::$db->query($query, $table, $data);
             } else {
-                $query = 'UPDATE ?n SET ?u WHERE ?n=?s';
-                return self::$db->query(
-                    $query, $table, $data, $primary, $data[$primary]
-                );
+                $filter = [$primary => $data[$primary]];
             }
+
+            $res = $meDoo->update($table, $data, $filter);
+            return $res;
 
         } catch
         (Throwable $exception) {
-			 $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ': MYSQL: '
+            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ':UPDATE MYSQL: '
                 . $exception->getMessage();
-            Helper::sendTGMessage($message);  
+            Helper::sendTGMessage($message);
             return false;
         }
     }
