@@ -1917,7 +1917,7 @@ class Helper
             $chatID = @MY_TELEGRAM_CHAT;
         }
 
-        if ( empty(TELEGRAM_ACTIVE)) {
+        if ( !defined(TELEGRAM_ACTIVE)) {
             return false;
         }
 
