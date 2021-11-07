@@ -1222,17 +1222,20 @@ ALTER TABLE `$table`
 
     public static function transactionStart()
     {
-        return self::$db->query('START TRANSACTION');
+        global $meDoo;
+        return $meDoo->pdo->beginTransaction();
     }
 
     public static function transactionRollback()
     {
-        return self::$db->query('ROLLBACK');
+        global $meDoo;
+        return $meDoo->pdo->rollBack();
     }
 
     public static function transactionCommit()
     {
-        return self::$db->query('commit');
+        global $meDoo;
+        return $meDoo->pdo->commit();
     }
 
 
