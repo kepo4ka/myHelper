@@ -1917,7 +1917,7 @@ class Helper
             $chatID = @MY_TELEGRAM_CHAT;
         }
 
-        if ( !defined(TELEGRAM_ACTIVE)) {
+        if (@empty(TELEGRAM_ACTIVE)) {
             return false;
         }
 
@@ -1953,6 +1953,8 @@ class Helper
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
         $res = curl_exec($ch);
         curl_close($ch);
+
+        Db::logDB([$res], 'telegram res');
 
         return $res;
     }
