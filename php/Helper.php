@@ -1917,7 +1917,7 @@ class Helper
             $chatID = @MY_TELEGRAM_CHAT;
         }
 
-        if (@empty(TELEGRAM_ACTIVE)) {
+        if ( !defined(TELEGRAM_ACTIVE)) {
             return false;
         }
 
@@ -1954,8 +1954,42 @@ class Helper
         $res = curl_exec($ch);
         curl_close($ch);
 
-        Db::logDB([$res], 'telegram res');
-
         return $res;
+    }
+
+    /**
+     * Сжать текст для хранения в БД в Base64
+     * @param $text
+     * @return bool|string
+     */
+    public static function textCompress($text)
+    {
+        try {
+            $str = gzdeflate($text);
+            $str = base64_encode($str);
+            return $str;
+        } catch (Throwable $exception) {
+            return $text;
+        }
+    }
+
+    /**
+     * Разжать сжатый в Base64 текст
+     * @param $hash
+     * @return bool|false|string
+     */
+    public static function textDecompress($hash)
+    {
+        try {
+            $temp = base64_decode($hash, true);
+            if (empty($temp)) {
+                return $hash;
+            }
+
+            $str = gzinflate($temp);
+            return $str;
+        } catch (Throwable $exception) {
+            return $hash;
+        }
     }
 }
