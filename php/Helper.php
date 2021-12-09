@@ -14,7 +14,7 @@ class Helper
      * Выполнить запрос
      *
      * @param      $url string Адрес, куда будет отправлен запрос
-     * @param null $z   Дополнительные параметры запроса
+     * @param null $z Дополнительные параметры запроса
      *
      * @return mixed Полученный ответ
      */
@@ -67,17 +67,15 @@ class Helper
         }
 
 
-		if (!empty($useragent))
-		{
-			curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
-		}
+        if (!empty($useragent)) {
+            curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+        }
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-		if (!empty($cookiePath))
-		{
-			curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiePath);
-			curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiePath);
-		}
+        if (!empty($cookiePath)) {
+            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiePath);
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiePath);
+        }
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         if (!empty($z['headers'])) {
@@ -148,7 +146,8 @@ class Helper
     public
     static function getRandLineFromFile(
         $file
-    ) {
+    )
+    {
         $line = '';
         try {
             $f_contents = @file($file);
@@ -171,7 +170,8 @@ class Helper
     public
     static function getRandUserAgent(
         $file = ''
-    ) {
+    )
+    {
         if (empty($file)) {
             $file = __DIR__ . '/assets/useragents.txt';
         }
@@ -199,7 +199,8 @@ class Helper
     public
     static function getIpReg(
         $str
-    ) {
+    )
+    {
         $matches = array();
         preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/m', $str, $matches);
 
@@ -242,7 +243,8 @@ class Helper
     public
     static function checkRegular(
         $re, $str, $index = 1
-    ) {
+    )
+    {
         $result = '';
         try {
             $matches = array();
@@ -271,7 +273,8 @@ class Helper
     public
     static function checkArrayFilled(
         $array
-    ) {
+    )
+    {
         if (!is_array($array)) {
             return false;
         }
@@ -307,7 +310,8 @@ class Helper
     public
     static function delApostrof(
         $string
-    ) {
+    )
+    {
         $bad_symbol = '"';
         $count = substr_count($string, $bad_symbol);
         $last_symbol = substr($string, -1);
@@ -329,7 +333,8 @@ class Helper
     public
     static function echoVarDumpPre(
         $var, $no_exit = false
-    ) {
+    )
+    {
         echo '<pre>';
         var_dump($var);
         echo '</pre>';
@@ -347,7 +352,8 @@ class Helper
     public
     static function echoBr(
         $var
-    ) {
+    )
+    {
         echo json_encode($var, JSON_UNESCAPED_UNICODE);
         echo '<hr>';
     }
@@ -363,17 +369,17 @@ class Helper
     public
     static function getCookiePath(
         $second = false
-    ) {
+    )
+    {
         global $config;
 
         if (empty($config['proccess_id'])) {
             return false;
         }
 
-		if (empty($config['project_dir']))
-		{
-			return false;
-		}
+        if (empty($config['project_dir'])) {
+            return false;
+        }
 
         self::makeDir($config['project_dir'] . '/cookies');
 
@@ -446,7 +452,8 @@ class Helper
     public
     static function urlLastPart(
         $url, $separator = '/'
-    ) {
+    )
+    {
         if (empty($url)) {
             return false;
         }
@@ -471,7 +478,8 @@ class Helper
     public
     static function makeDir(
         $path
-    ) {
+    )
+    {
         return is_dir($path) || mkdir($path);
     }
 
@@ -480,14 +488,15 @@ class Helper
      * Валидация значения
      *
      * @param      $input string Исходное значение
-     * @param null $link  MYSQLI LINK
+     * @param null $link MYSQLI LINK
      *
      * @return mixed|string "Очищенное" значение
      */
     public
     static function inputFilter(
         $input, $type = null
-    ) {
+    )
+    {
         $input = trim($input);
         $input = htmlspecialchars($input, ENT_QUOTES | ENT_SUBSTITUTE, 'utf-8');
         $input = html_entity_decode($input);
@@ -523,7 +532,8 @@ class Helper
     public
     static function scriptFilter(
         $input
-    ) {
+    )
+    {
         return str_replace('script', '', $input);
     }
 
@@ -538,7 +548,8 @@ class Helper
     public
     static function regexpFilter(
         $input
-    ) {
+    )
+    {
         $input = preg_replace(
             '/[^_\w\s\-+*\/=,.@#$&(){}\[\]!:\\\]/u', '', $input
         );
@@ -571,7 +582,8 @@ class Helper
     public
     static function utf8ize(
         $d
-    ) {
+    )
+    {
         if (is_array($d)) {
             foreach ($d as $k => $v) {
                 $d[$k] = self::utf8ize($v);
@@ -593,7 +605,8 @@ class Helper
     public
     static function max_array_value(
         $array, $key_name
-    ) {
+    )
+    {
         $max = '';
         foreach ($array as $key => $value) {
             $make_array[] = $value[$key_name];
@@ -614,7 +627,8 @@ class Helper
     public
     static function min_array_value(
         $array, $key_name
-    ) {
+    )
+    {
         $max = '';
         foreach ($array as $key => $value) {
             $make_array[] = $value[$key_name];
@@ -635,7 +649,8 @@ class Helper
     public
     static function checkListItemExist(
         $list, $list_key, $value
-    ) {
+    )
+    {
         foreach ($list as $item) {
             if ($item[$list_key] == $value) {
                 return $item;
@@ -653,7 +668,8 @@ class Helper
     public
     static function locationJs(
         $url
-    ) {
+    )
+    {
         ?>
         <script>
             location.href = '<?=$url?>';
@@ -669,14 +685,15 @@ class Helper
      * @param        $w    integer|double Требуемая ширина
      * @param        $h    integer|double Требуемая высота
      * @param string $type Расширение файла
-     * @param bool   $crop Нужно ли делать обрезание
+     * @param bool $crop Нужно ли делать обрезание
      *
      * @return bool|resource Результат обработки
      */
     public
     static function resize_image(
         $file, $w, $h, $type = 'jpeg', $crop = false
-    ) {
+    )
+    {
         list($width, $height) = getimagesize($file);
         $r = $width / $height;
         if ($crop) {
@@ -699,18 +716,18 @@ class Helper
             }
         }
         switch ($type) {
-        case 'jpg':
-        case 'jpeg':
-            $src = imagecreatefromjpeg($file);
-            break;
-        case 'png':
-            $src = imagecreatefrompng($file);
-            break;
-        case 'bmp':
-            $src = imagecreatefrombmp($file);
-            break;
-        default:
-            return false;
+            case 'jpg':
+            case 'jpeg':
+                $src = imagecreatefromjpeg($file);
+                break;
+            case 'png':
+                $src = imagecreatefrompng($file);
+                break;
+            case 'bmp':
+                $src = imagecreatefrombmp($file);
+                break;
+            default:
+                return false;
         }
 
         $dst = imagecreatetruecolor($newwidth, $newheight);
@@ -732,7 +749,8 @@ class Helper
     public
     static function getDirectoryImages(
         $directory = '../assets/images/'
-    ) {
+    )
+    {
         $images_array = array();
         $allowed_types = array(
             "jpg", "jpeg", "bmp", "png", "gif", "ico", "svg"
@@ -781,7 +799,8 @@ class Helper
     public
     static function getFiles(
         $directory
-    ) {
+    )
+    {
         $files = [];
 
         //пробуем открыть папку
@@ -842,7 +861,8 @@ class Helper
     public
     static function rus2translit(
         $string
-    ) {
+    )
+    {
         $converter = array(
             'а' => 'a', 'б' => 'b', 'в' => 'v',
             'г' => 'g', 'д' => 'd', 'е' => 'e',
@@ -881,7 +901,8 @@ class Helper
     public
     static function str2url(
         $str
-    ) {
+    )
+    {
         // переводим в транслит
         $str = self:: rus2translit($str);
         // в нижний регистр
@@ -922,7 +943,8 @@ class Helper
     public
     static function json_encodeKirilica(
         $val
-    ) {
+    )
+    {
         return json_encode($val, JSON_UNESCAPED_UNICODE);
     }
 
@@ -931,7 +953,7 @@ class Helper
      * Прочитать файл в родительской папке, зная только относительно расположение относительно текущего файла скрипта
      *
      * @param        $file_name string Имя файла с расширением
-     * @param int    $level     На сколько уровней выше находится выше
+     * @param int $level На сколько уровней выше находится выше
      * @param string $protocol
      *
      * @return bool|string Содержимое файла
@@ -939,7 +961,8 @@ class Helper
     public
     static function readFileOverDir(
         $file_name, $level = 1, $protocol = 'http'
-    ) {
+    )
+    {
         $dir_name = dirname($_SERVER['SCRIPT_NAME']);
 
         $dir = self:: recDirName($_SERVER['SCRIPT_NAME'], 0);
@@ -964,7 +987,8 @@ class Helper
     public
     static function recDirName(
         $dir_name, $cur_level, $level = 1
-    ) {
+    )
+    {
         if ($cur_level >= $level || $dir_name == '\\') {
             return $dir_name;
         } else {
@@ -984,7 +1008,8 @@ class Helper
     public
     static function myReadFile(
         $file_name
-    ) {
+    )
+    {
         $content = [];
 
         try {
@@ -1014,14 +1039,16 @@ class Helper
     public
     static function getShortMd5(
         $mixed, $length = 5
-    ) {
+    )
+    {
         return substr(md5(json_encode($mixed)), 0, $length);
     }
 
     public
     static function e(
         $str
-    ) {
+    )
+    {
         return htmlspecialchars($str, ENT_QUOTES, 'utf-8');
     }
 
@@ -1036,7 +1063,8 @@ class Helper
     public
     static function getvarDumpPre(
         $variable
-    ) {
+    )
+    {
         ob_start();
         echo "<pre>";
         var_dump($variable);
@@ -1106,11 +1134,12 @@ class Helper
      *
      * @param        $data  mixed Данные для записи
      * @param string $title Заголовок
-     * @param string $type  Тип
+     * @param string $type Тип
      */
     public static function logFile(
         $data, $title = 'Info', $type = 'info', $path = ''
-    ) {
+    )
+    {
         global $config;
 
         if (empty($path)) {
@@ -1195,7 +1224,8 @@ class Helper
     public static
     function scanDirFiltered(
         $dir
-    ) {
+    )
+    {
         $filtered_files = [];
         $files = scandir($dir);
         foreach ($files as $item) {
@@ -1213,7 +1243,7 @@ class Helper
      *
      * @param        $field    string Название поля
      * @param        $required bool Является ли Поле обязательным для заполнения
-     * @param string $type     Предполагаемый тип Поля
+     * @param string $type Предполагаемый тип Поля
      *
      * @return array Прошло ли Поле проверку
      */
@@ -1221,9 +1251,10 @@ class Helper
         $info
         = [
             'field' => '', 'required' => true, 'form_name' => 'formdata',
-            'type'  => '', 'method' => 'post', 'regex' => '[^\w\-\.\,\s]+'
+            'type' => '', 'method' => 'post', 'regex' => '[^\w\-\.\,\s]+'
         ]
-    ) {
+    )
+    {
 
         $form_name = $info['form_name'];
         $field = $info['field'];
@@ -1234,26 +1265,26 @@ class Helper
 
         $request = $_REQUEST;
         switch ($method) {
-        case 'post':
-            $request = $_POST;
-            break;
-        case 'get':
-            $request = $_GET;
-            break;
+            case 'post':
+                $request = $_POST;
+                break;
+            case 'get':
+                $request = $_GET;
+                break;
         }
 
 
         if (isset($type)) {
             switch ($type) {
-            case 'email':
-                $regex = "/[^\w\-@\.]+/u";
-                break;
-            case 'number':
-                $regex = "/[^+\d-()\s]/";
-                break;
-            case "hash":
-                $regex = "/[^\w\$\.\/\-]+/";
-                break;
+                case 'email':
+                    $regex = "/[^\w\-@\.]+/u";
+                    break;
+                case 'number':
+                    $regex = "/[^+\d-()\s]/";
+                    break;
+                case "hash":
+                    $regex = "/[^\w\$\.\/\-]+/";
+                    break;
             }
         }
 
@@ -1340,7 +1371,7 @@ class Helper
      * Заполнить xml элементами массива
      *
      * @param SimpleXMLElement $object
-     * @param array            $data
+     * @param array $data
      */
     private function _array_to_xml(SimpleXMLElement $object, array $data)
     {
@@ -1384,7 +1415,7 @@ class Helper
      * Функция удаляет её
      *
      * @param        $array array Исходный массив
-     * @param string $name  Название
+     * @param string $name Название
      *
      * @return array
      */
@@ -1527,8 +1558,8 @@ class Helper
     {
         return date('Y-m-d H:i:s', strtotime($date));
     }
-	
-	 public static function formatDateFromSeconds($seconds)
+
+    public static function formatDateFromSeconds($seconds)
     {
         return date('Y-m-d H:i:s', $seconds);
     }
@@ -1582,11 +1613,12 @@ class Helper
      * Отменить Транзакцию БД
      *
      * @param        $message string Текст ошибки
-     * @param string $url     URL для редиректа
+     * @param string $url URL для редиректа
      */
     public static function badEnd(
         $message, $url = '', $error = null, $rollback = false
-    ) {
+    )
+    {
         if (!empty($rollback)) {
             DB::transactionRollback();
         }
@@ -1690,8 +1722,8 @@ class Helper
      */
     public static function enHTML($str = '')
     {
-        $search = Array('&', '"', '<', '>');
-        $replace = Array('&amp;', '&quot;', '&lt;', '&gt');
+        $search = array('&', '"', '<', '>');
+        $replace = array('&amp;', '&quot;', '&lt;', '&gt');
         $str = str_replace($search, $replace, $str);
         return $str;
     }
@@ -1825,7 +1857,6 @@ class Helper
             );
 
 
-
             foreach ($item as $key => $value) {
                 // Проверка на возможность сгенерировать checkbox
                 if (in_array($key, $bolean_columns)) {
@@ -1839,8 +1870,6 @@ class Helper
 
                 try {
                     $field_info = DB::getByColumn('table_fields', 'field', $key);
-
-
 
 
                     if (!empty($field_info)) {
@@ -1861,17 +1890,17 @@ class Helper
                 if (!empty($relation)) {
 
                     switch (true) {
-                    case !empty($relation['is_small']):
-                        $item[$key] = Generator::genTableSelectBox(
-                            $relation, $value, $item['id']
-                        );
-                        break;
+                        case !empty($relation['is_small']):
+                            $item[$key] = Generator::genTableSelectBox(
+                                $relation, $value, $item['id']
+                            );
+                            break;
 
-                    default:
-                        $item[$key] = Generator::simpleFilter(
-                            $value, $relation
-                        );
-                        break;
+                        default:
+                            $item[$key] = Generator::simpleFilter(
+                                $value, $relation
+                            );
+                            break;
                     }
 
 
@@ -1910,18 +1939,19 @@ class Helper
     }
 
 
-	   public static function sendTGMessage($message, $token = null, $chatID = null
-    ) {
+    public static function sendTGMessage($message, $token = null, $chatID = null
+    )
+    {
         if (!empty(@MY_TELEGRAM_TOKEN)) {
             $token = @MY_TELEGRAM_TOKEN;
             $chatID = @MY_TELEGRAM_CHAT;
         }
 
-        if ( !defined(TELEGRAM_ACTIVE)) {
+        if (!defined(TELEGRAM_ACTIVE)) {
             return false;
         }
 
-       if (empty($token) || empty($chatID) || empty($message)) {
+        if (empty($token) || empty($chatID) || empty($message)) {
             return false;
         }
 
@@ -1933,7 +1963,7 @@ class Helper
         if (strlen($message) > 4000) {
             $message = substr($message, 0, 4000);
         }
-		
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -1945,9 +1975,9 @@ class Helper
             'https://api.telegram.org/bot' . $token . '/sendMessage'
         );
         $postFields = array(
-            'chat_id'                  => '-' . $chatID,
-            'text'                     => $message,
-            'parse_mode'               => 'HTML',
+            'chat_id' => '-' . $chatID,
+            'text' => $message,
+            'parse_mode' => 'HTML',
             'disable_web_page_preview' => false,
         );
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
@@ -1965,6 +1995,10 @@ class Helper
     public static function textCompress($text)
     {
         try {
+            if (empty($text)) {
+                return $text;
+            }
+
             $str = gzdeflate($text);
             $str = base64_encode($str);
             return $str;
