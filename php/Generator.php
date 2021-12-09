@@ -615,7 +615,7 @@ class Generator
 
         ob_start();
         ?>
-        <div class="col-12">
+        <div class='col-12'>
             <select name='<?= $key ?>' data-id='<?= $id ?>'
                     class='nice-select-table table_select_handler selectpicker'
                     data-live-search='true'>
@@ -879,12 +879,12 @@ class Generator
 
         if (!empty($info['relations'])) {
             $html
-                .= '<div class="btn-group btn btn-secondary p-0" role="group">
-    <button  type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <i class="fa fa-boxes"></i>
+                .= "<div class='btn-group btn btn-secondary p-0' role='group'>
+    <button  type='button' class='btn btn-secondary dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+      <i class='fa fa-boxes'></i>
       Связи
     </button>
-    <div class="dropdown-menu">';
+    <div class='dropdown-menu'>";
             foreach ($info['relations'] as $relation_info) {
                 $table_name = $relation_info['table_name'];
                 $table_full_name = !empty($relation_info['foreign_table_name'])
@@ -900,7 +900,7 @@ class Generator
                 $html .= "</a>";
             }
 
-            $html .= '</div></div>';
+            $html .= "</div></div>";
         }
 
         if (!empty($info['copy'])) {
@@ -1271,7 +1271,7 @@ class Generator
 
                 <div class="row mb-3">
                     <?php
-                   self::generateForm($row);
+                    self::generateForm($row);
                     ?>
                 </div>
 
