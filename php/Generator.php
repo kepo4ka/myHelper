@@ -616,12 +616,12 @@ class Generator
         ob_start();
         ?>
         <div class="col-12">
-            <select name="<?= $key ?>" data-id="<?= $id ?>"
-                    class="nice-select-table table_select_handler selectpicker"
+            <select name='<?= $key ?>' data-id='<?= $id ?>'
+                    class='nice-select-table table_select_handler selectpicker'
                     data-live-search='true'>
 
                 <option <?= empty($value) ? 'selected' : '' ?>
-                        value="">
+                        value=''>
                     0
                 </option>
 
@@ -642,7 +642,7 @@ class Generator
                         . $title;
                     ?>
                     <option <?= $item[$res_key] == @$value ? 'selected' : '' ?>
-                            value="<?= $item[$res_key] ?>">
+                            value='<?= $item[$res_key] ?>'>
                         <?= $title ?>
                     </option>
                     <?php
@@ -1271,7 +1271,7 @@ class Generator
 
                 <div class="row mb-3">
                     <?php
-                    generateForm($row);
+                   self::generateForm($row);
                     ?>
                 </div>
 
