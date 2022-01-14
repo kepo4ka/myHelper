@@ -145,7 +145,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
-                   value='<?= $value ?>'>
+                   value='<?= htmlspecialchars($value, ENT_QUOTES) ?>'>
         </div>
         <?php
         return true;
@@ -173,7 +173,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
-                   value="<?= $value ?>">
+                   value="<?= htmlspecialchars($value, ENT_QUOTES) ?>">
         </div>
         <?php
         return true;
@@ -201,7 +201,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
-                   value="<?= $value ?>">
+                   value="<?= htmlspecialchars($value, ENT_QUOTES) ?>">
         </div>
         <?php
         return true;
@@ -234,7 +234,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control <?= $class ?>"
-                   name="<?= $key ?>" value="<?= $value ?>">
+                   name="<?= $key ?>" value="<?= htmlspecialchars($value, ENT_QUOTES) ?>">
         </div>
         <?php
         return true;
@@ -256,7 +256,7 @@ class Generator
         ?>
 
         <input type="hidden" class="form-control disabled" disabled
-               name="<?= $key ?>" value='<?= $value ?>'>
+               name="<?= $key ?>" value='<?= htmlspecialchars($value, ENT_QUOTES) ?>'>
         <?php
         return true;
     }
@@ -280,7 +280,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control" readonly name="<?= $key ?>"
-                   value='<?= $value ?>'>
+                   value='<?= htmlspecialchars($value, ENT_QUOTES) ?>'>
         </div>
         <?php
         return true;
@@ -315,7 +315,7 @@ class Generator
             </label>
             <textarea type="text" cols="10" rows="5"
                       class="form-control <?= $editor_class ?>"
-                      name="<?= $key ?>"><?= $value ?></textarea>
+                      name="<?= $key ?>"><?= htmlspecialchars($value, ENT_QUOTES) ?></textarea>
         </div>
         <?php
         return true;
@@ -719,7 +719,11 @@ class Generator
                 $type = 'base64_img';
             } else if ($comment == 'editor') {
                 $type = 'blob';
-            } else if (!empty($relations)) {
+            }
+            else if ($comment == 'compress') {
+                $type = 'compress';
+            }
+            else if (!empty($relations)) {
                 $type = 'selectbox';
             } else if (false !== strpos($value['type'], 'tinyint(1)')) {
                 $type = 'checkbox';
@@ -787,6 +791,11 @@ class Generator
             case 'blob':
                 self::genTextarea($key, $value, true, $title);
                 break;
+            case 'compress':
+                $value= Helper::textDecompress($value);
+                self::genTextarea($key, $value, true, $title);
+                break;
+
             case 'text':
                 self::genTextarea($key, $value, $title);
                 break;
@@ -1165,7 +1174,10 @@ class Generator
                     <?php if ($act == "edit") { ?>
                         Редактировать запись #<?= $id ?>
                     <?php } else { ?>
-                        Добавить запись
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-plus"></i>
+                            Добавить запись
+                        </button>
                     <?php } ?>
                 </legend>
                 <hr class="mb-3">
@@ -1196,7 +1208,7 @@ class Generator
                         <?php } else { ?>
                             <button type="submit" class="btn btn-success">
                                 <i class="fa fa-plus"></i>
-                                Сохранить
+                                Добавить
                             </button>
                         <?php } ?>
                     </div>
@@ -1257,9 +1269,9 @@ class Generator
         <form method="post" action="save.php" enctype='multipart/form-data'>
             <fieldset>
 
-                <input name="cat" type="hidden" value="<?= @$cat ?>">
-                <input name="id" type="hidden" value="<?= @$id ?>">
-                <input name="act" type="hidden" value="<?= @$act ?>">
+                <input name="cat" type="hidden" value="<?= htmlspecialchars(@$cat, ENT_QUOTES) ?>">
+                <input name="id" type="hidden" value="<?= htmlspecialchars(@$id, ENT_QUOTES) ?>">
+                <input name="act" type="hidden" value="<?= htmlspecialchars(@$act, ENT_QUOTES) ?>">
 
                 <legend class="hidden-first">
                     <?php if ($act == "edit") { ?>
