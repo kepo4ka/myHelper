@@ -617,7 +617,7 @@ ALTER TABLE `$table`
         try {
             $count = self::counting($table);
 
-            if ($count > 500) {
+            if ($count > 5000) {
                 $primary = 'id';
                 $id = self::$db->getOne('SELECT ?n FROM ?n', $primary, $table);
 
