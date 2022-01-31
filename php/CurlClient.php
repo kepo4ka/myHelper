@@ -21,7 +21,7 @@ class CurlClient
         Helper::setVarField($config, $p_config, 'delay_min', 2);
         Helper::setVarField($config, $p_config, 'delay_max', 5);
         Helper::setVarField($config, $p_config, 'max_try', 2);
-        Helper::setVarField($config, $p_config, 'rucaptcha_key', '2d0b9ef88d61355b18a369063e8d60ef');
+        Helper::setVarField($config, $p_config, 'rucaptcha_key', 'cfb88cfc112b77ea35ee9d243084a4eb');
         Helper::setVarField($config, $p_config, 'enable_db', false);
         Helper::setVarField($config, $p_config, 'project_dir', __DIR__);
 
