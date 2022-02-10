@@ -652,13 +652,13 @@ ALTER TABLE `$table`
      *
      * @return array Список логирования
      */
-    public static function getlogDB($site = false, $table = 'debug_log')
+    public static function getlogDB($site = false, $table = 'debug_log', $limit = 200)
     {
         $query = 'SELECT * FROM ?n';
         if (!empty($site)) {
             $query .= ' WHERE `site`="' . $site . '"';
         }
-        $query .= ' ORDER BY `id` DESC LIMIT 50';
+        $query .= ' ORDER BY `id` DESC LIMIT ' . $limit;
 
         return self::$db->getAll($query, $table);
     }
