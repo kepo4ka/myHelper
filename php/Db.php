@@ -613,18 +613,17 @@ ALTER TABLE `$table`
         $data, $title = 'Info', $type = 'info', $table = 'debug_log', $limit = 50000, $site = '', $proccess_id = ''
     )
     {
+        global $meDoo;
 
         try {
-            $count = self::counting($table);
+            $count = $meDoo->count($table);
 
             if ($count > $limit) {
                 $primary = 'id';
-                $id = self::$db->getOne('SELECT ?n FROM ?n', $primary, $table);
+                $id = $meDoo->get($table, '*');
 
                 if (!empty($id)) {
-                    self::$db->query(
-                        'DELETE FROM ?n WHERE ?n=?i', $table, $primary, $id
-                    );
+                    self::deleteRow($table, $primary, $id);
                 }
             }
 
@@ -639,7 +638,7 @@ ALTER TABLE `$table`
             @$element['site'] = $site;
             $element['proccess_id'] = $proccess_id;
 
-            return self::$db->query('INSERT INTO ?n SET ?u', $table, $element);
+            return self::save($element, $table, $primary);
         } catch
         (Throwable $throwable) {
             return ['error' => true, 'message' => $throwable->getMessage()];
