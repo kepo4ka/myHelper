@@ -610,7 +610,7 @@ ALTER TABLE `$table`
      * @return array|FALSE|resource
      */
     public static function logDB(
-        $data, $title = 'Info', $type = 'info', $table = 'debug_log', $limit = 50000
+        $data, $title = 'Info', $type = 'info', $table = 'debug_log', $limit = 50000, $site = '', $proccess_id = ''
     )
     {
 
@@ -636,11 +636,12 @@ ALTER TABLE `$table`
             $element['data'] = json_encode($data, JSON_UNESCAPED_UNICODE);
             $element['type'] = $type;
             $element['title'] = $title;
-            @$element['site'] = @$element['site'] ?: '';
-            $element['proccess_id'] = @$element['proccess_id'] ?: '';
+            @$element['site'] = $site;
+            $element['proccess_id'] = $proccess_id;
 
             return self::$db->query('INSERT INTO ?n SET ?u', $table, $element);
-        } catch (Throwable $throwable) {
+        } catch
+        (Throwable $throwable) {
             return ['error' => true, 'message' => $throwable->getMessage()];
         } catch (Exception $exception) {
             return ['error' => true, 'message' => $exception->getMessage()];
