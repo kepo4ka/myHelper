@@ -610,14 +610,14 @@ ALTER TABLE `$table`
      * @return array|FALSE|resource
      */
     public static function logDB(
-        $data, $title = 'Info', $type = 'info', $table = 'debug_log'
+        $data, $title = 'Info', $type = 'info', $table = 'debug_log', $limit = 50000
     )
     {
 
         try {
             $count = self::counting($table);
 
-            if ($count > 5000) {
+            if ($count > $limit) {
                 $primary = 'id';
                 $id = self::$db->getOne('SELECT ?n FROM ?n', $primary, $table);
 
@@ -636,8 +636,8 @@ ALTER TABLE `$table`
             $element['data'] = json_encode($data, JSON_UNESCAPED_UNICODE);
             $element['type'] = $type;
             $element['title'] = $title;
-            @$element['site'] = '';
-            $element['proccess_id'] = '';
+            @$element['site'] = @$element['site'] ?: '';
+            $element['proccess_id'] = @$element['proccess_id'] ?: '';
 
             return self::$db->query('INSERT INTO ?n SET ?u', $table, $element);
         } catch (Throwable $throwable) {
