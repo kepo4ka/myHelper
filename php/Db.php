@@ -656,8 +656,16 @@ ALTER TABLE `$table`
     {
         global $meDoo;
 
-        return $meDoo->select($table, ['*'], ['site' => $site, 'ORDER' => ['id' => 'DESC'], 'LIMIT' => $limit]);
-    }
+		$filter = [
+            'ORDER' => ['id' => 'DESC'], 'LIMIT' => $limit
+        ];
+
+        if (!empty($site)) {
+            $filter['site'] = $site;
+        }
+
+        return $meDoo->select($table, ['*'], $filter);    
+	}
 
 
     public static function clearlogDB($table = 'debug_log')
