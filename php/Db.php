@@ -655,11 +655,6 @@ ALTER TABLE `$table`
     public static function getlogDB($site = false, $table = 'debug_log', $limit = 200)
     {
         global $meDoo;
-        $query = 'SELECT * FROM ?n';
-        if (!empty($site)) {
-            $query .= ' WHERE `site`="' . $site . '"';
-        }
-        $query .= ' ORDER BY `id` DESC LIMIT ' . $limit;
 
         return $meDoo->select($table, ['*'], ['site' => $site, 'ORDER' => ['id' => 'DESC'], 'LIMIT' => $limit]);
     }
