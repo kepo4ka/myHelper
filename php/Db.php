@@ -656,15 +656,16 @@ ALTER TABLE `$table`
     {
         global $meDoo;
 
+
 		$filter = [
-            'ORDER' => ['id' => 'DESC'], 'LIMIT' => $limit
+            'ORDER' => ['id' => 'DESC'],
+            'LIMIT' => $limit
         ];
 
         if (!empty($site)) {
             $filter['site'] = $site;
         }
-
-        return $meDoo->select($table, ['*'], $filter);    
+        return $meDoo->select($table, '*', $filter); 
 	}
 
 
