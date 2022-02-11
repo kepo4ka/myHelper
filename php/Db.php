@@ -617,9 +617,10 @@ ALTER TABLE `$table`
 
         try {
             $count = $meDoo->count($table);
+			 $primary = 'id';
 
             if ($count > $limit) {
-                $primary = 'id';
+               
                 $id = $meDoo->get($table, '*');
 
                 if (!empty($id)) {
