@@ -617,9 +617,10 @@ ALTER TABLE `$table`
 
         try {
             $count = $meDoo->count($table);
+			 $primary = 'id';
 
             if ($count > $limit) {
-                $primary = 'id';
+               
                 $id = $meDoo->get($table, '*');
 
                 if (!empty($id)) {
@@ -655,14 +656,18 @@ ALTER TABLE `$table`
     public static function getlogDB($site = false, $table = 'debug_log', $limit = 200)
     {
         global $meDoo;
-        $query = 'SELECT * FROM ?n';
-        if (!empty($site)) {
-            $query .= ' WHERE `site`="' . $site . '"';
-        }
-        $query .= ' ORDER BY `id` DESC LIMIT ' . $limit;
 
-        return $meDoo->select($table, ['*'], ['site' => $site, 'ORDER' => ['id' => 'DESC'], 'LIMIT' => $limit]);
-    }
+
+		$filter = [
+            'ORDER' => ['id' => 'DESC'],
+            'LIMIT' => $limit
+        ];
+
+        if (!empty($site)) {
+            $filter['site'] = $site;
+        }
+        return $meDoo->select($table, '*', $filter); 
+	}
 
 
     public static function clearlogDB($table = 'debug_log')
