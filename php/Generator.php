@@ -1355,6 +1355,8 @@ class Generator
             return '';
         }
 
+        $table_info = @Db::getByColumn('tables', 'name', $table);
+
         $id = $item['id'];
 
         $info['table'] = $table;
@@ -1363,9 +1365,9 @@ class Generator
         $info['id'] = $id;
 
         $info['data_type'] = $type;
-        $info['edit'] = true;
-        $info['copy'] = false;
-        $info['delete'] = true;
+        $info['edit'] = @$table_info['edit'];
+        $info['copy'] = @$table_info['copy'];
+        $info['delete'] = @$table_info['delete'];
 
         $relations = DB::getTableRelationsManyToOne($table);
 
