@@ -1367,7 +1367,7 @@ class Generator
         $info['data_type'] = $type;
         $info['edit'] = @$table_info['edit'];
         $info['copy'] = @$table_info['copy'];
-        $info['delete'] = @$table_info['delete'];
+        $info['delete'] = @$table_info['deleting'];
 
         $relations = DB::getTableRelationsManyToOne($table);
 
