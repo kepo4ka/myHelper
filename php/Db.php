@@ -486,7 +486,8 @@ class Db
 
     public static function lastId()
     {
-        return self::$db->insertId();
+		global $meDoo;
+		return $meDoo->id();
     }
 
 
