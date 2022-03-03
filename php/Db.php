@@ -622,7 +622,7 @@ ALTER TABLE `$table`
 
             if ($count > $limit) {
                
-                $id = $meDoo->get($table, '*');
+                $id = @$meDoo->get($table, ['id'])['id'];
 
                 if (!empty($id)) {
                     self::deleteRow($table, $primary, $id);
@@ -642,10 +642,10 @@ ALTER TABLE `$table`
 
             return self::save($element, $table, $primary);
         } catch
-        (Throwable $throwable) {
-            return ['error' => true, 'message' => $throwable->getMessage()];
+        (Throwable $exception) {
+            return ['error' => true, 'line'=>$exception->getLine(), 'message' => $exception->getMessage()];
         } catch (Exception $exception) {
-            return ['error' => true, 'message' => $exception->getMessage()];
+            return ['error' => true, 'line'=>$exception->getLine(), 'message' => $exception->getMessage()];
         }
     }
 
