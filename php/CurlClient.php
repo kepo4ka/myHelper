@@ -25,7 +25,7 @@ class CurlClient
         Helper::setVarField($config, $p_config, 'enable_db', false);
         Helper::setVarField($config, $p_config, 'project_dir', __DIR__);
 
-        $config['proccess_id'] = substr(md5(microtime()), 0, 5);
+        $config['proccess_id'] = mt_rand(0, 500);
         $this->config = $config;
     }
 
