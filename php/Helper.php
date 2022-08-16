@@ -1975,7 +1975,7 @@ class Helper
             'https://api.telegram.org/bot' . $token . '/sendMessage'
         );
         $postFields = array(
-            'chat_id' => '-' . $chatID,
+            'chat_id' => $chatID,
             'text' => $message,
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => false,
