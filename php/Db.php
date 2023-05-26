@@ -1266,5 +1266,3 @@ ALTER TABLE `$table`
     }
 
 }
-
-?>
