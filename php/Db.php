@@ -2,7 +2,7 @@
 
 namespace Helper;
 
-require_once(__DIR__ . '/safemysql.php');
+require_once(__DIR__.'/safemysql.php');
 
 use Exception;
 use Throwable;
@@ -20,7 +20,7 @@ class Db
         try {
             self::$db = new SafeMysql(
                 array(
-                    'user' => $user, 'pass' => $password, 'db' => $db_name,
+                    'user'    => $user, 'pass' => $password, 'db' => $db_name,
                     'charset' => $charset
                 )
             );
@@ -158,7 +158,7 @@ class Db
 
     public static function getAllByColLike($table, $column, $value)
     {
-        $value = '%' . $value . '%';
+        $value = '%'.$value.'%';
         $query = 'SELECT * FROM ?n WHERE ?n LIKE ?s';
         return self::$db->getAll($query, $table, $column, $value);
     }
@@ -192,7 +192,7 @@ class Db
                 $item['value'] = @$item[1];
             }
 
-            $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
+            $query .= ' '.$item['column'].'="'.$item['value'].'" AND';
         }
         $query .= ' 1';
 
@@ -326,8 +326,8 @@ class Db
                 return $res;
             }
         } catch (Throwable $exception) {
-            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ': MYSQL: '
-                . $exception->getMessage();
+            $message = @'error: '.$_SERVER['DOCUMENT_ROOT'].': MYSQL: '
+                .$exception->getMessage();
             Helper::sendTGMessage($message);
             return false;
         }
@@ -400,8 +400,8 @@ class Db
 
         } catch
         (Throwable $exception) {
-            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ':UPDATE MYSQL: '
-                . $exception->getMessage();
+            $message = @'error: '.$_SERVER['DOCUMENT_ROOT'].':UPDATE MYSQL: '
+                .$exception->getMessage();
             Helper::sendTGMessage($message);
             return false;
         }
@@ -486,8 +486,8 @@ class Db
 
     public static function lastId()
     {
-		global $meDoo;
-		return $meDoo->id();
+        global $meDoo;
+        return $meDoo->id();
     }
 
 
@@ -560,7 +560,7 @@ class Db
 
     public static function getAll($table)
     {
-        $query = "SELECT * FROM " . $table;
+        $query = "SELECT * FROM ".$table;
         return self::$db->getAll($query);
     }
 
@@ -618,10 +618,10 @@ ALTER TABLE `$table`
 
         try {
             $count = $meDoo->count($table);
-			 $primary = 'id';
+            $primary = 'id';
 
             if ($count > $limit) {
-               
+
                 $id = @$meDoo->get($table, ['id'])['id'];
 
                 if (!empty($id)) {
@@ -643,23 +643,26 @@ ALTER TABLE `$table`
             return self::save($element, $table, $primary);
         } catch
         (Throwable $exception) {
-            return ['error' => true, 'line'=>$exception->getLine(), 'message' => $exception->getMessage()];
+            return ['error' => true, 'line' => $exception->getLine(), 'message' => $exception->getMessage()];
         } catch (Exception $exception) {
-            return ['error' => true, 'line'=>$exception->getLine(), 'message' => $exception->getMessage()];
+            return ['error' => true, 'line' => $exception->getLine(), 'message' => $exception->getMessage()];
         }
     }
 
     /**
      * Получить записи Лог-базы
      *
-     * @return array Список логирования
+     * @return array|false
      */
     public static function getlogDB($site = false, $table = 'debug_log', $limit = 200)
     {
         global $meDoo;
 
+        if (!Helper::checkRegular('/_log$/', $table, 0)) {
+            return false;
+        }
 
-		$filter = [
+        $filter = [
             'ORDER' => ['id' => 'DESC'],
             'LIMIT' => $limit
         ];
@@ -667,14 +670,18 @@ ALTER TABLE `$table`
         if (!empty($site)) {
             $filter['site'] = $site;
         }
-        return $meDoo->select($table, '*', $filter); 
-	}
+        return $meDoo->select($table, '*', $filter);
+    }
 
 
     public static function clearlogDB($table = 'debug_log')
     {
         global $meDoo;
-        $table = 'debug_log';
+
+        if (!Helper::checkRegular('/_log$/', $table, 0)) {
+            return false;
+        }
+
         return $meDoo->delete($table, ['id[>]' => 0]);
     }
 
@@ -737,7 +744,7 @@ ALTER TABLE `$table`
                         if ($symbol_index === false) {
                             $symbol_index = strrpos($obj, ' ');
                         }
-                        $obj = mb_strcut($obj, 0, $symbol_index + 1) . ' ...';
+                        $obj = mb_strcut($obj, 0, $symbol_index + 1).' ...';
                     }
                 }
             }
@@ -955,11 +962,11 @@ ALTER TABLE `$table`
         $array = [
             [
                 'column' => 'table_name',
-                'value' => $table
+                'value'  => $table
             ],
             [
                 'column' => 'inner_column',
-                'value' => $key
+                'value'  => $key
             ]
         ];
 
@@ -973,7 +980,7 @@ ALTER TABLE `$table`
         $array = [
             [
                 'column' => 'foreign_table',
-                'value' => $table
+                'value'  => $table
             ]
         ];
 
@@ -986,7 +993,7 @@ ALTER TABLE `$table`
                 $filter = [
                     [
                         'column' => 'name',
-                        'value' => $relation['table_name']
+                        'value'  => $relation['table_name']
                     ]
                 ];
 
