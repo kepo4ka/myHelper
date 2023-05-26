@@ -63,7 +63,7 @@ class Helper
         }
 
         if (!empty($z['json'])) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($z['json']));
+                curl_setopt($ch, CURLOPT_POSTFIELDS, Helper::json_encode($z['json']));
         }
 
 
