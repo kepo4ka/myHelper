@@ -78,11 +78,6 @@ class Helper
         $z['con_timeout'] = (int)@$z['con_timeout'] ?: 20;
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $z['con_timeout']);
 
-
-        if ($z['timeout'] < $z['con_timeout']) {
-            $z['timeout'] = $z['con_timeout'];
-        }
-
         $z['timeout'] = (int)@$z['timeout'] ?: 60;
         curl_setopt($ch, CURLOPT_TIMEOUT, $z['timeout']);
 
