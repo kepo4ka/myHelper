@@ -39,6 +39,9 @@ class Helper
         curl_setopt($ch, CURLOPT_AUTOREFERER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
+        if (!empty($z['custom_request'])) {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $z['custom_request']);
+        }
 
         if (!empty($config['def_proxy_info']) && empty($z['no_proxy'])) {
             curl_setopt(
@@ -63,15 +66,26 @@ class Helper
         }
 
         if (!empty($z['json'])) {
-                curl_setopt($ch, CURLOPT_POSTFIELDS, Helper::json_encode($z['json']));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, Helper::json_encode($z['json']));
         }
 
 
         if (!empty($useragent)) {
             curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
         }
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+
+
+        $z['con_timeout'] = (int)@$z['con_timeout'] ?: 20;
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $z['con_timeout']);
+
+
+        if ($z['timeout'] < $z['con_timeout']) {
+            $z['timeout'] = $z['con_timeout'];
+        }
+
+        $z['timeout'] = (int)@$z['timeout'] ?: 60;
+        curl_setopt($ch, CURLOPT_TIMEOUT, $z['timeout']);
+
         if (!empty($cookiePath)) {
             curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiePath);
             curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiePath);
@@ -1251,7 +1265,7 @@ class Helper
         $info
         = [
             'field' => '', 'required' => true, 'form_name' => 'formdata',
-            'type' => '', 'method' => 'post', 'regex' => '[^\w\-\.\,\s]+'
+            'type'  => '', 'method' => 'post', 'regex' => '[^\w\-\.\,\s]+'
         ]
     )
     {
@@ -1975,9 +1989,9 @@ class Helper
             'https://api.telegram.org/bot' . $token . '/sendMessage'
         );
         $postFields = array(
-            'chat_id' => $chatID,
-            'text' => $message,
-            'parse_mode' => 'HTML',
+            'chat_id'                  => $chatID,
+            'text'                     => $message,
+            'parse_mode'               => 'HTML',
             'disable_web_page_preview' => false,
         );
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
