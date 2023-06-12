@@ -2,7 +2,7 @@
 
 namespace Helper;
 
-require_once(__DIR__.'/safemysql.php');
+require_once(__DIR__ . '/safemysql.php');
 
 use Exception;
 use Throwable;
@@ -158,7 +158,7 @@ class Db
 
     public static function getAllByColLike($table, $column, $value)
     {
-        $value = '%'.$value.'%';
+        $value = '%' . $value . '%';
         $query = 'SELECT * FROM ?n WHERE ?n LIKE ?s';
         return self::$db->getAll($query, $table, $column, $value);
     }
@@ -192,7 +192,7 @@ class Db
                 $item['value'] = @$item[1];
             }
 
-            $query .= ' '.$item['column'].'="'.$item['value'].'" AND';
+            $query .= ' ' . $item['column'] . '="' . $item['value'] . '" AND';
         }
         $query .= ' 1';
 
@@ -326,8 +326,8 @@ class Db
                 return $res;
             }
         } catch (Throwable $exception) {
-            $message = @'error: '.$_SERVER['DOCUMENT_ROOT'].': MYSQL: '
-                .$exception->getMessage();
+            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ': MYSQL: '
+                . $exception->getMessage();
             Helper::sendTGMessage($message);
             return false;
         }
@@ -400,8 +400,8 @@ class Db
 
         } catch
         (Throwable $exception) {
-            $message = @'error: '.$_SERVER['DOCUMENT_ROOT'].':UPDATE MYSQL: '
-                .$exception->getMessage();
+            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ':UPDATE MYSQL: '
+                . $exception->getMessage();
             Helper::sendTGMessage($message);
             return false;
         }
@@ -560,7 +560,7 @@ class Db
 
     public static function getAll($table)
     {
-        $query = "SELECT * FROM ".$table;
+        $query = "SELECT * FROM " . $table;
         return self::$db->getAll($query);
     }
 
@@ -744,7 +744,7 @@ ALTER TABLE `$table`
                         if ($symbol_index === false) {
                             $symbol_index = strrpos($obj, ' ');
                         }
-                        $obj = mb_strcut($obj, 0, $symbol_index + 1).' ...';
+                        $obj = mb_strcut($obj, 0, $symbol_index + 1) . ' ...';
                     }
                 }
             }
@@ -1265,4 +1265,22 @@ ALTER TABLE `$table`
         return self::$db->query($query, $table);
     }
 
+
+    public static function ping()
+    {
+        return self::$db->ping();
+    }
+
+
+    public function connect() {
+       self::$db->connect();
+    }
+
+    public function disconnect() {
+        self::$db->disconnect();
+    }
+
+    public function reconnect() {
+        self::$db->reconnect();
+    }
 }

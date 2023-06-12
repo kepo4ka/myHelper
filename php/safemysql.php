@@ -65,6 +65,7 @@
  * $data = $db->getAll("SELECT * FROM table WHERE ?p", $bar, $sqlpart);
  *
  */
+
 namespace Helper;
 
 use Exception;
@@ -73,26 +74,28 @@ use mysqli;
 class SafeMySQL
 {
 
-    protected $conn;
+    public $conn;
     protected $stats;
     protected $emode;
     protected $exname;
 
     protected $defaults = array(
-        'host' => 'localhost',
-        'user' => 'root',
-        'pass' => '',
-        'db' => 'test',
-        'port' => NULL,
-        'socket' => NULL,
-        'pconnect' => FALSE,
-        'charset' => 'utf8',
-        'errmode' => 'exception', //or 'error'
+        'host'      => 'localhost',
+        'user'      => 'root',
+        'pass'      => '',
+        'db'        => 'test',
+        'port'      => NULL,
+        'socket'    => NULL,
+        'pconnect'  => FALSE,
+        'charset'   => 'utf8',
+        'errmode'   => 'exception', //or 'error'
         'exception' => 'Exception', //Exception class name
     );
 
     const RESULT_ASSOC = MYSQLI_ASSOC;
     const RESULT_NUM = MYSQLI_NUM;
+
+    public $options;
 
     public function __construct($opt = array())
     {
@@ -115,14 +118,36 @@ class SafeMySQL
         if ($opt['pconnect']) {
             $opt['host'] = "p:" . $opt['host'];
         }
+        $this->options = $opt;
 
+        $this->connect();
+    }
+
+    public function connect()
+    {
+        $opt = $this->options;
         @$this->conn = mysqli_connect($opt['host'], $opt['user'], $opt['pass'], $opt['db'], $opt['port'], $opt['socket']);
         if (!$this->conn) {
             $this->error(mysqli_connect_errno() . " " . mysqli_connect_error());
         }
-
         mysqli_set_charset($this->conn, $opt['charset']) or $this->error(mysqli_error($this->conn));
         unset($opt); // I am paranoid
+    }
+
+    public function disconnect()
+    {
+        mysqli_close($this->conn);
+    }
+
+    public function reconnect()
+    {
+        $this->disconnect();
+        $this->connect();
+    }
+
+    public function ping()
+    {
+        return mysqli_ping($this->conn);
     }
 
     /**
@@ -486,6 +511,7 @@ class SafeMySQL
 
     protected function prepareQuery($args)
     {
+
         $query = '';
         $raw = array_shift($args);
         $array = preg_split('~(\?[nsiuapxw])~u', $raw, null, PREG_SPLIT_DELIM_CAPTURE);
