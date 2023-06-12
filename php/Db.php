@@ -1272,15 +1272,15 @@ ALTER TABLE `$table`
     }
 
 
-    public function connect() {
-       self::$db->connect();
+    public static function connect() {
+        self::$db->connect();
     }
 
-    public function disconnect() {
+    public static function disconnect() {
         self::$db->disconnect();
     }
 
-    public function reconnect() {
+    public static function reconnect() {
         self::$db->reconnect();
     }
 }
