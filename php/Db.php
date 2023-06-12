@@ -1268,19 +1268,19 @@ ALTER TABLE `$table`
 
     public static function ping()
     {
-        return self::$db->ping();
+        return @!empty(self::$db->ping());
     }
 
 
     public static function connect() {
-        self::$db->connect();
+        @self::$db->connect();
     }
 
     public static function disconnect() {
-        self::$db->disconnect();
+        @self::$db->disconnect();
     }
 
     public static function reconnect() {
-        self::$db->reconnect();
+        @self::$db->reconnect();
     }
 }
