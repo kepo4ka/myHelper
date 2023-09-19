@@ -20,6 +20,7 @@ class Db
         try {
             self::$db = new SafeMysql(
                 array(
+                    'host'=> $host,
                     'user'    => $user, 'pass' => $password, 'db' => $db_name,
                     'charset' => $charset
                 )
