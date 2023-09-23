@@ -52,7 +52,7 @@ class Db
      * @return array|bool|mixed Список записей
      */
     public static function getAllLimitAdvanced(
-        $table, $limit = 0, $offset = 0, $search_array, $order
+        $table, $limit = 0, $offset = 0, $search_array = null, $order = null
     )
     {
         if ($limit > 0) {
