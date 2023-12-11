@@ -513,7 +513,7 @@ class Helper
         $input = strip_tags($input);
 
         $input = self::regexpFilter($input);
-        $input = self::scriptFilter($input);
+        // $input = self::scriptFilter($input);
 
         if (!empty($type) && is_string($type)) {
             $array = str_split($type, 1);
