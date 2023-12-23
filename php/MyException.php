@@ -1,6 +1,7 @@
 <?php
 namespace Helper;
 use Exception;
+use Throwable;
 
 class MyException extends Exception
 {
