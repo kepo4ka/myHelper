@@ -944,6 +944,10 @@ class Helper
      */
     public static function json_decode($val)
     {
+        if (is_array($val)) {
+            return $val;
+        }
+
         return json_decode($val, true);
     }
 
