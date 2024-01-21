@@ -448,19 +448,19 @@ class Db
 
     }
 
-    /**
+  /**
      * Удалить запись
      *
      * @param $table  string Исходная таблица
      * @param $column string Столбец, по которому идёт фильрация
      * @param $value  string Значение стоблца
      *
-     * @return FALSE|\mysqli|resource Удалось ли удалить запись
+     * @return bool Удалось ли удалить запись
      */
     public static function deleteRow($table, $column, $value)
     {
-        $query = 'DELETE FROM ?n WHERE ?n=?s';
-        return self::$db->query($query, $table, $column, $value);
+        global $meDoo;
+        return !empty($meDoo->delete($table, [$column => $value]));
     }
 
 
