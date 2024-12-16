@@ -5,6 +5,7 @@ namespace Helper;
 require_once(__DIR__ . '/safemysql.php');
 
 use Exception;
+use PDO;
 use Throwable;
 
 
@@ -20,7 +21,7 @@ class Db
         try {
             self::$db = new SafeMysql(
                 array(
-                    'host'=> $host,
+                    'host'    => $host,
                     'user'    => $user, 'pass' => $password, 'db' => $db_name,
                     'charset' => $charset
                 )
@@ -261,6 +262,16 @@ class Db
         );
     }
 
+    private static function sanitize($table, array $data)
+    {
+        $columns = self::getColumnNames($table);
+        foreach (array_keys($data) as $key) {
+            if (!in_array($key, $columns)) {
+                unset($data[$key]);
+            }
+        }
+        return $data;
+    }
 
     /**
      * Добавление записи или обновление в случае существования
@@ -269,7 +280,7 @@ class Db
      * @param              $table   string Исходная Таблица
      * @param string|array $primary Название первичного ключа
      *
-     * @return bool|FALSE|resource Результат операции
+     * @return mixed Результат операции
      */
     public static function save($p_data, $table, $primary = 'id')
     {
@@ -279,10 +290,7 @@ class Db
                 return false;
             }
 
-            $columns = self::getColumnNames($table);
-            $data = self::$db->filterArray($p_data, $columns);
-
-            $exist = false;
+            $data = self::sanitize($table, $p_data);
 
             if (is_array($primary)) {
                 $exist = self::checkExist($table, $primary, $data);
@@ -300,7 +308,6 @@ class Db
                 return $meDoo->insert($table, $data);
             } else {
                 if (is_array($primary)) {
-
                     $filter = [];
 
                     foreach ($primary as $item) {
@@ -327,8 +334,7 @@ class Db
                 return $res;
             }
         } catch (Throwable $exception) {
-            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . ': MYSQL: '
-                . $exception->getMessage();
+            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . '|' . __CLASS__ . '|' . __METHOD__ . '|message:' . $exception->getMessage() . '|line:' . $exception->getLine() . '|file:' . $exception->getFile();
             Helper::sendTGMessage($message);
             return false;
         }
@@ -448,7 +454,7 @@ class Db
 
     }
 
-  /**
+    /**
      * Удалить запись
      *
      * @param $table  string Исходная таблица
@@ -496,13 +502,14 @@ class Db
      * Проверить существование записи с указанным значением одного поля
      *
      * @param $table  string Таблица для проверки
-     * @param $column string Поле для проверки
+     * @param $column string|array Поле для проверки
      * @param $value  string|array Контрольное Значение
      *
      * @return FALSE|string Существует или нет
      */
     public static function checkExist($table, $column, $value)
     {
+        global $meDoo;
         if (is_array($column) && Helper::isAssoc($value)) {
             $new_filter = [];
 
@@ -524,11 +531,9 @@ class Db
                 }
             }
 
-            $query = 'SELECT ?n FROM ?n WHERE ?x';
-            return self::$db->getOne($query, $column, $table, $new_filter);
+            return $meDoo->get($table, '*', $new_filter);
         } else {
-            $query = 'SELECT ?n FROM ?n WHERE ?n=?s';
-            return self::$db->getOne($query, $column, $table, $column, $value);
+            return $meDoo->get($table, '*', [$column => $value]);
         }
     }
 
@@ -542,12 +547,13 @@ class Db
      */
     public static function getColumnNames($table_name)
     {
+        global $meDoo;
         $columns = array();
 
         try {
             $sql = "SHOW COLUMNS FROM `$table_name`";
-            $result = self::$db->query($sql);
-            while ($row = self::$db->fetch($result)) {
+            $result = $meDoo->query($sql);
+            while ($row = $result->fetch(2)) {
                 $columns[] = $row['Field'];
             }
         } catch (Throwable $throwable) {
@@ -1273,15 +1279,18 @@ ALTER TABLE `$table`
     }
 
 
-    public static function connect() {
+    public static function connect()
+    {
         @self::$db->connect();
     }
 
-    public static function disconnect() {
+    public static function disconnect()
+    {
         @self::$db->disconnect();
     }
 
-    public static function reconnect() {
+    public static function reconnect()
+    {
         @self::$db->reconnect();
     }
 }
