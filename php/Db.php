@@ -18,26 +18,16 @@ class Db
         $host, $db_name, $user, $password, $charset = 'utf8mb4'
     )
     {
-        try {
-            self::$db = new SafeMysql(
-                array(
-                    'host'    => $host,
-                    'user'    => $user, 'pass' => $password, 'db' => $db_name,
-                    'charset' => $charset
-                )
-            );
-        } catch (Throwable $throwable) {
-            return false;
-        } catch (Exception $exception) {
-            return false;
-        }
-        return false;
+
     }
 
     public static function getTables($db_name)
     {
-        $query = 'SHOW TABLES FROM ?n';
-        return self::$db->getCol($query, $db_name);
+        global $meDoo;
+        $db_name = Helper::inputFilter($db_name, 'w');
+        $query = 'SHOW TABLES FROM ' . $db_name;
+
+        return $meDoo->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
@@ -56,12 +46,18 @@ class Db
         $table, $limit = 0, $offset = 0, $search_array = null, $order = null
     )
     {
+        global $meDoo;
+
+        $limit = abs((int)$limit);
+        $offset = abs((int)$offset);
+
         if ($limit > 0) {
         } else {
             $limit = 1000;
         }
 
-        $query = "SELECT * FROM ?n";
+        $table = Helper::inputFilter($table, 'w');
+        $query = "SELECT * FROM $table";
 
         if (!empty($search_array)) {
 
@@ -72,8 +68,8 @@ class Db
                     $iValue['full'] = true;
                 }
 
-                $column = $iValue['column'];
-                $value = $iValue['value'];
+                $column = Helper::inputFilter($iValue['column'], 'w');
+                $value = Helper::inputFilter($iValue['value']);
 
                 if (empty($iValue['full'])) {
                     $query .= " `$column` LIKE'%$value%' AND";
@@ -85,8 +81,8 @@ class Db
         }
 
         if (!empty($order)) {
-            $column = $order['column'];
-            $dir = $order['dir'];
+            $column = Helper::inputFilter($order['column'], 'w');
+            $dir = Helper::inputFilter($order['dir'], 'w');
 
             $query .= " ORDER BY `$column` $dir";
         }
@@ -98,7 +94,8 @@ class Db
                 $query .= " OFFSET $offset";
             }
         }
-        return self::$db->getAll($query, $table);
+
+        return $meDoo->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
@@ -112,9 +109,10 @@ class Db
      */
     public static function getById($table, $id)
     {
+        global $meDoo;
         $id = (int)$id;
-        $query = 'SELECT * FROM ?n WHERE `id`=?i';
-        return self::$db->getRow($query, $table, $id);
+
+        return $meDoo->get($table, '*', ['id' => $id]);
     }
 
 
@@ -128,8 +126,8 @@ class Db
      */
     public static function getAllOrdered($table, $column)
     {
-        $query = 'SELECT * FROM ?n ORDER BY ?n DESC';
-        return self::$db->getAll($query, $table, $column);
+        global $meDoo;
+        return $meDoo->select($table, '*', ['ORDER' => [$column => 'DESC']]);
     }
 
     /**
@@ -142,19 +140,14 @@ class Db
      */
     public static function getByColumn($table, $column, $value)
     {
-        $query = 'SELECT * FROM ?n';
-
-        if (!empty($column)) {
-            $query .= " WHERE ?n=?s";
-            return self::$db->getRow($query, $table, $column, $value);
-        }
-        return self::$db->getRow($query, $table, $column, $value);
+        global $meDoo;
+        return $meDoo->get($table, '*', [$column => $value]);
     }
 
     public static function getByColAll($table, $column, $value)
     {
-        $query = 'SELECT * FROM ?n WHERE ?n = ?s';
-        return self::$db->getAll($query, $table, $column, $value);
+        global $meDoo;
+        return $meDoo->select($table, '*', [$column => $value]);
     }
 
 
@@ -200,16 +193,15 @@ class Db
 
         if ($needed_column !== '*') {
             if ($is_one) {
-                return self::$db->getOne($query);
+                return self::qSELECT($query, true);
             }
             return self::$db->getCol($query);
-
         }
 
         if ($is_one) {
-            return self::$db->getRow($query);
+            return self::qSELECT($query, true);
         } else {
-            return self::$db->getAll($query);
+            return self::qSELECT($query);
         }
     }
 
@@ -227,11 +219,9 @@ class Db
             return false;
         }
 
-        $columns = self::getColumnNames($table);
-        $data = self::$db->filterArray($p_data, $columns);
+        $data = self::sanitize($table, $p_data);
 
-        $query = 'INSERT INTO ?n SET ?u';
-        return self::$db->query($query, $table, $data);
+        return self::save($data, $table);
     }
 
 
@@ -250,19 +240,21 @@ class Db
         $table, $column, $value, $needed_column, $limit = 0
     )
     {
-        $query = 'SELECT ?n FROM ?n WHERE ?n=?s';
+        global $meDoo;
         $limit = (int)$limit;
 
-        if ($limit) {
-            $query .= "LIMIT $limit";
+        $data = [
+            $column => $value
+        ];
+
+        if (!empty($limit)) {
+            $data['LIMIT'] = $limit;
         }
 
-        return self::$db->getCol(
-            $query, $needed_column, $table, $column, $value
-        );
+        return $meDoo->select($table, [$needed_column], $data);
     }
 
-    private static function sanitize($table, array $data)
+    public static function sanitize(string $table, array $data)
     {
         $columns = self::getColumnNames($table);
         foreach (array_keys($data) as $key) {
@@ -481,13 +473,17 @@ class Db
      */
     public static function counting($table, $col = false, $val = false)
     {
-        $query = "SELECT COUNT(1) FROM ?n";
+        global $meDoo;
 
-        if (!empty($col) && !empty($val)) {
-            $query .= " WHERE `$col`='$val'";
+        try {
+            if (!empty($col)) {
+                return $meDoo->count($table, [$col => $val]);
+            }
+
+            return $meDoo->count($table);
+        } catch (Throwable $e) {
+            return false;
         }
-        $res = self::$db->getOne($query, $table);
-        return $res ?: 0;
     }
 
 
@@ -545,20 +541,20 @@ class Db
      *
      * @return array Список столбцов
      */
-    public static function getColumnNames($table_name)
+    public static function getColumnNames(string $table_name)
     {
         global $meDoo;
         $columns = array();
 
+        $table_name = Helper::inputFilter($table_name, 'w');
+
         try {
             $sql = "SHOW COLUMNS FROM `$table_name`";
             $result = $meDoo->query($sql);
-            while ($row = $result->fetch(2)) {
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $columns[] = $row['Field'];
             }
         } catch (Throwable $throwable) {
-
-        } catch (Exception $ex) {
 
         }
         return $columns;
@@ -567,8 +563,8 @@ class Db
 
     public static function getAll($table)
     {
-        $query = "SELECT * FROM " . $table;
-        return self::$db->getAll($query);
+        global $meDoo;
+        return $meDoo->select($table, '*');
     }
 
 
@@ -717,17 +713,28 @@ ALTER TABLE `$table`
 
     public static function getColumnComment($db_name, $table, $column)
     {
+        $db_name = Helper::inputFilter($db_name, 'w');
+        $table = Helper::inputFilter($table, 'w');
+        $column = Helper::inputFilter($column, 'w');
+
         $query
-            = "SELECT `COLUMN_COMMENT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
-        return self::$db->getOne($query, $db_name, $table, $column);
+            = "SELECT `COLUMN_COMMENT` as comment FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`='{$db_name}' AND `TABLE_NAME`='{$table}' AND `COLUMN_NAME`='{$column}'";
+
+        $result = self::qSELECT($query, true);
+
+        return ifempty($result, 'comment', null);
     }
 
 
     public static function getColumnDefaultValue($db_name, $table, $column)
     {
+        $db_name = Helper::inputFilter($db_name, 'w');
+        $table = Helper::inputFilter($table, 'w');
+        $column = Helper::inputFilter($column, 'w');
+
         $query
-            = "SELECT `COLUMN_DEFAULT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`=?s AND `TABLE_NAME`=?s AND `COLUMN_NAME`=?s";
-        return self::$db->getOne($query, $db_name, $table, $column);
+            = "SELECT `COLUMN_DEFAULT` FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA`='{$db_name}' AND `TABLE_NAME`='{$table}' AND `COLUMN_NAME`='{$column}'";
+        return self::qSELECT($query, true);
     }
 
     /**
@@ -838,12 +845,13 @@ ALTER TABLE `$table`
      *
      * @return array Список типов
      */
-    public static function getTableTypes($table)
+    public static function getTableTypes(string $table)
     {
-        $columns = array();
+        global $meDoo;
+        $columns = [];
 
-        $q = self::$db->query("DESCRIBE `$table`");
-        while ($row = self::$db->fetch($q)) {
+        $q = $meDoo->query("DESCRIBE `$table`");
+        while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
             $temp['type'] = $row['Type'];
             $temp['name'] = $row['Field'];
             $temp['value'] = '';
@@ -922,7 +930,6 @@ ALTER TABLE `$table`
         if (!$id) {
             return $empty_row;
         }
-
         $row = self::getById($table, $id);
 
         if (empty($row)) {
@@ -945,14 +952,14 @@ ALTER TABLE `$table`
     /**
      * Проверить имеет ли таблица возможность использования SelectBox
      *
-     * @param $table string Исходная таблица
+     * @param $table_name string Исходная таблица
      *
      * @return array Список связей
      */
-    public static function checkTableHavingSelectBox($table)
+    public static function checkTableHavingSelectBox(string $table_name)
     {
-        $query = 'SELECT inner_column FROM relations WHERE table_name=?s';
-        return self::$db->getAll($query, $table);
+        global $meDoo;
+        return $meDoo->select(_TABLE_RELATIONS, ['inner_column'], ['table_name' => $table_name]);
     }
 
 
@@ -966,24 +973,19 @@ ALTER TABLE `$table`
      */
     public static function getTableRelationsOneToMany($table, $key)
     {
-        $array = [
-            [
-                'column' => 'table_name',
-                'value'  => $table
-            ],
-            [
-                'column' => 'inner_column',
-                'value'  => $key
-            ]
-        ];
+        global $meDoo;
 
-        $relation = self::getByColumnAndArray('relations', $array);
-        return $relation;
+        return $meDoo->get(_TABLE_RELATIONS, '*', [
+            'table_name'   => $table,
+            'inner_column' => $key
+        ]);
     }
 
 
     public static function getTableRelationsManyToOne($table)
     {
+        global $meDoo;
+
         $array = [
             [
                 'column' => 'foreign_table',
@@ -991,37 +993,25 @@ ALTER TABLE `$table`
             ]
         ];
 
-        $relations = self::getByColumnAndArray('relations', $array, false);
+        $relations = $meDoo->select(_TABLE_RELATIONS, '*', [
+            'foreign_table' => $table]);
 
         $result_array = [];
         foreach ($relations as $relation) {
             if ($relation['table_name'] !== $relation['foreign_table']) {
-
-                $filter = [
-                    [
-                        'column' => 'name',
-                        'value'  => $relation['table_name']
-                    ]
-                ];
-
-                $relation['foreign_table_name'] = DB::getByColumnAndArray(
-                    'tables', $filter, true, 'full_name'
-                );
-
+                $relation['foreign_table_name'] = $meDoo->get(_TABLES, ['full_name'], [
+                    'name' => $relation['table_name']
+                ]);
                 $result_array[] = $relation;
-
             }
         }
-
-        $relations = $result_array;
-
-
-        return $relations;
+        return $result_array;
     }
 
 
     public static function getForeignKeys($db_name, $table, $column)
     {
+        global $meDoo;
         $query
             = "select REFERENCED_TABLE_NAME as ref_table, REFERENCED_COLUMN_NAME as ref_column from INFORMATION_SCHEMA.KEY_COLUMN_USAGE where  REFERENCED_COLUMN_NAME<>'' AND TABLE_SCHEMA=?s AND TABLE_NAME = ?s AND COLUMN_NAME=?s";
         return self::$db->getRow($query, $db_name, $table, $column);
@@ -1038,7 +1028,9 @@ ALTER TABLE `$table`
      */
     public static function countingAdvanced($table, $cols)
     {
-        $query = "SELECT COUNT(1) FROM ?n";
+        global $meDoo;
+        $table = Helper::inputFilter($table, 'w');
+        $query = "SELECT COUNT(1) FROM {$table}";
 
         $query .= ' WHERE';
 
@@ -1057,7 +1049,7 @@ ALTER TABLE `$table`
 
         $query .= ' 1';
 
-        $res = self::$db->getOne($query, $table);
+        $res = $meDoo->query($query)->fetch(PDO::FETCH_ASSOC);
         return $res ?: 0;
     }
 
@@ -1071,14 +1063,12 @@ ALTER TABLE `$table`
      * @return array|FALSE Создана ли база
      */
     public static function createControlTable(
-        $db_name, $control_table_name = 'tables'
+        $db_name, $control_table_name = _TABLES
     )
     {
-
         $query = 'DROP TABLE IF EXISTS ?n.?n';
 
         self::$db->query($query, $db_name, $control_table_name);
-
 
         $query
             = "CREATE TABLE ?n.?n (
@@ -1096,7 +1086,7 @@ ALTER TABLE `$table`
 
         self::$db->query($query, $db_name, $control_table_name);
 
-        $relations_table = 'relations';
+        $relations_table = _TABLE_RELATIONS;
 
         $query
             = 'CREATE TABLE ?n.?n (
@@ -1175,13 +1165,13 @@ ALTER TABLE `$table`
 
     public static function qSELECT($query, $is_one = false)
     {
-        if (preg_match('/select/iu', $query)) {
-            $result = self::$db->getAll($query);
+        global $meDoo;
+        if (strpos(mb_strtolower($query), 'select') === 0) {
+            $result = $meDoo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         } else {
-            $result = self::$db->query($query);
+            $result = $meDoo->query($query)->fetch(PDO::FETCH_ASSOC);
             return $result;
         }
-
 
         if ($is_one) {
             return @$result[0];

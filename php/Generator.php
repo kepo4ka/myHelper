@@ -315,7 +315,7 @@ class Generator
             </label>
             <textarea type="text" cols="10" rows="5"
                       class="form-control <?= $editor_class ?>"
-                      name="<?= $key ?>"><?= htmlspecialchars($value, ENT_QUOTES) ?></textarea>
+                      name="<?= $key ?>"><?= htmlspecialchars(ifset($value, ''), ENT_QUOTES) ?></textarea>
         </div>
         <?php
         return true;
@@ -366,7 +366,7 @@ class Generator
         $db_name, $table, $input_key, $input_value, $is_bad = false, $title = ''
     )
     {
-        if (DB::getColumnComment($db_name, $table, $input_key) == 'json') {
+        if (mb_strtolower(DB::getColumnComment($db_name, $table, $input_key)) == 'json') {
             $is_json_input = true;
         }
 
@@ -414,7 +414,7 @@ class Generator
                             const editor_<?= $input_key ?> = new JSONEditor(container_<?= $input_key ?>, options_<?= $input_key ?>);
 
                             let val_<?= $input_key ?> = <?= $input_value
-                                ?: '[1]' ?>;
+                                ?: '{}' ?>;
                             editor_<?= $input_key ?>.set(val_<?= $input_key ?>);
 
                         </script>
@@ -698,7 +698,6 @@ class Generator
                 }
             }
 
-
             $type = 'simple';
             $relations = DB::getTableRelationsOneToMany($table, $value['name']);
             $comment = DB::getColumnComment($db_name, $table, $value['name']);
@@ -719,11 +718,9 @@ class Generator
                 $type = 'base64_img';
             } else if ($comment == 'editor') {
                 $type = 'blob';
-            }
-            else if ($comment == 'compress') {
+            } else if ($comment == 'compress') {
                 $type = 'compress';
-            }
-            else if (!empty($relations)) {
+            } else if (!empty($relations)) {
                 $type = 'selectbox';
             } else if (false !== strpos($value['type'], 'tinyint(1)')) {
                 $type = 'checkbox';
@@ -746,7 +743,6 @@ class Generator
             } else if (false !== strpos($value['type'], 'text')) {
                 $type = 'text';
             }
-
 
 //        switch ($value['name']) {
 //            case $info['primary'];
@@ -778,7 +774,6 @@ class Generator
             $act = 'edit';
         }
 
-
         switch ($type) {
             case 'simple':
                 self::genSimpleInput($key, $value, $title);
@@ -792,7 +787,7 @@ class Generator
                 self::genTextarea($key, $value, true, $title);
                 break;
             case 'compress':
-                $value= Helper::textDecompress($value);
+                $value = Helper::textDecompress($value);
                 self::genTextarea($key, $value, true, $title);
                 break;
 
@@ -828,7 +823,7 @@ class Generator
                 break;
 
             case 'json':
-                self::genJsonEditor($db_name, $table, $key, $value, $title);
+                self::genJsonEditor($db_name, $table, $key, $value, false, $title);
                 break;
 
             case 'bad_json':
@@ -948,28 +943,43 @@ class Generator
             return false;
         }
 
+        $table = Helper::inputFilter($table, 'w');
+
         $all_delete_button = false;
 
         if (!empty($options['all_delete'])) {
             $all_delete_button = true;
         }
 
-        $table_info = DB::getByColumn('tables', 'name', $table);
+        $table_info = DB::getByColumn(_TABLES, 'name', $table);
 
         if (empty($table_info)) {
             return false;
         }
 
-        $columns_array = DB::getColumnsReadable($table);
+        $columns_array = DB::getColumnsReadable(ifempty($table, 'full_name', $table));
 
         $data_columns = $columns_array['data_columns'];
         $columns = $columns_array['columns'];
+
+        $count = Db::counting($table);
+        ?>
+
+        <?php if ($count === false) { ?>
+        <div class="p-">
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">
+                    Таблица <b class="text-danger"><?= $table ?></b> не найдена в БД
+                </h4>
+            </div>
+        </div>
+        <?php
+        return false;
+    }
         ?>
 
         <input type="hidden" class="table_columns"
-               value='<?= json_encode($data_columns) ?>'>
-
-
+               value='<?php echo Helper::json_encode($data_columns) ?>'>
         <hr>
 
         <div class="row">
@@ -982,7 +992,7 @@ class Generator
                         Количество записей:
                     </span>
                     <span class="badge badge-pill badge-success">
-                        <?= DB::counting($table) ?>
+                        <?= $count ?>
                     </span>
                 </p>
             </div>
@@ -1101,12 +1111,13 @@ class Generator
      * Сгенерировать страницу для Редактирования информации о Записи в таблицы
      * Generate a page for editing table entry information
      *
-     * @param bool $read_user_id
+     * @param $db_name
+     * @param $table
+     * @return false|void
      */
-    public static function generateStandartEditPage($db_name, $table)
+    public static function generateStandartEditPage(string $db_name, string $table)
     {
-
-        $table_info = DB::getByColumn('tables', 'name', $table);
+        $table_info = DB::getByColumn(_TABLES, 'name', $table);
 
         if (empty($table_info)) {
             return false;
@@ -1218,7 +1229,8 @@ class Generator
     }
 
 
-    public static function generateAnotherKeyEditPage(
+    public
+    static function generateAnotherKeyEditPage(
         $table, $cat, $list_name, $key_name
     )
     {
@@ -1299,7 +1311,8 @@ class Generator
     }
 
 
-    public static function uniqueColumnUpDownButtons(
+    public
+    static function uniqueColumnUpDownButtons(
         $item, $column, $min_value, $max_value, $page_name
     )
     {
@@ -1349,13 +1362,14 @@ class Generator
      *
      * @return bool|string generated html
      */
-    public static function genActionButtons($page_name, $table, &$item, $type)
+    public
+    static function genActionButtons($page_name, $table, &$item, $type)
     {
         if (empty($item['id'])) {
             return '';
         }
 
-        $table_info = @Db::getByColumn('tables', 'name', $table);
+        $table_info = @Db::getByColumn(_TABLES, 'name', $table);
 
         $id = $item['id'];
 

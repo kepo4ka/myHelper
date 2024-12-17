@@ -506,6 +506,10 @@ class Helper
         $input, $type = null
     )
     {
+        if ($input == null) {
+            return '';
+        }
+
         $input = trim($input);
         $input = htmlspecialchars($input, ENT_QUOTES | ENT_SUBSTITUTE, 'utf-8');
         $input = html_entity_decode($input);
@@ -814,7 +818,7 @@ class Helper
 
         //пробуем открыть папку
         $dir_handle = @opendir($directory)
-        or die("Ошибка при открытии папки ${directory}!!!");
+        or die("Ошибка при открытии папки {$$directory}!!!");
 
         while ($file = readdir($dir_handle))    //поиск по файлам
         {
@@ -1955,15 +1959,6 @@ class Helper
     public static function sendTGMessage($message, $token = null, $chatID = null
     )
     {
-        if (!empty(@MY_TELEGRAM_TOKEN)) {
-            $token = @MY_TELEGRAM_TOKEN;
-            $chatID = @MY_TELEGRAM_CHAT;
-        }
-
-        if (empty(@TELEGRAM_ACTIVE)) {
-            return false;
-        }
-
         if (empty($token) || empty($chatID) || empty($message)) {
             return false;
         }
