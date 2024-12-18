@@ -1030,13 +1030,11 @@ ALTER TABLE `$table`
     {
         global $meDoo;
         $table = Helper::inputFilter($table, 'w');
-        $query = "SELECT COUNT(1) FROM {$table}";
+        $query = "SELECT COUNT(1) as count FROM {$table}";
 
         $query .= ' WHERE';
 
         foreach ($cols as $item) {
-
-
             $col = $item['column'];
             $val = $item['value'];
 
@@ -1050,7 +1048,7 @@ ALTER TABLE `$table`
         $query .= ' 1';
 
         $res = $meDoo->query($query)->fetch(PDO::FETCH_ASSOC);
-        return $res ?: 0;
+        return $res['count'] ?: 0;
     }
 
 
