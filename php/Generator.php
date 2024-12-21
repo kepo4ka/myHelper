@@ -138,6 +138,7 @@ class Generator
     public static function genSimpleInput($key, $value, $title = '')
     {
         $title = $title ?: Helper::readableText($key);
+        $value = Helper::inputFilter($value);
 
         ?>
         <div class="col-12 col-md-4 mb-3">
@@ -428,7 +429,7 @@ class Generator
                           cols="10" rows="10"
                           class="form-control border-radius-0"
                           name="<?= $input_key ?>"
-                ><?= stripslashes($input_value) ?></textarea>
+                ><?= stripslashes($input_value ?? '') ?></textarea>
 
                     </div>
                 <?php } ?>
