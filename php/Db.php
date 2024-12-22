@@ -5,6 +5,7 @@ namespace Helper;
 require_once(__DIR__ . '/safemysql.php');
 
 use Exception;
+use Medoo\Medoo;
 use PDO;
 use Throwable;
 
@@ -1269,16 +1270,58 @@ ALTER TABLE `$table`
 
     public static function connect()
     {
-        @self::$db->connect();
+      //  @self::$db->connect();
+
+        global $meDoo, $db_info;
+
+        //// Initialize Medoo DB
+        $meDoo = new Medoo(
+            [
+                'database_type' => 'mysql',
+                'database_name' => $db_info['db_name'],
+                'server'        => $db_info['host'],
+                'username'      => $db_info['user'],
+                'password'      => $db_info['password'],
+                'charset'       => $db_info['charset'],
+                'logging'       => true,
+            ]
+        );
+
+        $GLOBALS['meDoo'] = $meDoo;
     }
 
     public static function disconnect()
     {
-        @self::$db->disconnect();
+//        @self::$db->disconnect();
+
+        global $meDoo;
+        $meDoo->pdo = null;
+
+        $GLOBALS['meDoo']->pdo = null;
+        $GLOBALS['meDoo'] = null;
     }
 
     public static function reconnect()
     {
-        @self::$db->reconnect();
+        global $meDoo, $db_info;
+//        @self::$db->reconnect();
+
+        $meDoo->pdo = null;
+
+        //// Initialize Medoo DB
+        $meDoo = new Medoo(
+            [
+                'database_type' => 'mysql',
+                'database_name' => $db_info['db_name'],
+                'server'        => $db_info['host'],
+                'username'      => $db_info['user'],
+                'password'      => $db_info['password'],
+                'charset'       => $db_info['charset'],
+                'logging'       => true,
+            ]
+        );
+
+        $GLOBALS['meDoo'] = $meDoo;
+        return $meDoo;
     }
 }
