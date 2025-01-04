@@ -620,6 +620,8 @@ ALTER TABLE `$table`
     {
         global $meDoo;
 
+        self::reconnect();
+
         try {
             $count = $meDoo->count($table);
             $primary = 'id';
@@ -644,7 +646,11 @@ ALTER TABLE `$table`
             @$element['site'] = $site;
             $element['proccess_id'] = $proccess_id;
 
-            return self::save($element, $table, $primary);
+            $saved = self::save($element, $table, $primary);
+
+            self::disconnect();
+
+            return $saved;
         } catch
         (Throwable $exception) {
             return ['error' => true, 'line' => $exception->getLine(), 'message' => $exception->getMessage()];
