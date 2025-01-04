@@ -1270,7 +1270,7 @@ ALTER TABLE `$table`
 
     public static function connect()
     {
-      //  @self::$db->connect();
+        //  @self::$db->connect();
 
         global $meDoo, $db_info;
 
@@ -1295,9 +1295,12 @@ ALTER TABLE `$table`
 //        @self::$db->disconnect();
 
         global $meDoo;
-        $meDoo->pdo = null;
 
-        $GLOBALS['meDoo']->pdo = null;
+        if (!empty($meDoo) && !empty($meDoo->pdo)) {
+            $meDoo->pdo = null;
+            $GLOBALS['meDoo']->pdo = null;
+        }
+
         $GLOBALS['meDoo'] = null;
     }
 
@@ -1306,7 +1309,9 @@ ALTER TABLE `$table`
         global $meDoo, $db_info;
 //        @self::$db->reconnect();
 
-        $meDoo->pdo = null;
+        if (!empty($meDoo) && !empty($meDoo->pdo)) {
+            $meDoo->pdo = null;
+        }
 
         //// Initialize Medoo DB
         $meDoo = new Medoo(
