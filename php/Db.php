@@ -654,8 +654,6 @@ ALTER TABLE `$table`
         } catch
         (Throwable $exception) {
             return ['error' => true, 'line' => $exception->getLine(), 'message' => $exception->getMessage()];
-        } catch (Exception $exception) {
-            return ['error' => true, 'line' => $exception->getLine(), 'message' => $exception->getMessage()];
         }
     }
 
@@ -680,7 +678,13 @@ ALTER TABLE `$table`
         if (!empty($site)) {
             $filter['site'] = $site;
         }
-        return $meDoo->select($table, '*', $filter);
+        self::reconnect();
+
+        $res = $meDoo->select($table, '*', $filter);
+
+        self::disconnect();
+
+        return $res;
     }
 
 
@@ -691,8 +695,11 @@ ALTER TABLE `$table`
         if (!Helper::checkRegular('/_log$/', $table, 0)) {
             return false;
         }
+        self::reconnect();
 
-        return $meDoo->delete($table, ['id[>]' => 0]);
+        $deleted = !empty($meDoo->delete($table, ['id[>]' => 0]));
+        self::disconnect();
+        return $deleted;
     }
 
     /**
