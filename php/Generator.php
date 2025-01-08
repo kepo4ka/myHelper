@@ -680,6 +680,9 @@ class Generator
         }
 
         foreach ($row as $key => $value) {
+            if (ifempty($value, 'name', null) == 'id') {
+                continue;
+            }
 
             $title = '';
 
@@ -703,13 +706,7 @@ class Generator
             $relations = DB::getTableRelationsOneToMany($table, $value['name']);
             $comment = DB::getColumnComment($db_name, $table, $value['name']);
 
-            if ($value['name'] == 'id'
-                && preg_match(
-                    '/int\(/', $value['type']
-                )
-            ) {
-                $type = 'disabled';
-            } else if ($comment == 'json') {
+            if ($comment == 'json') {
                 if (!Helper::checkJson($value['value'])) {
                     $type = 'bad_json';
                 } else {
@@ -1230,8 +1227,7 @@ class Generator
     }
 
 
-    public
-    static function generateAnotherKeyEditPage(
+    public static function generateAnotherKeyEditPage(
         $table, $cat, $list_name, $key_name
     )
     {
@@ -1312,8 +1308,7 @@ class Generator
     }
 
 
-    public
-    static function uniqueColumnUpDownButtons(
+    public static function uniqueColumnUpDownButtons(
         $item, $column, $min_value, $max_value, $page_name
     )
     {
@@ -1363,8 +1358,7 @@ class Generator
      *
      * @return bool|string generated html
      */
-    public
-    static function genActionButtons($page_name, $table, &$item, $type)
+    public static function genActionButtons($page_name, $table, &$item, $type)
     {
         if (empty($item['id'])) {
             return '';
