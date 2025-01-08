@@ -410,14 +410,16 @@ class Generator
 
                                 onChangeText: function (jsonString) {
                                     $('#json_textarea<?= $input_key ?>').text(jsonString);
-                                }
+                                },
+
+                                modes: ['code', 'tree'],
+                                mode: 'tree',
                             };
                             const editor_<?= $input_key ?> = new JSONEditor(container_<?= $input_key ?>, options_<?= $input_key ?>);
 
                             let val_<?= $input_key ?> = <?= $input_value
                                 ?: '{}' ?>;
                             editor_<?= $input_key ?>.set(val_<?= $input_key ?>);
-
                         </script>
                     </div>
                     <div class="tab-pane fade"
