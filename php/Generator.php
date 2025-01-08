@@ -1146,8 +1146,6 @@ class Generator
             $new_row[] = $item;
         }
         $row = $new_row;
-
-
         ?>
 
         <div class="d-flex justify-content-between">
@@ -1177,10 +1175,12 @@ class Generator
         <form method="post" action="save.php" enctype='multipart/form-data'>
 
             <fieldset>
-
                 <input name="cat" type="hidden" value="<?= @$table ?>">
-                <input name="id" type="hidden" value="<?= @$id ?>">
                 <input name="act" type="hidden" value="<?= @$act ?>">
+
+                <?php if ($act !== 'add') { ?>
+                    <input name="id" type="hidden" value="<?= @$id ?>">
+                <?php } ?>
 
                 <legend class="hidden-first mb-0">
                     <?php if ($act == "edit") { ?>
