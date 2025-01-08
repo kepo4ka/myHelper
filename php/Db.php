@@ -884,11 +884,17 @@ ALTER TABLE `$table`
      */
     public static function getColumnType($table, $column)
     {
+        global $meDoo;
+
+        $table = Helper::inputFilter($table, 'w');
+        $column = Helper::inputFilter($column, 'w');
+
         $query
-            = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
-      WHERE `table_name` = ?s AND COLUMN_NAME = ?s";
-        $res = self::$db->getOne($query, $table, $column);
-        return $res;
+            = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE `table_name` = '{$table}' AND COLUMN_NAME = '{$column}'";
+
+        $res = $meDoo->query($query)->fetch(PDO::FETCH_ASSOC);
+        return ifempty($res, 'DATA_TYPE', null);
     }
 
     /**
