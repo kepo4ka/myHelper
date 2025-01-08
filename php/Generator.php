@@ -911,7 +911,7 @@ class Generator
         if (!empty($info['copy'])) {
             $html
                 .= "
-            <a class='btn btn-dark' href='save.php?cat=$page_name&act=copy&id=$id'>
+            <a class='btn btn-dark' href='edit.php?cat=$page_name&act=add&id=$id'>
                 <i class='far fa-copy'></i>
                     Копировать 
             </a>";
