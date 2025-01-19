@@ -413,13 +413,16 @@ class Generator
                                 },
 
                                 modes: ['code', 'tree'],
-                                mode: 'code',
+                                mode: 'tree',
                             };
                             const editor_<?= $input_key ?> = new JSONEditor(container_<?= $input_key ?>, options_<?= $input_key ?>);
-
-                            let val_<?= $input_key ?> = <?= $input_value
-                                ?: '{}' ?>;
+                            let val_<?= $input_key ?> = <?= $input_value ?: '{}' ?>;
                             editor_<?= $input_key ?>.set(val_<?= $input_key ?>);
+
+                            setTimeout(function () {
+                                editor_<?= $input_key ?>.setMode('tree');
+                                editor_<?= $input_key ?>.setMode('code');
+                            }, 1100);
                         </script>
                     </div>
                     <div class="tab-pane fade"
