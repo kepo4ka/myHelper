@@ -987,6 +987,7 @@ class Generator
                 <h1>
                     <?= @$table_info['full_name'] ?>
                 </h1>
+
                 <p>
                     <span>
                         Количество записей:
@@ -1041,12 +1042,12 @@ class Generator
 
             <div>
 
-                <?php if (!empty($_GET['get_column'])) {
+                <?php if (!empty($_GET['get_column']) || !empty($_GET['custom_filters'])) {
                     ?>
-                    <a class="btn btn-primary"
+                    <a class="btn btn-outline-secondary"
                        href="list.php?cat=<?= $table ?>">
-                        <i class="fa fa-list"></i>
-                        Все записи <?= $table_info['name'] ?>
+                        <i class="fa fa-eraser"></i>
+                        Сбросить фильтры
                     </a>
                     <?php
                 } ?>

@@ -65,17 +65,27 @@ class Db
             $query .= ' WHERE';
 
             foreach ($search_array as $i => $iValue) {
+                $column = Helper::inputFilter($iValue['column'], 'w');
+
                 if (empty($iValue['value'])) {
                     $iValue['full'] = true;
                 }
 
-                $column = Helper::inputFilter($iValue['column'], 'w');
-                $value = Helper::inputFilter($iValue['value']);
+                if (@is_array($iValue['value'])) {
+                    // Если значение является массивом, создаем условие IN
+                    $values = array_map(function ($val) {
+                        return "'" . Helper::inputFilter($val) . "'";
+                    }, $iValue['value']);
 
-                if (empty($iValue['full'])) {
-                    $query .= " `$column` LIKE'%$value%' AND";
+                    $values_query = implode(',', $values);
+                    $query .= " `$column` IN ($values_query) AND";
                 } else {
-                    $query .= " `$column`='$value' AND";
+                    $value = Helper::inputFilter($iValue['value'], 'w');
+                    if (empty($iValue['full'])) {
+                        $query .= " `$column` LIKE'%$value%' AND";
+                    } else {
+                        $query .= " `$column`='$value' AND";
+                    }
                 }
             }
             $query .= ' 1';
@@ -1055,13 +1065,23 @@ ALTER TABLE `$table`
         $query .= ' WHERE';
 
         foreach ($cols as $item) {
-            $col = $item['column'];
+            $col = Helper::inputFilter($item['column'], 'w');
             $val = $item['value'];
 
-            if ($item['full']) {
-                $query .= " `$col`='$val' AND";
+            if (is_array($val)) {
+                // Если значение является массивом, создаем условие IN
+                $values = array_map(function ($val) {
+                    return "'" . Helper::inputFilter($val) . "'";
+                }, $val);
+
+                $values_query = implode(',', $values);
+                $query .= " `$col` IN ($values_query) AND";
             } else {
-                $query .= " `$col` LIKE '%$val%' AND";
+                if ($item['full']) {
+                    $query .= " `$col`='$val' AND";
+                } else {
+                    $query .= " `$col` LIKE '%$val%' AND";
+                }
             }
         }
 
