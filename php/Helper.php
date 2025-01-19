@@ -1362,6 +1362,9 @@ class Helper
      */
     public static function checkJson($str)
     {
+        if (null == $str) {
+            return false;
+        }
         $json = json_decode($str);
         return $json && $str != $json;
     }
@@ -1863,7 +1866,7 @@ class Helper
         $response['recordsFiltered'] = $full_count;
 
 
-        $bolean_columns = DB::filterEnumColumns($table);
+        $bolean_columns = DB::filterBoleanColumns($table);
 
 //        $select_info = DB::checkTableHavingSelectBox($table);
 

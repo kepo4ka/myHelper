@@ -664,25 +664,36 @@ class Generator
      * Сгенерировать SelectBox для формы
      * Generate SelectBox for the form
      *
-     * @return bool
+     * @return string
      */
     public static function getEnumSelectBox(
-        string $table, string $key, array $value_data, string $class = 'table_select_handler', string $title = null,
+        string $table, string $key, array $value_data, string $mode = 'form', string $title = null,
     )
     {
         $title = $title ?: Helper::readableText($key);
-        $value = @$value_data['value'];
+        $title_class = 'd-none';
+        $js_class = 'table_select_handler';
+        $wrapper_class = 'col-12';
+        if ($mode == 'form') {
+            $title_class = '';
+            $js_class = '';
+            $wrapper_class = 'col-12  col-md-4';
+        }
 
+
+        $value = @$value_data['value'];
+        ob_start();
         ?>
-        <div class="col-12 col-md-4">
-            <label>
+        <div class="<?= $wrapper_class ?>">
+            <label class="<?= $title_class ?>">
                 <span>
                     <?= $title ?>
                 </span>
             </label>
             <select name="<?= $key ?>"
-                    class="select2 col-12 px-0 nice-select-table selectpicker <?= $class ?>"
+                    class="select2 col-12 px-0 nice-select-table selectpicker <?= $js_class ?>"
                     data-live-search='true'
+                    data-id="<?= @$value_data['id'] ?>"
                     data-url="<?= $table ?>">
                 <option <?= empty($value) ? 'selected' : '' ?>
                         value="">
@@ -701,8 +712,8 @@ class Generator
             </select>
         </div>
         <?php
-
-        return true;
+        $html = ob_get_clean();
+        return $html;
     }
 
 
@@ -820,7 +831,7 @@ class Generator
      * Generate form field
      *
      * @param $key   string Название поля
-     * @param $value string значение поля
+     * @param $value array|string Значение поля
      * @param $type  string Тип поля
      */
     public static function generateFormInput(
@@ -890,7 +901,7 @@ class Generator
                 break;
 
             case 'enum_selectbox':
-                self::getEnumSelectBox($table, $key, $value);
+                echo self::getEnumSelectBox($table, $key, $value);
                 break;
 
             case 'relation_selectbox':

@@ -932,7 +932,7 @@ ALTER TABLE `$table`
      *
      * @return array Список столбцов, подходящих под критерий
      */
-    public static function filterEnumColumns($table)
+    public static function filterBooleanColumns($table)
     {
         $list = self::getTableTypes($table);
 
@@ -943,6 +943,26 @@ ALTER TABLE `$table`
             }
         }
         return $bolean_columns;
+    }
+
+    /**
+     * Получить столбцы таблицы, которые принимают enumeric значения
+     *
+     * @param $table string Исходная таблицы
+     *
+     * @return array Список столбцов, подходящих под критерий
+     */
+    public static function filterEnumColumns(string $table)
+    {
+        $list = self::getTableTypes($table);
+
+        $enum_columns = [];
+        foreach ($list as $item) {
+            if (preg_match('/enum\((.*)\)/', $item['type'], $matches)) {
+                $enum_columns[] = $item['name'];
+            }
+        }
+        return $enum_columns;
     }
 
     /**
