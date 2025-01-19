@@ -413,7 +413,7 @@ class Generator
                                 },
 
                                 modes: ['code', 'tree'],
-                                mode: 'tree',
+                                mode: 'code',
                             };
                             const editor_<?= $input_key ?> = new JSONEditor(container_<?= $input_key ?>, options_<?= $input_key ?>);
 
