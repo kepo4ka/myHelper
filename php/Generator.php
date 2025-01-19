@@ -529,7 +529,7 @@ class Generator
      *
      * @return bool
      */
-    public static function genSelectBox(
+    public static function getRelationSelectBox(
         $relation, $key, $value, $title = ''
     )
     {
@@ -620,7 +620,7 @@ class Generator
         ?>
         <div class='col-12'>
             <select name='<?= $key ?>' data-id='<?= $id ?>'
-                    class='nice-select-table table_select_handler selectpicker'
+                    class='nice-select-table selectpicker table_select_handler'
                     data-live-search='true'>
 
                 <option <?= empty($value) ? 'selected' : '' ?>
@@ -657,6 +657,52 @@ class Generator
         $html = ob_get_clean();
 
         return $html;
+    }
+
+
+    /**
+     * Сгенерировать SelectBox для формы
+     * Generate SelectBox for the form
+     *
+     * @return bool
+     */
+    public static function getEnumSelectBox(
+        string $table, string $key, array $value_data, string $class = 'table_select_handler', string $title = null,
+    )
+    {
+        $title = $title ?: Helper::readableText($key);
+        $value = @$value_data['value'];
+
+        ?>
+        <div class="col-12 col-md-4">
+            <label>
+                <span>
+                    <?= $title ?>
+                </span>
+            </label>
+            <select name="<?= $key ?>"
+                    class="select2 col-12 px-0 nice-select-table selectpicker <?= $class ?>"
+                    data-live-search='true'
+                    data-url="<?= $table ?>">
+                <option <?= empty($value) ? 'selected' : '' ?>
+                        value="">
+                    0
+                </option>
+
+                <?php foreach (@$value_data['enum'] as $item) {
+                    ?>
+                    <option <?= $item == @$value ? 'selected' : '' ?>
+                            value="<?= @$item ?>">
+                        <?= Helper::readableText($item) ?>
+                    </option>
+                    <?php
+                }
+                ?>
+            </select>
+        </div>
+        <?php
+
+        return true;
     }
 
 
@@ -721,7 +767,20 @@ class Generator
             } else if ($comment == 'compress') {
                 $type = 'compress';
             } else if (!empty($relations)) {
-                $type = 'selectbox';
+                $type = 'relation_selectbox';
+            } else if (preg_match('/enum\(/', $value['type'])) {
+                preg_match_all("/'([^']+)'/", $value['type'], $matches);
+
+                if (empty($matches[1])) {
+                    $type = 'simple';
+                } else {
+                    $type = 'enum_selectbox';
+                    $value['value'] = [
+                        'value' => $value['value'],
+                        'enum'  => $matches[1]
+                    ];
+                }
+
             } else if (false !== strpos($value['type'], 'tinyint(1)')) {
                 $type = 'checkbox';
             } else if (false !== strpos($value['type'], 'tinyint(1)')) {
@@ -830,12 +889,16 @@ class Generator
                 self::genJsonEditor($db_name, $table, $key, $value, true, $title);
                 break;
 
-            case 'selectbox':
+            case 'enum_selectbox':
+                self::getEnumSelectBox($table, $key, $value);
+                break;
+
+            case 'relation_selectbox':
                 $relation = DB::getTableRelationsOneToMany($table, $key);
 
                 if (!empty($relation) && !empty($relation['is_small'])) {
                     if ($relation['inner_column'] == $key) {
-                        self::genSelectBox(
+                        self::getRelationSelectBox(
                             $relation,
                             $key, $value, $title
                         );
