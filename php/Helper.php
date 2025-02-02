@@ -934,9 +934,9 @@ class Helper
      *
      * @return string
      */
-    public static function json_encode($val)
+    public static function json_encode($val, $flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
     {
-        return json_encode($val, JSON_UNESCAPED_UNICODE);
+        return json_encode($val, $flags);
     }
 
     /**
@@ -1991,6 +1991,7 @@ class Helper
             'parse_mode'               => 'HTML',
             'disable_web_page_preview' => false,
         );
+
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
         $res = curl_exec($ch);
         curl_close($ch);
