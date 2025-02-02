@@ -400,8 +400,22 @@ class Generator
                          role="tabpanel"
                          aria-labelledby="json_editor_content<?= $input_key ?>-tab">
 
+                        <?php
+                        $length = mb_strlen($input_value);
+                        $min_height = 200;
+                        if ($length > 300) {
+                            $min_height = 400;
+                        }
+                        if ($length > 500) {
+                            $min_height = 600;
+                        }
+                        if ($length > 1000) {
+                            $min_height = $length * .51;
+                        }
+                        ?>
+
                         <div id="jsoneditor_<?= $input_key ?>"
-                             style=" height: 400px;"></div>
+                             style="height: <?= $min_height ?>px;"></div>
                         <script>
 
                             // create the editor
