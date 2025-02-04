@@ -1959,9 +1959,13 @@ class Helper
     }
 
 
-    public static function sendTGMessage($message, $token = null, $chatID = null
-    )
+    public static function sendTGMessage($message, $token = null, $chatID = null)
     {
+        if (empty($token) && empty($chatID) && defined('MY_TELEGRAM_TOKEN') && defined('MY_TELEGRAM_CHAT')) {
+            $token = @MY_TELEGRAM_TOKEN;
+            $chatID = @MY_TELEGRAM_CHAT;
+        }
+
         if (empty($token) || empty($chatID) || empty($message)) {
             return false;
         }
