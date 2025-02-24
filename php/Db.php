@@ -625,10 +625,34 @@ ALTER TABLE `$table`
      * @return array|FALSE|resource
      */
     public static function logDB(
-        $data, $title = 'Info', $type = 'info', $table = 'debug_log', $limit = 50000, $site = '', $proccess_id = ''
+        $data, $title = 'Info', $type = 'info', $table = 'debug_log', $limit = 50000, $site = '', $proccess_id = '',
     )
     {
         global $meDoo;
+		
+		$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+		  // Проверяем, был ли вызов из класса
+		if (isset($backtrace[1]['class'])) {
+			$class = $backtrace[1]['class']; // Класс, из которого вызван метод
+			$method = $backtrace[1]['function']; // Метод, из которого вызван метод
+			$file = $backtrace[0]['file']; // Файл, из которого вызван метод
+			$line = $backtrace[0]['line']; // Строка, из которой вызван метод
+
+			if (empty($site)) {
+				$site = $class;
+			}
+
+			if (empty($proccess_id)) {
+				$proccess_id = $method;
+			}
+		} else {
+			
+			// Если вызов был не из класса (например, из глобальной области)
+			$class = null;
+			$method = null;
+			$file = $backtrace[0]['file'];
+			$line = $backtrace[0]['line'];
+		}
 
         self::reconnect();
 
@@ -654,7 +678,12 @@ ALTER TABLE `$table`
             $element['type'] = $type;
             $element['title'] = $title;
             @$element['site'] = $site;
-            $element['proccess_id'] = $proccess_id;
+            @$element['proccess_id'] = @$proccess_id;
+            @$element['class'] = $class;
+            @$element['method'] = $method;
+            @$element['file'] = $file;
+            @$element['line'] = $line;
+		
 
             $saved = self::save($element, $table, $primary);
 
