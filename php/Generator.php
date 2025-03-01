@@ -146,7 +146,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
-                   value='<?= htmlspecialchars($value, ENT_QUOTES) ?>'>
+                   value='<?= isset($value) ? htmlspecialchars($value, ENT_QUOTES) : '' ?>'>
         </div>
         <?php
         return true;
@@ -174,7 +174,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
-                   value="<?= htmlspecialchars($value, ENT_QUOTES) ?>">
+                   value="<?= isset($value) ? htmlspecialchars($value, ENT_QUOTES) : '' ?>">
         </div>
         <?php
         return true;
@@ -202,7 +202,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control" name="<?= $key ?>"
-                   value="<?= htmlspecialchars($value, ENT_QUOTES) ?>">
+                   value="<?= isset($value) ? htmlspecialchars($value, ENT_QUOTES) : '' ?>">
         </div>
         <?php
         return true;
@@ -235,7 +235,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control <?= $class ?>"
-                   name="<?= $key ?>" value="<?= htmlspecialchars($value, ENT_QUOTES) ?>">
+                   name="<?= $key ?>" value="<?= isset($value) ? htmlspecialchars($value, ENT_QUOTES) : '' ?>">
         </div>
         <?php
         return true;
@@ -257,7 +257,7 @@ class Generator
         ?>
 
         <input type="hidden" class="form-control disabled" disabled
-               name="<?= $key ?>" value='<?= htmlspecialchars($value, ENT_QUOTES) ?>'>
+               name="<?= $key ?>" value='<?= isset($value) ? htmlspecialchars($value, ENT_QUOTES) : '' ?>'>
         <?php
         return true;
     }
@@ -281,7 +281,7 @@ class Generator
                 <?= $title ?>
             </label>
             <input type="text" class="form-control" readonly name="<?= $key ?>"
-                   value='<?= htmlspecialchars($value, ENT_QUOTES) ?>'>
+                   value='<?= isset($value) ? htmlspecialchars($value, ENT_QUOTES) : '' ?>'>
         </div>
         <?php
         return true;
@@ -315,8 +315,8 @@ class Generator
                 <?= $title ?>
             </label>
             <textarea type="text" cols="10" rows="5"
-                      class="form-control <?= $editor_class ?>"
-                      name="<?= $key ?>"><?= htmlspecialchars(ifset($value, ''), ENT_QUOTES) ?></textarea>
+                      class="form-control <?= @$editor_class ?>"
+                      name="<?= $key ?>"><?= isset($value) ? htmlspecialchars($value, ENT_QUOTES) : '' ?></textarea>
         </div>
         <?php
         return true;
@@ -1372,9 +1372,9 @@ class Generator
         <form method="post" action="save.php" enctype='multipart/form-data'>
             <fieldset>
 
-                <input name="cat" type="hidden" value="<?= htmlspecialchars(@$cat, ENT_QUOTES) ?>">
-                <input name="id" type="hidden" value="<?= htmlspecialchars(@$id, ENT_QUOTES) ?>">
-                <input name="act" type="hidden" value="<?= htmlspecialchars(@$act, ENT_QUOTES) ?>">
+                <input name="cat" type="hidden" value="<?= isset($cat) ? htmlspecialchars(@$cat, ENT_QUOTES) : '' ?>">
+                <input name="id" type="hidden" value="<?= isset($id) ? htmlspecialchars(@$id, ENT_QUOTES) : '' ?>">
+                <input name="act" type="hidden" value="<?= isset($act) ? htmlspecialchars(@$act, ENT_QUOTES) : '' ?>">
 
                 <legend class="hidden-first">
                     <?php if ($act == "edit") { ?>
