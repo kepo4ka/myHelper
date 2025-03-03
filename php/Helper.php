@@ -1959,7 +1959,16 @@ class Helper
     }
 
 
-    public static function sendTGMessage($message, $token = null, $chatID = null)
+    /**
+     * Отправить сообщение в Telegram с возможностью добавления кнопок-ссылок
+     * 
+     * @param mixed $message Текст сообщения или массив данных
+     * @param string|null $token Токен бота
+     * @param string|null $chatID ID чата
+     * @param array|null $keyboard Массив с кнопками в формате [['title' => 'Button Text', 'link' => 'https://example.com']]
+     * @return bool|string Результат отправки
+     */
+    public static function sendTGMessage($message, $token = null, $chatID = null, $keyboard = null)
     {
         if (empty($token) && empty($chatID) && defined('MY_TELEGRAM_TOKEN') && defined('MY_TELEGRAM_CHAT')) {
             $token = @MY_TELEGRAM_TOKEN;
@@ -1983,20 +1992,48 @@ class Helper
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt(
-            $ch, CURLOPT_HTTPHEADER, ['Content-Type: multipart/form-data']
+            $ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']
         );
         curl_setopt(
             $ch, CURLOPT_URL,
             'https://api.telegram.org/bot' . $token . '/sendMessage'
         );
+        
         $postFields = array(
-            'chat_id'                  => $chatID,
-            'text'                     => $message,
-            'parse_mode'               => 'HTML',
+            'chat_id' => $chatID,
+            'text' => $message,
+            'parse_mode' => 'HTML',
             'disable_web_page_preview' => false,
         );
 
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        // Добавляем клавиатуру со ссылками, если она передана
+        if (!empty($keyboard) && is_array($keyboard)) {
+            $inline_keyboard = array();
+            
+            // Если передан одиночный элемент (не массив массивов)
+            if (isset($keyboard['title'])) {
+                $keyboard = array($keyboard);
+            }
+            
+            foreach ($keyboard as $button) {
+                if (!empty($button['title']) && !empty($button['link'])) {
+                    $inline_keyboard[] = array(
+                        array(
+                            'text' => $button['title'],
+                            'url' => $button['link']
+                        )
+                    );
+                }
+            }
+            
+            if (!empty($inline_keyboard)) {
+                $postFields['reply_markup'] = array(
+                    'inline_keyboard' => $inline_keyboard
+                );
+            }
+        }
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postFields));
         $res = curl_exec($ch);
         curl_close($ch);
 
