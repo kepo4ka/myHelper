@@ -951,6 +951,10 @@ class Helper
         if (is_array($val)) {
             return $val;
         }
+		
+		if (null === $val) {
+			return null;
+		}
 
         return json_decode($val, true);
     }
