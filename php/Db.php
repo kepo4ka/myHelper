@@ -337,7 +337,8 @@ class Db
                 return $res;
             }
         } catch (Throwable $exception) {
-            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . '|' . __CLASS__ . '|' . __METHOD__ . PHP_EOL . 'message:' . $exception->getMessage() . PHP_EOL . 'line:' . $exception->getLine()  . PHP_EOL . 'file:' . $exception->getFile() . PHP_EOL . 'trace:' . $exception->getTraceAsString();
+            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . '|' . __CLASS__ . '|' . __METHOD__ . PHP_EOL . 'message:' . $exception->getMessage() . PHP_EOL . 'line:' . $exception->getLine()  . PHP_EOL . 'file:' . $exception->getFile() . PHP_EOL . 'trace:' . $exception->getTraceAsString()
+            . PHP_EOL . 'last query:' . $meDoo->last();
             Helper::sendTGMessage($message);
             return false;
         }
@@ -629,7 +630,7 @@ ALTER TABLE `$table`
     )
     {
         global $meDoo;
-		
+
 		$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 		  // Проверяем, был ли вызов из класса
 		if (isset($backtrace[1]['class'])) {
@@ -646,7 +647,7 @@ ALTER TABLE `$table`
 				$proccess_id = $method;
 			}
 		} else {
-			
+
 			// Если вызов был не из класса (например, из глобальной области)
 			$class = null;
 			$method = null;
@@ -683,7 +684,7 @@ ALTER TABLE `$table`
             @$element['method'] = $method;
             @$element['file'] = $file;
             @$element['line'] = $line;
-		
+
 
             $saved = self::save($element, $table, $primary);
 
