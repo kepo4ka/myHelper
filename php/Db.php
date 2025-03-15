@@ -337,7 +337,7 @@ class Db
                 return $res;
             }
         } catch (Throwable $exception) {
-            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . '|' . __CLASS__ . '|' . __METHOD__ . '|message:' . $exception->getMessage() . '|line:' . $exception->getLine() . '|file:' . $exception->getFile();
+            $message = @'error: ' . $_SERVER['DOCUMENT_ROOT'] . '|' . __CLASS__ . '|' . __METHOD__ . PHP_EOL . 'message:' . $exception->getMessage() . PHP_EOL . 'line:' . $exception->getLine()  . PHP_EOL . 'file:' . $exception->getFile() . PHP_EOL . 'trace:' . $exception->getTraceAsString();
             Helper::sendTGMessage($message);
             return false;
         }
