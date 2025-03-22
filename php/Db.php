@@ -65,7 +65,7 @@ class Db
             $query .= ' WHERE';
 
             foreach ($search_array as $i => $iValue) {
-                $column = Helper::inputFilter($iValue['column'], 'w');
+                $column = Helper::inputFilter($iValue['column'], 'w-');
 
                 if (empty($iValue['value'])) {
                     $iValue['full'] = true;
@@ -80,7 +80,7 @@ class Db
                     $values_query = implode(',', $values);
                     $query .= " `$column` IN ($values_query) AND";
                 } else {
-                    $value = Helper::inputFilter($iValue['value'], 'w');
+                    $value = Helper::inputFilter($iValue['value'], 'ws-$#!@#,.?!:;/+=*()[]{}#%^&*');
                     if (empty($iValue['full'])) {
                         $query .= " `$column` LIKE'%$value%' AND";
                     } else {
@@ -92,8 +92,8 @@ class Db
         }
 
         if (!empty($order)) {
-            $column = Helper::inputFilter($order['column'], 'w');
-            $dir = Helper::inputFilter($order['dir'], 'w');
+            $column = Helper::inputFilter($order['column'], 'w-');
+            $dir = Helper::inputFilter($order['dir'], 'w-');
 
             $query .= " ORDER BY `$column` $dir";
         }
