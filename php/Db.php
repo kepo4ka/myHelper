@@ -74,7 +74,7 @@ class Db
                 if (@is_array($iValue['value'])) {
                     // Если значение является массивом, создаем условие IN
                     $values = array_map(function ($val) {
-                        return "'" . Helper::inputFilter($val) . "'";
+                        return "'" . Helper::inputFilter($val, 'ws-$#!@#,.?!:;/+=*()[]{}#%^&*') . "'";
                     }, $iValue['value']);
 
                     $values_query = implode(',', $values);
