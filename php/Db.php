@@ -1115,13 +1115,13 @@ ALTER TABLE `$table`
         $query .= ' WHERE';
 
         foreach ($cols as $item) {
-            $col = Helper::inputFilter($item['column'], 'w');
+            $col = Helper::inputFilter($item['column'], 'ws-$#!@#,.?!:;/+=*()[]{}#%^&*');
             $val = $item['value'];
 
             if (is_array($val)) {
                 // Если значение является массивом, создаем условие IN
                 $values = array_map(function ($val) {
-                    return "'" . Helper::inputFilter($val) . "'";
+                    return "'" . Helper::inputFilter($val, 'ws-$#!@#,.?!:;/+=*()[]{}#%^&*') . "'";
                 }, $val);
 
                 $values_query = implode(',', $values);
