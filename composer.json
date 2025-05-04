@@ -15,6 +15,6 @@
     },
     "require": {
       "ext-curl": "*",
-	   "catfan/medoo": "*"
+	   "catfan/medoo": "^2.1"
     }
 }
