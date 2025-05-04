@@ -1073,9 +1073,9 @@ class Generator
                value='<?php echo Helper::json_encode($data_columns) ?>'>
         <hr>
 
-        <div class="row">
+        <div class="row js-header-wrapper">
             <div class="col-6">
-                <h1>
+                <h1 class="js-header-title">
                     <?= @$table_info['full_name'] ?>
                 </h1>
 
@@ -1083,7 +1083,7 @@ class Generator
                     <span>
                         Количество записей:
                     </span>
-                    <span class="badge badge-pill badge-success">
+                    <span class="badge badge-pill badge-success js-all-rows-count">
                         <?= $count ?>
                     </span>
                 </p>
@@ -1114,7 +1114,7 @@ class Generator
                     }
                     ?>
 
-                    <div class="alert <?= $class ?>" role="alert">
+                    <div class="alert <?= $class ?> js-add-result-alert-message" role="alert">
                         <?= $message ?>
                     </div>
                     <?php
@@ -1122,20 +1122,20 @@ class Generator
             </div>
         </div>
 
-        <div class="d-flex justify-content-between mb-3">
+        <div class="d-flex justify-content-between mb-3 js-actions-wrapper">
             <div>
-                <a class="btn btn-primary"
+                <a class="btn btn-primary js-add-row-button"
                    href="edit.php?cat=<?= $table ?>&act=add">
                     <i class="fa fa-plus-circle"></i>
                     Добавить запись
                 </a>
             </div>
 
-            <div>
+            <div class="js-custom-actions-wrapper">
 
                 <?php if (!empty($_GET['get_column']) || !empty($_GET['custom_filters'])) {
                     ?>
-                    <a class="btn btn-outline-secondary"
+                    <a class="btn btn-outline-secondary js-clear-filters"
                        href="list.php?cat=<?= $table ?>">
                         <i class="fa fa-eraser"></i>
                         Сбросить фильтры
@@ -1145,7 +1145,7 @@ class Generator
 
                 <?php if (!empty($all_delete_button)) {
                     ?>
-                    <a class="btn btn-danger"
+                    <a class="btn btn-danger js-clear-table"
                        href="save.php?cat=<?= $table ?>&act=clear"
                        onclick="return navConfirm(this.href, 'The Table will be cleared! Continue?');">
                         <i class="fa fa-ban"></i>
@@ -1153,15 +1153,19 @@ class Generator
                     </a>
                     <?php
                 } ?>
+
+                <div class="js-custom-actions">
+
+                </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12 ">
+        <div class="row js-table-wrapper">
+            <div class="col-12 js-table-wrapper-inner">
                 <table id="serverside"
-                       class="table table-striped table-bordered display "
+                       class="table table-striped table-bordered display js-serverside-table"
                        style="width:100%">
-                    <thead>
+                    <thead class="js-table-header-wrapper">
                     <tr>
                         <th class="no-sort">
                             Действие
@@ -1176,20 +1180,20 @@ class Generator
                     </tr>
                     </thead>
 
-                    <tfoot>
-                    <tr>
-                        <th>Поиск <br>
-                            <span class='text-danger'>(не менее 3-5 символов)
-                            </span>
-                        </th>
-                        <?php foreach ($columns as $column) {
-                            ?>
-                            <th>
-                                <?= $column ?>
+                    <tfoot class="js-table-footer">
+                        <tr class="js-table-footer-search-wrapper">
+                            <th>Поиск <br>
+                                <span class='text-danger'>(не менее 3-5 символов)
+                                </span>
                             </th>
-                            <?php
-                        } ?>
-                    </tr>
+                            <?php foreach ($columns as $column) {
+                                ?>
+                                <th>
+                                    <?= $column ?>
+                                </th>
+                                <?php
+                            } ?>
+                        </tr>
                     </tfoot>
                 </table>
             </div>
