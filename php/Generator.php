@@ -401,9 +401,8 @@ class Generator
                          aria-labelledby="json_editor_content<?= $input_key ?>-tab">
 
                         <?php
-						$min_height = 200;
-                        $length = !empty($input_value) ? mb_strlen($input_value) : $min_height;
-                      
+                        $length = mb_strlen($input_value);
+                        $min_height = 200;
                         if ($length > 300) {
                             $min_height = 400;
                         }
