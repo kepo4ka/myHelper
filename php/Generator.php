@@ -364,7 +364,7 @@ class Generator
      * @return bool
      */
     public static function genJsonEditor(
-        $db_name, $table, $input_key, $input_value, $is_bad = false, $title = ''
+            $db_name, $table, $input_key, $input_value, $is_bad = false, $title = ''
     )
     {
         if (mb_strtolower(DB::getColumnComment($db_name, $table, $input_key)) == 'json') {
@@ -372,6 +372,19 @@ class Generator
         }
 
         $title = $title ?: Helper::readableText($input_key);
+
+        if ($is_bad) {
+            $title .= ' <label>
+                <?= $title ?> (<b
+                        class="text-warning font-weight-bold">JSON</b>)
+            </label>';
+
+            $title .= '<small for="" class="text-danger">
+                    Значение имеет невалидный json, поэтому форматирование не применено
+                </small>';
+            self::genTextarea($input_key, $input_value, true, $title);
+            return;
+        }
 
         ?>
 
@@ -381,14 +394,6 @@ class Generator
                 <?= $title ?> (<b
                         class='text-warning font-weight-bold'>JSON</b>)
             </label>
-
-            <?php if ($is_bad) {
-                ?>
-                <small for="" class="text-danger">
-                    Значение поля имело неверный формат, поэтому было сброшено!
-                </small>
-                <?php
-            } ?>
 
             <div class="tab-content"
                  id="json_container_<?= $input_key ?>Content">
@@ -401,9 +406,9 @@ class Generator
                          aria-labelledby="json_editor_content<?= $input_key ?>-tab">
 
                         <?php
-						$min_height = 200;
+                        $min_height = 200;
                         $length = !empty($input_value) ? mb_strlen($input_value) : $min_height;
-                      
+
                         if ($length > 300) {
                             $min_height = 400;
                         }
