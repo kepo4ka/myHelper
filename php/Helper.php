@@ -951,7 +951,7 @@ class Helper
         if (is_array($val)) {
             return $val;
         }
-		
+
 		if (null === $val) {
 			return null;
 		}
@@ -1366,11 +1366,18 @@ class Helper
      */
     public static function checkJson($str)
     {
-        if (null == $str) {
+        if (!is_string($str) || empty(trim($str))) {
             return false;
         }
-        $json = json_decode($str);
-        return $json && $str != $json;
+
+        // Для PHP 8.3+ используем встроенную функцию json_validate()
+        if (function_exists('json_validate')) {
+            return json_validate($str);
+        }
+
+        // Для более старых версий PHP используем традиционный метод
+        json_decode($str);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     /**
@@ -1965,7 +1972,7 @@ class Helper
 
     /**
      * Отправить сообщение в Telegram с возможностью добавления кнопок-ссылок
-     * 
+     *
      * @param mixed $message Текст сообщения или массив данных
      * @param string|null $token Токен бота
      * @param string|null $chatID ID чата
@@ -2002,7 +2009,7 @@ class Helper
             $ch, CURLOPT_URL,
             'https://api.telegram.org/bot' . $token . '/sendMessage'
         );
-        
+
         $postFields = array(
             'chat_id' => $chatID,
             'text' => $message,
@@ -2013,12 +2020,12 @@ class Helper
         // Добавляем клавиатуру со ссылками, если она передана
         if (!empty($keyboard) && is_array($keyboard)) {
             $inline_keyboard = array();
-            
+
             // Если передан одиночный элемент (не массив массивов)
             if (isset($keyboard['title'])) {
                 $keyboard = array($keyboard);
             }
-            
+
             foreach ($keyboard as $button) {
                 if (!empty($button['title']) && !empty($button['link'])) {
                     $inline_keyboard[] = array(
@@ -2029,7 +2036,7 @@ class Helper
                     );
                 }
             }
-            
+
             if (!empty($inline_keyboard)) {
                 $postFields['reply_markup'] = array(
                     'inline_keyboard' => $inline_keyboard
