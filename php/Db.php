@@ -591,7 +591,9 @@ CREATE TABLE `$table` (
   `type` varchar(20) NOT NULL,
   `data` text NOT NULL,
   `site` varchar(25) NOT NULL,
-  `proccess_id` varchar(20) NOT NULL
+  `proccess_id` varchar(20) NOT NULL,
+  `count` int(10) unsigned NOT NULL DEFAULT 1,
+  `fingerprint` char(32) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
 ";
 
@@ -603,7 +605,8 @@ ALTER TABLE `$table`
   ADD KEY `date` (`date`),
   ADD KEY `title` (`title`),
   ADD KEY `type` (`type`),
-  ADD KEY `proccess_id` (`proccess_id`); 
+  ADD KEY `proccess_id` (`proccess_id`),
+  ADD UNIQUE KEY `uq_fingerprint` (`fingerprint`); 
 ALTER TABLE `$table`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
 
@@ -614,6 +617,25 @@ ALTER TABLE `$table`
         } catch (Exception $exception) {
             return false;
         }
+    }
+
+    /**
+     * Build fingerprint for similar debug/error log entries.
+     */
+    public static function buildLogFingerprint(
+        string $title,
+        string $type,
+        string $site,
+        $file,
+        $line,
+    ): string {
+        return md5(implode('|', [
+            $title,
+            $type,
+            $site,
+            (string)$file,
+            (string)$line,
+        ]));
     }
 
     /**
@@ -658,17 +680,7 @@ ALTER TABLE `$table`
         self::reconnect();
 
         try {
-            $count = $meDoo->count($table);
             $primary = 'id';
-
-            if ($count > $limit) {
-
-                $id = @$meDoo->get($table, ['id'])['id'];
-
-                if (!empty($id)) {
-                    self::deleteRow($table, $primary, $id);
-                }
-            }
 
             if (!is_array($data)) {
                 $data = [$data];
@@ -685,8 +697,41 @@ ALTER TABLE `$table`
             @$element['file'] = $file;
             @$element['line'] = $line;
 
+            $fingerprint = self::buildLogFingerprint(
+                (string)$title,
+                (string)$type,
+                (string)$site,
+                $file,
+                $line,
+            );
+            $element['fingerprint'] = $fingerprint;
+            $element['count'] = 1;
 
-            $saved = self::save($element, $table, $primary);
+            $existing = $meDoo->get($table, ['id'], ['fingerprint' => $fingerprint]);
+
+            if (!empty($existing['id'])) {
+                $saved = $meDoo->update($table, [
+                    'count[+]' => 1,
+                    'date'     => date('Y-m-d H:i:s'),
+                    'data'     => $element['data'],
+                    'class'    => $class,
+                    'method'   => $method,
+                    'site'     => $site,
+                    'proccess_id' => $proccess_id,
+                ], ['id' => $existing['id']]);
+            } else {
+                $row_count = $meDoo->count($table);
+
+                if ($row_count > $limit) {
+                    $id = @$meDoo->get($table, ['id'])['id'];
+
+                    if (!empty($id)) {
+                        self::deleteRow($table, $primary, $id);
+                    }
+                }
+
+                $saved = self::save($element, $table, $primary);
+            }
 
             self::disconnect();
 
@@ -711,7 +756,7 @@ ALTER TABLE `$table`
         }
 
         $filter = [
-            'ORDER' => ['id' => 'DESC'],
+            'ORDER' => ['date' => 'DESC', 'id' => 'DESC'],
             'LIMIT' => $limit
         ];
 
