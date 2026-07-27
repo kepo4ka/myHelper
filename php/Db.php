@@ -621,6 +621,7 @@ ALTER TABLE `$table`
 
     /**
      * Build fingerprint for similar debug/error log entries.
+     * $body — JSON payload (data column); same call site with different body = different row.
      */
     public static function buildLogFingerprint(
         string $title,
@@ -628,6 +629,7 @@ ALTER TABLE `$table`
         string $site,
         $file,
         $line,
+        $body = '',
     ): string {
         return md5(implode('|', [
             $title,
@@ -635,6 +637,7 @@ ALTER TABLE `$table`
             $site,
             (string)$file,
             (string)$line,
+            (string)$body,
         ]));
     }
 
@@ -703,6 +706,7 @@ ALTER TABLE `$table`
                 (string)$site,
                 $file,
                 $line,
+                $element['data'],
             );
             $element['fingerprint'] = $fingerprint;
             $element['count'] = 1;
