@@ -15,6 +15,9 @@ class Db
 
     public static $db;
 
+    /** @var array<string, array> кэш справочников в пределах одного запроса */
+    private static $get_all_ordered_cache = [];
+
     public function __construct(
         $host, $db_name, $user, $password, $charset = 'utf8mb4'
     )
@@ -130,6 +133,10 @@ class Db
     /**
      * Получить отсортированные данные из таблицы
      *
+     * Результат кэшируется на время запроса: справочники запрашиваются в циклах отрисовки
+     * (например, Generator::genTableSelectBox зовёт этот метод на каждую строку списка),
+     * а данные за один запрос не меняются.
+     *
      * @param $table  string Исходная таблица
      * @param $column string Столбец, по которому идёт сортировка
      *
@@ -137,8 +144,15 @@ class Db
      */
     public static function getAllOrdered($table, $column)
     {
+        $cache_key = $table . ':' . $column;
+
+        if (array_key_exists($cache_key, self::$get_all_ordered_cache)) {
+            return self::$get_all_ordered_cache[$cache_key];
+        }
+
         global $meDoo;
-        return $meDoo->select($table, '*', ['ORDER' => [$column => 'DESC']]);
+
+        return self::$get_all_ordered_cache[$cache_key] = $meDoo->select($table, '*', ['ORDER' => [$column => 'DESC']]);
     }
 
     /**
